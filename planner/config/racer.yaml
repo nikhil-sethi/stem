@@ -1,0 +1,21 @@
+# State machine update frequency (Hz)
+loop_frequency: 50
+
+# Lab bounds (m)
+lab_bounds: [6, 5, 2]
+
+# Distance threshold for reaching a desired position
+dist_thres: 0.1
+
+# Desired positions in 3D space
+pos:
+  takeoff: [0, 0, 0.5]
+  start: [0, 0, 0.5]
+  goal: [0, 0, 1]
+  land: [0, 0, 0.1]
+
+# Usage of external planner and/or controller during mission execution phase
+use_external_controller: true
+
+# Print debug information
+enable_debug: true

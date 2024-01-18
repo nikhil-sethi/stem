@@ -6,9 +6,12 @@
     <arg name="odometry_topic" default="/mavros/odometry/in" />
     <arg name="drone_num" default="1" />
     <arg name="drone_id" default="1" />
+    <arg name="depth_topic" default="/iris_depth_camera/camera/depth/image_raw"/>
     <arg name="init_x"/>
     <arg name="init_y"/>
     <arg name="init_z"/> 
+
+    <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10"/>
 
     <!-- Planner -->
     <include file="$(find exploration_manager)/launch/single_drone_exploration.xml">
@@ -21,12 +24,14 @@
         <arg name="map_size_z" value="$(arg map_size_z)"/>
         <arg name="odom_prefix" value="$(arg odom_prefix)"/>
         <arg name="odometry_topic" value="$(arg odometry_topic)"/>
-        <arg name="depth_topic" value="/iris_depth_camera/camera/depth/image_raw"/>
+        <arg name="depth_topic" value="$(arg depth_topic)"/>
         <arg name="cloud_topic" value="drone_0/sem_cloud"/>
         <arg name="sem_cloud_topic" value="drone_0/sem_cloud"/>
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
         <arg name="drone_num" value="$(arg drone_num)"/>
         <arg name="simulation" value="false"/>
+
+        <!-- Got these from gazebo camera info topic -->
         <arg name="cx" value="424.5"/>
         <arg name="cy" value="240.5"/>
         <arg name="fx" value="454.68577"/>

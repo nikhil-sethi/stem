@@ -1,25 +1,39 @@
 <launch>
-    <arg name="odometry_topic" value="drone_0/odom" />
-    <arg name="init_x"   value="1"/>
-    <arg name="init_y"   value="1"/>
-    <arg name="init_z"   value="0.1"/> 
+    <arg name="odometry_topic" default="mavros/local_position/odom" />
+    <arg name="init_x"   default="1"/>
+    <arg name="init_y"   default="1"/>
+    <arg name="init_z"   default="0.1"/> 
+    <arg name="init_R"   default="0"/>
+    <arg name="init_P"   default="0"/>
+    <arg name="init_Y"   default="0"/> 
+
     <arg name="gui" default="false" />
+    <arg name="world" default="/root/.gazebo/experiment3.world"/>
+    <arg name="vehicle" default="iris_depth_camera"/>
+    <arg name="sim" default="true"/>
 
-    <!-- Simulator and flight controller -->
-    <include file="$(find simulator)/launch/simulator.launch">
-        <arg name="init_x"   value="$(arg init_x)"/>
-        <arg name="init_y"   value="$(arg init_y)"/>
-        <arg name="init_z"   value="$(arg init_z)"/> 
-        <arg name="odometry_topic"   value="$(arg odometry_topic)"/> 
+    <!-- firmware -->
+    <include file="$(find px4_tools)/launch/px4_tools.launch">
+        <arg name="sim"   value="$(arg sim)"/>
+        <arg name="x"   value="$(arg init_x)"/>
+        <arg name="y"   value="$(arg init_y)"/>
+        <arg name="z"   value="$(arg init_z)"/> 
+        <arg name="R"   value="$(arg init_R)"/>
+        <arg name="P"   value="$(arg init_P)"/>
+        <arg name="Y"   value="$(arg init_Y)"/> 
+
         <arg name="gui"   value="$(arg gui)"/> 
+        <arg name="world" value="$(arg world)"/>
+        <arg name="vehicle" value="$(arg vehicle)"/>
+        <arg name="px4_control_interface_param_file" value="$(find planner)/config/racer.yaml"/>
     </include>
 
-    <include file="$(find planner)/launch/planner.launch">
+    <!-- Planner -->
+    <include file="$(find planner)/launch/racer.launch">
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
-        <arg name="init_z"   value="$(arg init_z)"/> 
+        <arg name="init_z"   value="$(arg init_z)"/>
+        <arg name="depth_topic" value="/iris_depth_camera/camera/depth/image_raw"/> 
     </include>
-
-    
 
 </launch>
