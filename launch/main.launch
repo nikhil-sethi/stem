@@ -1,0 +1,25 @@
+<launch>
+    <arg name="odometry_topic" value="drone_0/odom" />
+    <arg name="init_x"   value="1"/>
+    <arg name="init_y"   value="1"/>
+    <arg name="init_z"   value="0.1"/> 
+    <arg name="gui" default="false" />
+
+    <!-- Simulator and flight controller -->
+    <include file="$(find simulator)/launch/simulator.launch">
+        <arg name="init_x"   value="$(arg init_x)"/>
+        <arg name="init_y"   value="$(arg init_y)"/>
+        <arg name="init_z"   value="$(arg init_z)"/> 
+        <arg name="odometry_topic"   value="$(arg odometry_topic)"/> 
+        <arg name="gui"   value="$(arg gui)"/> 
+    </include>
+
+    <include file="$(find planner)/launch/planner.launch">
+        <arg name="init_x"   value="$(arg init_x)"/>
+        <arg name="init_y"   value="$(arg init_y)"/>
+        <arg name="init_z"   value="$(arg init_z)"/> 
+    </include>
+
+    
+
+</launch>

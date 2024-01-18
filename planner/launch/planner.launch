@@ -1,0 +1,37 @@
+<launch>
+    <arg name="map_size_x" default="6"/>
+    <arg name="map_size_y" default="5"/>
+    <arg name="map_size_z" default=" 2"/>
+    <arg name="odom_prefix" value="/state_ukf/odom" />
+    <arg name="odometry_topic" default="/mavros/odometry/in" />
+    <arg name="drone_num" default="1" />
+    <arg name="drone_id" default="1" />
+    <arg name="init_x"/>
+    <arg name="init_y"/>
+    <arg name="init_z"/> 
+
+    <!-- Planner -->
+    <include file="$(find exploration_manager)/launch/single_drone_exploration.xml">
+        <arg name="drone_id" value="$(arg drone_id)"/>
+        <arg name="init_x"   value="$(arg init_x)"/>
+        <arg name="init_y"   value="$(arg init_y)"/>
+        <arg name="init_z"   value="$(arg init_z)"/> 
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+        <arg name="odom_prefix" value="$(arg odom_prefix)"/>
+        <arg name="odometry_topic" value="$(arg odometry_topic)"/>
+        <arg name="depth_topic" value="/iris_depth_camera/camera/depth/image_raw"/>
+        <arg name="cloud_topic" value="drone_0/sem_cloud"/>
+        <arg name="sem_cloud_topic" value="drone_0/sem_cloud"/>
+        <arg name="sensor_pose_topic" value="drone_0/camera"/>
+        <arg name="drone_num" value="$(arg drone_num)"/>
+        <arg name="simulation" value="false"/>
+        <arg name="cx" value="424.5"/>
+        <arg name="cy" value="240.5"/>
+        <arg name="fx" value="454.68577"/>
+        <arg name="fy" value="424.5"/>
+
+      </include>
+
+</launch>
