@@ -1,6 +1,6 @@
 import rospy
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseStamped, Quaternion
+from geometry_msgs.msg import PoseStamped,Pose, Quaternion
 from std_srvs.srv import Trigger, TriggerResponse, Empty
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 import time
@@ -27,7 +27,7 @@ class BaseInterface:
         rospy.init_node(node_name, anonymous=True)
 
         self.odom_sub = rospy.Subscriber("/mavros/local_position/odom", Odometry, callback = self.odom_callback)
-
+        self.pose = PoseStamped()
         self.pose_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
         self.rate = rospy.Rate(50)  # 10 Hz
 
@@ -38,7 +38,9 @@ class BaseInterface:
         self.reset_gazebo_client_ = rospy.ServiceProxy("/gazebo/reset_world", Empty);
 
         self.planner = BasePlanner()
-        self.start_pose = [0, 0, 0.1, 0]
+        self.start_pose = [0, 0, 0.5, 0]
+
+        rospy.sleep(0.5) # for callbacks to get updated before things get inherited
 
     def sanity_checks(self):
         if self.planner.end_mission:
@@ -66,9 +68,15 @@ class BaseInterface:
         self.autopilot_ctrl = res.success
 
     def odom_callback(self, msg):
-        self.position = [msg.pose.pose.position.x,msg.pose.pose.position.y,msg.pose.pose.position.z]
-        quat = [msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
-        self.orientation = euler_from_quaternion(quat)
+        # just for easy accesses
+        # self.pose = msg.pose
+        self.pose_header = msg.header
+        self.position = msg.pose.pose.position
+        self.orientation = msg.pose.pose.orientation
+        # self.vel
+        # self.position = [msg.pose.pose.position.x,msg.pose.pose.position.y,msg.pose.pose.position.z]
+        # quat = [msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
+        # self.orientation = euler_from_quaternion(quat)
         # self.velocity = msg.twist.twist.linear_velocity
 
     def send_pose_command(self, x, y, z, yaw_degrees):
@@ -87,15 +95,23 @@ class BaseInterface:
         self.pose_pub.publish(pose_msg)
 
     def run(self):
-        while not rospy.is_shutdown() and not self.planner.end_mission:
-            self.sanity_checks()
-            if self.ready:
-                x, y, z, yaw = self.planner.target_pose()
+        try:
+            while not rospy.is_shutdown() and not self.planner.end_mission:
+                self.sanity_checks()
+                if self.ready:
+                    x, y, z, yaw = self.planner.target_pose()
+                    print(x, y, z, yaw)
+                else:
+                    x, y, z, yaw = self.start_pose
+                
                 self.send_pose_command(x, y, z, yaw)
 
-        
-            self.rate.sleep()
-        
+                self.rate.sleep()
+            self.mission_finished_client_.call()
+        except KeyboardInterrupt:
+            self.mission_finished_client_.call()
+        finally:
+            raise
         rospy.loginfo("Exiting cleanly.")
 
 

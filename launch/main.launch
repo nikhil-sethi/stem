@@ -1,12 +1,11 @@
 <launch>
-    <arg name="odometry_topic" default="mavros/local_position/odom" />
     <arg name="init_x"   default="1"/>
     <arg name="init_y"   default="1"/>
     <arg name="init_z"   default="0.1"/> 
     <arg name="init_R"   default="0"/>
     <arg name="init_P"   default="0"/>
     <arg name="init_Y"   default="0"/> 
-
+    
     <arg name="gui" default="false" />
     <arg name="world" default="/root/.gazebo/experiment3.world"/>
     <arg name="vehicle" default="iris_depth_camera"/>
@@ -33,7 +32,9 @@
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
-        <arg name="depth_topic" value="/iris_depth_camera/camera/depth/image_raw"/> 
+        <arg name="depth_topic" value="iris_depth_camera/camera/depth/image_raw"/> 
+        <arg name="odometry_topic" value="mavros/local_position/odom"/>
+        <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>
 
 </launch>
