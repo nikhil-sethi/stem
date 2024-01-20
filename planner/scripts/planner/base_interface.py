@@ -1,13 +1,15 @@
 import rospy
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseStamped,Pose, Quaternion
+from geometry_msgs.msg import PoseStamped,Pose, Quaternion, Point
 from std_srvs.srv import Trigger, TriggerResponse, Empty
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
+import tf
 import time
+
 
 class BasePlanner:
     def __init__(self, *args, **kwargs) -> None:
-        # self.active = True
+        self.ready = True
         self.end_mission = False
 
     def target_pose(self) -> tuple:
@@ -27,6 +29,9 @@ class BaseInterface:
         rospy.init_node(node_name, anonymous=True)
 
         self.odom_sub = rospy.Subscriber("/mavros/local_position/odom", Odometry, callback = self.odom_callback)
+        self.t = tf.TransformListener(True)
+        
+        self.odom_pub = rospy.Publisher('drone/odom', Odometry, queue_size=10)
         self.pose = PoseStamped()
         self.pose_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
         self.rate = rospy.Rate(50)  # 10 Hz
@@ -55,6 +60,8 @@ class BaseInterface:
     def start_mission(self, req:Trigger):
         
         self.autopilot_ctrl = False
+        self.sanity_checks()
+
         response = TriggerResponse()
         response.success = self.ready
         if self.ready:
@@ -69,19 +76,29 @@ class BaseInterface:
 
     def odom_callback(self, msg):
         # just for easy accesses
+        odom_msg = msg
+        self.t.waitForTransform("map", "odom", rospy.Time(), rospy.Duration(4.0))
+        # try:
+        self.position, self.orientation = self.t.lookupTransform("map", "odom", rospy.Time())
+        odom_msg.pose.pose.position = Point(*self.position)
+        odom_msg.pose.pose.orientation = Quaternion(*self.orientation)
         # self.pose = msg.pose
         self.pose_header = msg.header
         self.position = msg.pose.pose.position
         self.orientation = msg.pose.pose.orientation
+        # except:
+        #     pass
         # self.vel
         # self.position = [msg.pose.pose.position.x,msg.pose.pose.position.y,msg.pose.pose.position.z]
         # quat = [msg.pose.pose.orientation.x,msg.pose.pose.orientation.y,msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]
         # self.orientation = euler_from_quaternion(quat)
         # self.velocity = msg.twist.twist.linear_velocity
 
+        self.odom_pub.publish(odom_msg)
+
     def send_pose_command(self, x, y, z, yaw_degrees):
         pose_msg = PoseStamped()
-        pose_msg.header.frame_id = "base_link"
+        pose_msg.header.frame_id = "world"
         pose_msg.header.stamp = rospy.Time.now()
         pose_msg.pose.position.x = x
         pose_msg.pose.position.y = y
@@ -100,7 +117,6 @@ class BaseInterface:
                 self.sanity_checks()
                 if self.ready:
                     x, y, z, yaw = self.planner.target_pose()
-                    print(x, y, z, yaw)
                 else:
                     x, y, z, yaw = self.start_pose
                 

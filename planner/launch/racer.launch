@@ -1,12 +1,12 @@
 <launch>
-    <arg name="map_size_x" default="6"/>
+    <arg name="map_size_x" default="6.2"/>
     <arg name="map_size_y" default="5"/>
     <arg name="map_size_z" default=" 2"/>
     <arg name="odometry_topic" default="mavros/local_position/odom" />
     <arg name="depth_topic" default="iris_depth_camera/camera/depth/image_raw"/>
     <arg name="sensor_pose_topic" default="drone_0/camera"/>
-    <arg name="init_x" default="0"/>
-    <arg name="init_y" default="0"/>
+    <arg name="init_x" default="1"/>
+    <arg name="init_y" default="1"/>
     <arg name="init_z" default="1"/> 
 
     <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10"/>
@@ -23,8 +23,6 @@
         <arg name="odom_prefix" value="/state_ukf/odom"/>
         <arg name="odometry_topic" value="$(arg odometry_topic)"/>
         <arg name="depth_topic" value="$(arg depth_topic)"/>
-        <arg name="cloud_topic" value="drone_0/sem_cloud"/>
-        <arg name="sem_cloud_topic" value="drone_0/sem_cloud"/>
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
         <arg name="simulation" value="true"/>
 
