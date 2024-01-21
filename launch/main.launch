@@ -37,4 +37,7 @@
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>
 
+    <!-- planner-simulator interface -->
+    <node name="planner_if" type="racer_if.py" pkg="planner"/>
+
 </launch>
