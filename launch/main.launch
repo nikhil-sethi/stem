@@ -32,7 +32,7 @@
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
-        <arg name="depth_topic" value="iris_depth_camera/camera/depth/image_raw"/> 
+        <arg name="depth_topic" value="drone1/depth/image_rect_raw"/> 
         <arg name="odometry_topic" value="mavros/local_position/odom"/>
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>

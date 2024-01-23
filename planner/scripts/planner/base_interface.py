@@ -45,7 +45,7 @@ class BaseInterface:
         self.planner = BasePlanner()
         self.start_pose = [0, 0, 0.5, 0]
 
-        rospy.sleep(0.5) # for callbacks to get updated before things get inherited
+        rospy.sleep(2) # for callbacks to get updated before things get inherited. depends highly on how fast your system is
 
     def sanity_checks(self):
         if self.planner.end_mission:

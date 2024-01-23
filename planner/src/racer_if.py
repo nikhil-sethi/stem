@@ -11,6 +11,8 @@ from planner.base_interface import BaseInterface, BasePlanner
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np
+import tf
+import tf2_ros
 
 class RacerPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
@@ -62,14 +64,17 @@ class RacerInterface(BaseInterface):
         sensor_pose = PoseStamped()
         sensor_pose.header.stamp = rospy.Time.now()
         sensor_pose.header.frame_id = "world"
-        self.t.waitForTransform("world", "drone_0/camera", rospy.Time(), rospy.Duration(4.0))
-        pos, quat = self.t.lookupTransform("world", "drone_0/camera", rospy.Time())
+        try:
+            self.t.waitForTransform("world", "drone_0/camera", rospy.Time(), rospy.Duration(8.0))
+            pos, quat = self.t.lookupTransform("world", "drone_0/camera", rospy.Time())
 
-        sensor_pose.pose.position = Point(*pos)
-        sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
-        sensor_pose.pose.orientation = Quaternion(*quat)
-        self.sensor_pose_publisher.publish(sensor_pose)
-
+            sensor_pose.pose.position = Point(*pos)
+            sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
+            sensor_pose.pose.orientation = Quaternion(*quat)
+            self.sensor_pose_publisher.publish(sensor_pose)
+        except tf2_ros.TransformException:
+            print("Tf returned a tranform error. Trying again..")
+            pass
 
     def sanity_checks(self):
         self.ready = super().sanity_checks()*self.planner.ready

@@ -3,7 +3,7 @@
     <arg name="map_size_y" default="5"/>
     <arg name="map_size_z" default=" 2"/>
     <arg name="odometry_topic" default="mavros/local_position/odom" />
-    <arg name="depth_topic" default="iris_depth_camera/camera/depth/image_raw"/>
+    <arg name="depth_topic" default="drone1/depth/image_rect_raw"/>
     <arg name="sensor_pose_topic" default="drone_0/camera"/>
     <arg name="init_x" default="1"/>
     <arg name="init_y" default="1"/>
@@ -26,11 +26,11 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
         <arg name="simulation" value="true"/>
 
-        <!-- Got these from gazebo camera info topic -->
-        <arg name="cx" value="424.5"/>
-        <arg name="cy" value="240.5"/>
-        <arg name="fx" value="454.68577"/>
-        <arg name="fy" value="424.5"/>
+        <!-- Got these from drone1/depth/camera_info -->
+        <arg name="cx" value="211.4328"/>
+        <arg name="cy" value="121.2307"/>
+        <arg name="fx" value="213.8786"/>
+        <arg name="fy" value="213.8786"/>
 
       </include>
 
