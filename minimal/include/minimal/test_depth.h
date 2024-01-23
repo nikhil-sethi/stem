@@ -21,24 +21,22 @@ class TestDepth{
         SynchronizerImagePose sync_image_pose_;
         ros::Publisher depth_pub_;
         shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> depth_sub_;
+        shared_ptr<message_filters::Subscriber<geometry_msgs::PoseStamped>> pose_sub_;
+
+        ros::Subscriber pose_test_sub_;
+        ros::Subscriber depth_test_sub_;
         vector<Eigen::Vector3d> proj_points_;
-        ros::NodeHandle node_;
+        // ros::NodeHandle node_;
 
     public:
-        TestDepth();
+        TestDepth(ros::NodeHandle nh);
+        void poseCallback(const geometry_msgs::PoseStampedConstPtr& pose);
+        void depthCallback(const sensor_msgs::ImageConstPtr& img);
 
-        // void MapROS::depthPoseCallback(
-        //         const sensor_msgs::ImageConstPtr& img, const geometry_msgs::PoseStampedConstPtr& pose);
+        void depthPoseCallback(const sensor_msgs::ImageConstPtr& img, const geometry_msgs::PoseStampedConstPtr& pose);
 
         // void MapROS::processDepthImage();
         
         // void MapROS::publishDepth();
 
 };
-
-
-int main(int argc, char **argv){
-    uint8_t a = 5;
-    int b = 4;
-    std::cout<<a+b<<std::endl;    
-}

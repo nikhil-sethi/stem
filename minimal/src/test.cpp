@@ -9,12 +9,13 @@ class Test{
         Test(ros::NodeHandle nh){
             node_ = nh;
             sensor_pose_pub = node_.advertise<geometry_msgs::PoseStamped>("/drone0/camera", 10);
-            timer = nh.createTimer(ros::Duration(0.1), Test::pose_callback);
+            timer = nh.createTimer(ros::Duration(0.1), &Test::pose_callback, this);
         }
         ros::Publisher sensor_pose_pub;
         ros::Timer timer;
-    
-    void pose_callback(){
+        ros::NodeHandle node_;
+
+    void pose_callback(const ros::TimerEvent&){
     
         geometry_msgs::PoseStamped sensor_pose = geometry_msgs::PoseStamped();
         sensor_pose.header.frame_id = "world";
@@ -29,9 +30,7 @@ class Test{
         sensor_pose_pub.publish(sensor_pose);
 
     }
-
-
-}
+};
 
 
 
@@ -39,12 +38,12 @@ int main(int argc, char **argv){
     
     ros::init(argc, argv, "test");
     ros::NodeHandle nh;
-    test Test;
+    Test test(nh);
     
     fast_planner::MapROS* mr = new fast_planner::MapROS();
     mr->setNode(nh);
     mr->init();
-
+    ROS_ERROR("asfdgadfg");
     ros::Duration(1.0).sleep();
     ros::spin();
 
