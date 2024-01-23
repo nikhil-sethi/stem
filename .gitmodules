@@ -1,0 +1,18 @@
+[submodule "drone_toolbox"]
+	path = drone_toolbox
+	url = https://github.com/cor-drone-dev/drone_toolbox
+    branch = nikhil/main
+
+[submodule "drone_toolbox_ext_control_template"]
+	path = drone_toolbox_ext_control_template
+	url = https://github.com/cor-drone-dev/drdrone_toolbox_ext_control_template
+
+[submodule "mav_comm"]
+	path = mav_comm
+	url = https://github.com/ethz-asl/mav_comm
+
+
+[submodule "RACER"]
+	path = RACER
+	url = https://github.com/nikhil-sethi/RACER
+    branch = new_lab
