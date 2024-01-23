@@ -10,6 +10,8 @@
     <arg name="world" default="/root/.gazebo/experiment3.world"/>
     <arg name="vehicle" default="iris_depth_camera"/>
     <arg name="sim" default="true"/>
+    <arg name="planner" default="racer"/>
+
 
     <!-- firmware -->
     <include file="$(find px4_tools)/launch/px4_tools.launch">
@@ -28,7 +30,8 @@
     </include>
 
     <!-- Planner -->
-    <include file="$(find planner)/launch/racer.launch">
+
+    <include if="$(eval arg('planner') == 'racer')" file="$(find planner)/launch/racer.launch">
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
@@ -36,8 +39,8 @@
         <arg name="odometry_topic" value="mavros/local_position/odom"/>
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>
-
+    
     <!-- planner-simulator interface -->
-    <node name="planner_if" type="racer_if.py" pkg="planner"/>
+    <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" launch-prefix="xterm -e"/>
 
 </launch>

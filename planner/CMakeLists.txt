@@ -159,8 +159,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  src/drone_teleop.py
+  src/teleop_if.py
   src/racer_if.py
+  src/attention_map.py
   scripts/planner/base_interface.py
   src/key_teleop.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
