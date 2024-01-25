@@ -123,7 +123,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-  ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include
 )
 
 ## Declare a C++ library
@@ -140,8 +140,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node 
-  src/test.cpp
-  # src/test_depth.cpp
+  # src/test.cpp
+  src/test_depth.cpp
   )
 
 ## Rename C++ executable without prefix

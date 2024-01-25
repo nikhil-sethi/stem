@@ -13,6 +13,8 @@ from cv_bridge import CvBridge
 import numpy as np
 import tf
 import tf2_ros
+import time
+
 
 class RacerPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
@@ -62,7 +64,7 @@ class RacerInterface(BaseInterface):
 
     def sensor_pose_cb(self, event):
         sensor_pose = PoseStamped()
-        sensor_pose.header.stamp = rospy.Time.now()
+        sensor_pose.header.stamp = rospy.Time.from_sec(time.time())
         sensor_pose.header.frame_id = "world"
         try:
             self.t.waitForTransform("world", "drone_0/camera", rospy.Time(), rospy.Duration(8.0))

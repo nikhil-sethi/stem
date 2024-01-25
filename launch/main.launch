@@ -10,6 +10,7 @@
     <arg name="world" default="/root/.gazebo/experiment3.world"/>
     <arg name="vehicle" default="iris_depth_camera"/>
     <arg name="sim" default="true"/>
+    <param name="sim" value="$(arg sim)">
 
     <!-- firmware -->
     <include file="$(find px4_tools)/launch/px4_tools.launch">
@@ -32,7 +33,7 @@
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
-        <arg name="depth_topic" value="drone1/depth/image_rect_raw"/> 
+        <arg name="depth_topic" value="camera/depth/image_rect_raw"/> 
         <arg name="odometry_topic" value="mavros/local_position/odom"/>
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>
