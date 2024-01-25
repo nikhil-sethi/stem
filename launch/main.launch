@@ -10,20 +10,19 @@
     <arg name="world" default="/root/.gazebo/experiment3.world"/>
     <arg name="vehicle" default="iris_depth_camera"/>
     <arg name="sim" default="true"/>
-    <param name="sim" value="$(arg sim)">
+    <param name="sim" value="$(arg sim)"/>
 
     <!-- firmware -->
     <include file="$(find px4_tools)/launch/px4_tools.launch">
         <arg name="sim"   value="$(arg sim)"/>
-        <arg name="x"   value="$(arg init_x)"/>
-        <arg name="y"   value="$(arg init_y)"/>
-        <arg name="z"   value="$(arg init_z)"/> 
-        <arg name="R"   value="$(arg init_R)"/>
-        <arg name="P"   value="$(arg init_P)"/>
-        <arg name="Y"   value="$(arg init_Y)"/> 
-
-        <arg name="gui"   value="$(arg gui)"/> 
-        <arg name="world" value="$(arg world)"/>
+        <arg if="$(arg sim)" name="x"   value="$(arg init_x)"/>
+        <arg if="$(arg sim)" name="y"   value="$(arg init_y)"/>
+        <arg if="$(arg sim)" name="z"   value="$(arg init_z)"/> 
+        <arg if="$(arg sim)" name="R"   value="$(arg init_R)"/>
+        <arg if="$(arg sim)" name="P"   value="$(arg init_P)"/>
+        <arg if="$(arg sim)" name="Y"   value="$(arg init_Y)"/> 
+        <arg if="$(arg sim)" name="gui"   value="$(arg gui)"/> 
+        <arg if="$(arg sim)" name="world" value="$(arg world)"/>
         <arg name="vehicle" value="$(arg vehicle)"/>
         <arg name="px4_control_interface_param_file" value="$(find planner)/config/racer.yaml"/>
     </include>
@@ -33,12 +32,15 @@
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
-        <arg name="depth_topic" value="camera/depth/image_rect_raw"/> 
+        
+        <arg if="$(arg sim)" name="depth_topic" value="iris_depth_camera/camera/depth/image_raw"/> 
+        <arg unless="$(arg sim)" name="depth_topic" value="camera/depth/image_rect_raw"/> 
+
         <arg name="odometry_topic" value="mavros/local_position/odom"/>
         <arg name="sensor_pose_topic" value="drone_0/camera"/>
     </include>
 
     <!-- planner-simulator interface -->
-    <node name="planner_if" type="racer_if.py" pkg="planner"/>
+    <node name="planner_if" type="racer_if.py" pkg="planner" output="screen"/>
 
 </launch>

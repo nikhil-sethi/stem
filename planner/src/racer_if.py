@@ -21,7 +21,7 @@ class RacerPlanner(BasePlanner):
         super().__init__()
         self.cmd_sub = rospy.Subscriber("planning/pos_cmd_1", PositionCommand, callback = self.cmd_cb)
         self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
-        self.ready = False
+        self.ready = True
 
     def cmd_cb(self, msg):
         self.ready = True
@@ -64,7 +64,14 @@ class RacerInterface(BaseInterface):
 
     def sensor_pose_cb(self, event):
         sensor_pose = PoseStamped()
-        sensor_pose.header.stamp = rospy.Time.from_sec(time.time())
+
+        # correctly set stamp so that message filter sync works with racer
+        if self.sim:
+            stamp = rospy.Time.now() # because gazebo depth cam starts from 0
+        else:
+            stamp = rospy.Time.from_sec(time.time()) # because realsense depth cam uses unix time
+        sensor_pose.header.stamp = stamp
+        
         sensor_pose.header.frame_id = "world"
         try:
             self.t.waitForTransform("world", "drone_0/camera", rospy.Time(), rospy.Duration(8.0))

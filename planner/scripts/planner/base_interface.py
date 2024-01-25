@@ -27,7 +27,7 @@ class BaseInterface:
 
     def __init__(self, node_name="base_interface") -> None:
         rospy.init_node(node_name, anonymous=True)
-
+        self.sim = rospy.get_param("simulation", default=True)
         self.odom_sub = rospy.Subscriber("/mavros/local_position/odom", Odometry, callback = self.odom_callback)
         self.t = tf.TransformListener(True)
         
