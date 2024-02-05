@@ -1,7 +1,7 @@
 <launch>
-    <arg name="init_x"   default="3"/>
-    <arg name="init_y"   default="1"/>
-    <arg name="init_z"   default="0.1"/> 
+    <arg name="init_x"   default="-4.2"/>
+    <arg name="init_y"   default="-0.06"/>
+    <arg name="init_z"   default="0"/> 
     <arg name="init_R"   default="0"/>
     <arg name="init_P"   default="0"/>
     <arg name="init_Y"   default="0"/> 
@@ -10,11 +10,18 @@
     <arg name="world" default="/root/.gazebo/experiment3.world"/>
     <arg name="vehicle" default="iris_depth_camera"/>
     <arg name="sim" default="true"/>
+    <arg name="planner" default="racer"/>
+    
     <param name="sim" value="$(arg sim)"/>
 
     <!-- firmware -->
     <include file="$(find px4_tools)/launch/px4_tools.launch">
+        <!-- common -->
         <arg name="sim"   value="$(arg sim)"/>
+        <arg name="vehicle" value="$(arg vehicle)"/>
+        <arg name="px4_control_interface_param_file" value="$(find planner)/config/racer.yaml"/>
+
+        <!-- simulation -->
         <arg if="$(arg sim)" name="x"   value="$(arg init_x)"/>
         <arg if="$(arg sim)" name="y"   value="$(arg init_y)"/>
         <arg if="$(arg sim)" name="z"   value="$(arg init_z)"/> 
@@ -23,12 +30,22 @@
         <arg if="$(arg sim)" name="Y"   value="$(arg init_Y)"/> 
         <arg if="$(arg sim)" name="gui"   value="$(arg gui)"/> 
         <arg if="$(arg sim)" name="world" value="$(arg world)"/>
-        <arg name="vehicle" value="$(arg vehicle)"/>
-        <arg name="px4_control_interface_param_file" value="$(find planner)/config/racer.yaml"/>
+        
+        <!-- Real world -->
+        <arg unless="$(arg sim)" name="fcu_url" value="/dev/ttyUSB0:921600" />
+        <arg unless="$(arg sim)" name="gcs_url" value="udp-b://@" />
+        <!-- <arg unless="$(arg sim)" name="machine_name" value="mantis1"/> -->
+        <arg unless="$(arg sim)" name="machine_address" value="mantis1"/>
+        
     </include>
 
     <!-- Planner -->
-    <include file="$(find planner)/launch/racer.launch">
+    <!-- <include  file="$(find planner)/launch/localizer.launch">
+        <arg if="$(arg sim)" name="pose_topic" value="/mavros/local_position/pose"/>
+        <arg unless="$(arg sim)" name="pose_topic" value="/mavros/vision_pose/pose"/>
+    </include>  -->
+
+    <include if="$(eval arg('planner') == 'racer')" file="$(find planner)/launch/racer.launch">
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>

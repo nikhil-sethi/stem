@@ -24,7 +24,7 @@ def getKey():
 
 class KeyboardPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
-        self.pos_tol = 0.2
+        self.pos_tol = 0.1
         self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
         super().__init__()
 

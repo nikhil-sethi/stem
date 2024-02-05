@@ -43,7 +43,7 @@ class BaseInterface:
         self.reset_gazebo_client_ = rospy.ServiceProxy("/gazebo/reset_world", Empty);
 
         self.planner = BasePlanner()
-        self.start_pose = [0, 0, 0.5, 0]
+        self.start_pose = [0, 0, 1, 0] # TODO get this from the yaml or it could be dangerous
 
         rospy.sleep(2) # for callbacks to get updated before things get inherited. depends highly on how fast your system is
 
