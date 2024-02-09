@@ -1,6 +1,6 @@
 <launch>
-    <arg name="init_x"   default="3"/>
-    <arg name="init_y"   default="1"/>
+    <arg name="init_x"   default="0"/>
+    <arg name="init_y"   default="0"/>
     <arg name="init_z"   default="0.1"/> 
     <arg name="init_R"   default="0"/>
     <arg name="init_P"   default="0"/>
@@ -15,7 +15,7 @@
     <param name="sim" value="$(arg sim)"/>
 
     <!-- firmware -->
-    <include file="$(find px4_tools)/launch/px4_tools.launch">
+    <include if="$(arg sim)" file="$(find px4_tools)/launch/px4_tools.launch">
         <arg name="sim"   value="$(arg sim)"/>
         <arg if="$(arg sim)" name="x"   value="$(arg init_x)"/>
         <arg if="$(arg sim)" name="y"   value="$(arg init_y)"/>
@@ -35,15 +35,15 @@
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
-        
+        <arg name="sim"   value="$(arg sim)"/>
         <arg if="$(arg sim)" name="depth_topic" value="iris_depth_camera/camera/depth/image_raw"/> 
         <arg unless="$(arg sim)" name="depth_topic" value="camera/depth/image_rect_raw"/> 
 
         <arg name="odometry_topic" value="mavros/local_position/odom"/>
-        <arg name="sensor_pose_topic" value="drone_0/camera"/>
+        <arg name="sensor_pose_topic" value="camera/pose"/>
     </include>
     
     <!-- planner-simulator interface -->
-    <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" launch-prefix="xterm -e"/>
+    <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" output="screen"/>
 
 </launch>

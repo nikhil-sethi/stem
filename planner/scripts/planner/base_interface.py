@@ -44,6 +44,8 @@ class BaseInterface:
 
         self.planner = BasePlanner()
         self.start_pose = [0, 0, 0.5, 0]
+        self.position = [0,0,0]
+        self.orientation = [0,0,0]
 
         rospy.sleep(0.5) # for callbacks to get updated before things get inherited
 
@@ -80,6 +82,8 @@ class BaseInterface:
         self.t.waitForTransform("map", "odom", rospy.Time(), rospy.Duration(4.0))
         # try:
         self.position, self.orientation = self.t.lookupTransform("map", "odom", rospy.Time())
+        # self.yaw = 
+        # print(self.yaw)
         odom_msg.pose.pose.position = Point(*self.position)
         odom_msg.pose.pose.orientation = Quaternion(*self.orientation)
         # self.pose = msg.pose
@@ -117,11 +121,13 @@ class BaseInterface:
                 self.sanity_checks()
                 if self.ready:
                     x, y, z, yaw = self.planner.target_pose()
-                else:
-                    x, y, z, yaw = self.start_pose
-                
-                self.send_pose_command(x, y, z, yaw)
+                # else:
+                #     x, y, z = self.position
+                #     yaw = euler_from_quaternion(self.orientation)[2] 
+                    # x, y, z, yaw = self.start_pose
 
+                    self.send_pose_command(x, y, z, yaw)
+                
                 self.rate.sleep()
             self.mission_finished_client_.call()
         except KeyboardInterrupt:

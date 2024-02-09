@@ -12,13 +12,14 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np
 import time
+from std_srvs.srv import Trigger
 
 class RacerPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.cmd_sub = rospy.Subscriber("planning/pos_cmd_1", PositionCommand, callback = self.cmd_cb)
         self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
-        self.ready = True
+        self.ready = False
 
     def cmd_cb(self, msg):
         self.ready = True
@@ -36,13 +37,19 @@ class RacerInterface(BaseInterface):
         super().__init__("racer_interface")
 
         self.planner = RacerPlanner(start_pose = self.start_pose)
-        self.sensor_pose_publisher = rospy.Publisher(f"drone_0/camera", PoseStamped, queue_size=1)
+        self.sensor_pose_publisher = rospy.Publisher(f"camera/pose", PoseStamped, queue_size=1)
         self.sensor_pose_timer = rospy.Timer(rospy.Duration(0.01), self.sensor_pose_cb)
+
+        self.trigger = rospy.Publisher(f"/move_base_simple/goal", PoseStamped, queue_size=1)
 
         self.cv_bridge = CvBridge()        
         # self.depth_sub = rospy.Subscriber("iris_depth_camera/camera/depth/image_raw", Image, self.depth_mod_cb)
         # self.depth_mod_publisher = rospy.Publisher("drone/img_dep", Image, queue_size=10)
         
+    def start_mission(self, req:Trigger):
+        msg = PoseStamped()
+        self.trigger.publish(msg)
+        return super().start_mission(req)
 
     def depth_mod_cb(self, msg):
         "Cut depth map and republish. Racer needs this to detect frontiers"
@@ -69,15 +76,17 @@ class RacerInterface(BaseInterface):
             stamp = rospy.Time.from_sec(time.time()) # because realsense depth cam uses unix time
         sensor_pose.header.stamp = stamp
         
-        sensor_pose.header.frame_id = "world"
-        self.t.waitForTransform("world", "drone_0/camera", rospy.Time(), rospy.Duration(4.0))
-        pos, quat = self.t.lookupTransform("world", "drone_0/camera", rospy.Time())
+        # try:
+        sensor_pose.header.frame_id = "map"
+        self.t.waitForTransform("map", "camera_link", rospy.Time(), rospy.Duration(4.0))
+        pos, quat = self.t.lookupTransform("map", "camera_link", rospy.Time())
 
         sensor_pose.pose.position = Point(*pos)
-        sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
+        # sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
         sensor_pose.pose.orientation = Quaternion(*quat)
         self.sensor_pose_publisher.publish(sensor_pose)
-
+        # except:
+        #     pass
 
     def sanity_checks(self):
         self.ready = super().sanity_checks()*self.planner.ready

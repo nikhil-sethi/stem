@@ -163,7 +163,6 @@ catkin_install_python(PROGRAMS
   src/racer_if.py
   src/attention_map.py
   scripts/planner/base_interface.py
-  src/key_teleop.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
