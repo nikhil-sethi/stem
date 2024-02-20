@@ -19,10 +19,10 @@ class RacerPlanner(BasePlanner):
         super().__init__()
         self.cmd_sub = rospy.Subscriber("planning/pos_cmd_1", PositionCommand, callback = self.cmd_cb)
         self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
-        self.ready = False
+        self.ready = False 
 
     def cmd_cb(self, msg):
-        self.ready = True
+        # self.ready = True
         self.x = msg.position.x
         self.y = msg.position.y
         self.z = msg.position.z
@@ -47,9 +47,13 @@ class RacerInterface(BaseInterface):
         # self.depth_mod_publisher = rospy.Publisher("drone/img_dep", Image, queue_size=10)
         
     def start_mission(self, req:Trigger):
+        res = super().start_mission(req)
+
         msg = PoseStamped()
         self.trigger.publish(msg)
-        return super().start_mission(req)
+        self.planner.ready = True
+
+        return res
 
     def depth_mod_cb(self, msg):
         "Cut depth map and republish. Racer needs this to detect frontiers"
@@ -87,7 +91,7 @@ class RacerInterface(BaseInterface):
         self.sensor_pose_publisher.publish(sensor_pose)
         # except:
         #     pass
-
+    
     def sanity_checks(self):
         self.ready = super().sanity_checks()*self.planner.ready
 

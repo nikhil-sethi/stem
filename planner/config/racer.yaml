@@ -9,10 +9,10 @@ dist_thres: 0.1
 
 # Desired positions in 3D space
 pos:
-  takeoff: [-2.2, -2.2, 0.5]
-  start: [-2.2, -2.2, 0.5]
-  goal: [-2.2, -2.2, 0.5]
-  land: [-2.2, -2.2, 0.1]
+  takeoff: [-2, -1, 1]
+  start:   [-2, -1, 1]
+  goal:    [-2, -1, 1]
+  land:    [-2, -1, 1]
 
 # Usage of external planner and/or controller during mission execution phase
 use_external_controller: true
