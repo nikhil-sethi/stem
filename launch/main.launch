@@ -86,4 +86,6 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
+    <node name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true"/>
+
 </launch>

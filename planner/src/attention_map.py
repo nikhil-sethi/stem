@@ -11,14 +11,14 @@ class NoName():
     def __init__(self) -> None:
         rospy.init_node("noname")
 
-        res = (480,640)
+        res = (480,848)
         self.arr_att = np.zeros(res)
         self.fig, self.ax = plt.subplots()
         self.im = self.ax.imshow(self.arr_att, animated=True, origin='upper',cmap='jet', extent=[0, res[1], res[0],0], vmax=1, vmin=0) # the vmax vmin is important so that inital colour range is set. 
         self.bridge = CvBridge()
 
-        cam_sub = rospy.Subscriber("/iris_depth_camera/camera/rgb/image_raw", Image, self.cam_callback, queue_size=10)
-        self.att_pub = rospy.Publisher("attention_map", Image, queue_size=10)
+        cam_sub = rospy.Subscriber("/mantis/camera/rgb/image_raw", Image, self.cam_callback, queue_size=10)
+        self.att_pub = rospy.Publisher("attention_map/2d", Image, queue_size=10)
 
         # att_timer = rospy.Timer(rospy.Duration(0.1), self.att_map_publisher)
         
@@ -83,11 +83,12 @@ def get_attention_map(rgb_image):
     arr_att[arr_att<0.31]=0
     return arr_att
 
+# class FakeAttention
 
 if __name__=="__main__":
-    # arr = plt.imread("../view.png")
+    # arr = plt.imread("/root/thesis_ws/src/thesis/planner/view2.png")
     # arr_att = get_attention_map(arr)
-    # plt.imshow(arr, cmap='jet')
+    # plt.imshow(arr_att, cmap='jet')
 
     # plt.show()
 

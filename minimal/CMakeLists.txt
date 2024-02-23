@@ -8,15 +8,11 @@ project(minimal)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  geometry_msgs
-  image_transport
-  pcl_ros
-  roscpp
-  rospy
   sensor_msgs
+  cv_bridge
+  roscpp
   std_msgs
-  plan_env
+  image_transport
 )
 
 ## System dependencies are found with CMake's conventions
