@@ -98,13 +98,13 @@ class FakeEKFOriginLocalizer{
 class FakeVisionLocalizer
 {
 public:
-    FakeVisionLocalizer()
+    FakeVisionLocalizer(ros::NodeHandle& nh)
     {
         // Subscribe to the odometry topic
-        odom_sub_ = nh_.subscribe("/gazebo/ground_truth/odom", 10, &FakeVisionLocalizer::odomCallback, this);
+        odom_sub_ = nh.subscribe("/gazebo/ground_truth/odom", 10, &FakeVisionLocalizer::odomCallback, this);
 
         // Advertise the PoseStamped topic
-        pose_stamped_pub_ = nh_.advertise<geometry_msgs::PoseStamped>("/mavros/vision_pose/pose", 10);
+        pose_stamped_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/mavros/vision_pose/pose", 10);
     }
 
     void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "fake_localization");
     ros::NodeHandle nh("~");
     // Create an instance of the OdometryToPoseStamped class
-    FakeEKFOriginLocalizer localizer(nh);
+    FakeVisionLocalizer localizer(nh);
 
     // Spin to process callbacks
     ros::spin();

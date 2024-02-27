@@ -13,6 +13,58 @@ from cv_bridge import CvBridge
 import numpy as np
 import time
 from std_srvs.srv import Trigger
+import sys, select, termios, tty
+
+
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+class KeyboardPlanner(BasePlanner):
+    def __init__(self, *args, **kwargs):
+        self.pos_tol = 0.2
+        self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
+        super().__init__()
+
+    def target_pose(self):
+        key = getKey()
+        # print(key)
+        if key == '+':  # thrist increase
+            self.z += self.pos_tol
+        elif key == '-': # thrust decrease
+            self.z += -self.pos_tol
+        # NUMPAD ON!
+        elif key == '4': # left
+            self.y += self.pos_tol
+        elif key == '6': # right
+            self.y += -self.pos_tol
+        elif key == '8': # forward
+            self.x += self.pos_tol
+        elif key == '2': # backward
+            self.x += -self.pos_tol
+        elif key == '7':
+            self.yaw += 10.0 # yaw ccw
+        elif key == '9':
+            self.yaw += -10.0 # yaw cw
+
+        elif key == 'q': # mission end
+            self.end_mission = True
+
+        elif key == 'r': # reset gazebo
+            res = self.reset_gazebo_client_.call()                            
+            
+        elif key == '\x03': # ctrl-c
+            self.end_mission = True
+
+        return self.x, self.y, self.z, self.yaw
+
 
 class RacerPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
@@ -37,6 +89,7 @@ class RacerInterface(BaseInterface):
         super().__init__("racer_interface")
 
         self.planner = RacerPlanner(start_pose = self.start_pose)
+        # self.planner = KeyboardPlanner(start_pose = self.start_pose)  # enable this if you want all planning to happen but use control yourself
         self.sensor_pose_publisher = rospy.Publisher(f"camera/pose", PoseStamped, queue_size=1)
         self.sensor_pose_timer = rospy.Timer(rospy.Duration(0.01), self.sensor_pose_cb)
 
@@ -96,9 +149,12 @@ class RacerInterface(BaseInterface):
         self.ready = super().sanity_checks()*self.planner.ready
 
 if __name__ == "__main__":
+    settings = termios.tcgetattr(sys.stdin)
     racer_interface = RacerInterface()
     
     try:
         racer_interface.run()
     except Exception as e:
         print(e)
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)

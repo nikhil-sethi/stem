@@ -15,8 +15,10 @@
     <arg name="sim_name" default="sitl"/>
     <arg name="vehicle" default="mantis"/>
     
-    <arg name="odometry_topic" default="/mavros/local_position/odom"/>
-    <!-- <arg unless="$(arg sim)" name="odometry_topic" default="/mavros/local_position/odom"/> -->
+    <!-- <arg name="odometry_topic" default="/mavros/local_position/odom"/> -->
+    
+    <!-- enable for perfect odometry -->
+    <arg name="odometry_topic" default="/gazebo/ground_truth/odom"/>
 
     <arg name="sensor_pose_topic" default="/camera/pose"/>
     <!-- <arg if="$(eval sim_name=='perfect')" name="odometry_topic" value="/state_ukf/odom_1"/> -->
@@ -32,6 +34,7 @@
     <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="screen">
         <rosparam command="load" file="$(find planner)/config/racer.yaml"/>
         <param name="is_sim" value="$(arg sim)"/>
+        <param name="odometry_topic" value="$(arg odometry_topic)"/>
     </node>
 
     <!-- simulator -->
@@ -62,16 +65,14 @@
             <param name="init_y" value="$(arg init_y)"/>
             <param name="init_z" value="$(arg init_z)"/>
         </node>
-
-            <!-- drone toolbox template -->
-        <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" output="screen" required="true"/>
-            
-
-
     </group>
 
+    <!-- drone toolbox template -->
+    <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" output="screen" required="true" launch-prefix="xterm -e"/>
+            
+
     <!-- Planner -->
-    <include if="$(eval arg('planner') == 'racer')" file="$(find planner)/launch/racer.launch">
+    <include file="$(find planner)/launch/racer.launch">
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
