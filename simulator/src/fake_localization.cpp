@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "fake_localization");
     ros::NodeHandle nh("~");
     // Create an instance of the OdometryToPoseStamped class
-    FakeVisionLocalizer localizer(nh);
+    FakeEKFOriginLocalizer localizer(nh);
 
     // Spin to process callbacks
     ros::spin();

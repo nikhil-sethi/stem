@@ -13,12 +13,12 @@
     <arg name="sim" default="true"/>
     <arg name="planner" default="racer"/>
     <arg name="sim_name" default="sitl"/>
-    <arg name="vehicle" default="mantis"/>
+    <arg name="vehicle" default="iris_depth_camera"/>
     
-    <!-- <arg name="odometry_topic" default="/mavros/local_position/odom"/> -->
+    <arg name="odometry_topic" default="/mavros/local_position/odom"/>
     
     <!-- enable for perfect odometry -->
-    <arg name="odometry_topic" default="/gazebo/ground_truth/odom"/>
+    <!-- <arg name="odometry_topic" default="/gazebo/ground_truth/odom"/> -->
 
     <arg name="sensor_pose_topic" default="/camera/pose"/>
     <!-- <arg if="$(eval sim_name=='perfect')" name="odometry_topic" value="/state_ukf/odom_1"/> -->
@@ -51,7 +51,7 @@
             <arg name="vehicle" value="$(arg vehicle)"/>
             <arg name="world" value="/root/.gazebo/experiment3.world"/>
             <arg name="gui" value="$(arg gui)" />
-            <arg name="sdf" value="/root/.gazebo/models/mantis_depth_camera/mantis_depth_camera.sdf"/>
+            <!-- <arg name="sdf" value="/root/.gazebo/models/$(arg vehicle)_depth_camera/$(arg vehicle)_depth_camera.sdf"/> -->
             
             <!-- mavros args -->
             <!-- <arg name="fcu_url" value="udp://@10.43.0.225:14540"/> -->
@@ -72,7 +72,7 @@
             
 
     <!-- Planner -->
-    <include file="$(find planner)/launch/racer.launch">
+    <!-- <include file="$(find planner)/launch/racer.launch">
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="$(arg init_z)"/>
@@ -85,8 +85,21 @@
         <arg name="odometry_topic" value="$(arg odometry_topic)"/>
         <arg name="depth_topic" value="$(arg depth_topic)"/>
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
+    </include> -->
+
+    <include file="$(find planner)/launch/fuel.launch">
+        <arg name="init_x"   value="$(arg init_x)"/>
+        <arg name="init_y"   value="$(arg init_y)"/>
+        <arg name="init_z"   value="1"/>
+        <arg name="map_size_x" value="$(arg map_size_x)"/>
+        <arg name="map_size_y" value="$(arg map_size_y)"/>
+        <arg name="map_size_z" value="$(arg map_size_z)"/>
+
+        <arg name="odometry_topic" value="$(arg odometry_topic)"/>
+        <arg name="depth_topic" value="$(arg depth_topic)"/>
+        <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
-    <node name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true"/>
+    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true"/>
 
 </launch>

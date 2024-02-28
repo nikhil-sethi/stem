@@ -17,7 +17,7 @@ class NoName():
         self.im = self.ax.imshow(self.arr_att, animated=True, origin='upper',cmap='jet', extent=[0, res[1], res[0],0], vmax=1, vmin=0) # the vmax vmin is important so that inital colour range is set. 
         self.bridge = CvBridge()
 
-        cam_sub = rospy.Subscriber("/mantis/camera/rgb/image_raw", Image, self.cam_callback, queue_size=10)
+        cam_sub = rospy.Subscriber("camera/rgb/image_raw", Image, self.cam_callback, queue_size=10)
         self.att_pub = rospy.Publisher("attention_map/2d", Image, queue_size=10)
 
         # att_timer = rospy.Timer(rospy.Duration(0.1), self.att_map_publisher)
@@ -54,7 +54,7 @@ def get_attention_map(rgb_image):
     # top down attention (red patches)
     rgb_image /=255
     arr_red = rgb_image[:,:,0]-(rgb_image[:,:,1] + rgb_image[:,:,2])
-    arr_red = (arr_red + 0.5)/(1.5)
+    # arr_red = (arr_red + 0.5)/(1.5)
 
     arr_blur = gaussian_filter(arr_red, sigma=5)
     # arr_blur = (arr_blur - arr_blur.min())/(arr_blur.max() - arr_blur.min())
@@ -66,8 +66,8 @@ def get_attention_map(rgb_image):
     # print((arr_red>0).shape)
     # geometry (edges, occlusions), happens partially in 3d
     arr_seg = arr_red.copy()
-    arr_seg[arr_red<0.5] = 0
-    arr_seg[arr_red>0.5] = 1
+    arr_seg[arr_red<0.0] = 0
+    # arr_seg[arr_red>0.5] = 1
     mode = 'nearest'
     sobel_h = sobel(arr_seg, 0, mode=mode)  # horizontal gradient
     sobel_v = sobel(arr_seg, mode = mode)  # vertical gradient
@@ -81,7 +81,7 @@ def get_attention_map(rgb_image):
     arr_att = gaussian_filter(arr_att, sigma=3)      
     arr_att = gaussian_filter(arr_att, sigma=5)    
     arr_att[arr_att<0.31]=0
-    return arr_att
+    return arr_seg
 
 # class FakeAttention
 

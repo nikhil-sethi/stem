@@ -69,7 +69,7 @@ class KeyboardPlanner(BasePlanner):
 class RacerPlanner(BasePlanner):
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.cmd_sub = rospy.Subscriber("planning/pos_cmd_1", PositionCommand, callback = self.cmd_cb)
+        self.cmd_sub = rospy.Subscriber("planning/pos_cmd", PositionCommand, callback = self.cmd_cb)
         self.x, self.y, self.z,  self.yaw  = kwargs["start_pose"]
         self.ready = False 
 
