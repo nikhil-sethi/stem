@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   visualization_msgs
   common_msgs
+  plan_env
   
 )
 find_package(PCL 1.7 REQUIRED)

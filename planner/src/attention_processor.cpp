@@ -14,34 +14,61 @@
 #include <Eigen/Eigen>
 #include <traj_utils/planning_visualization.h>
 #include <common_msgs/uint8List.h>
+#include <plan_env/sdf_map.h>
+#include <memory>
 
+using namespace Eigen;
 struct Object{
+    int id;
     pcl::PointCloud<pcl::PointXYZI> points;
     float max_gain;
-    pcl::PointXYZI bbox_min;
-    pcl::PointXYZI bbox_max;
+    Eigen::Vector3d bbox_min_;
+    Eigen::Vector3d bbox_max_;
+    Eigen::Vector3d centroid_;
+    vector<Eigen::Vector3d> viewpoint_candidates;
 
     void computeInfo(){
         if (points.size() == 0) return;
+        pcl::PointXYZI bbox_min;
+        pcl::PointXYZI bbox_max;
         pcl::getMinMax3D(points, bbox_min, bbox_max); 
+        bbox_min_ = Eigen::Vector3d(bbox_min.x, bbox_min.y, bbox_min.z);
+        bbox_max_ = Eigen::Vector3d(bbox_max.x, bbox_max.y, bbox_max.z);
 
+        centroid_ = bbox_min_ + bbox_max_;
+        
     }
 };
+
+// class fast_planner::SDFMap;
+
 class AttentionMap{
+    friend fast_planner::SDFMap;
     public:
         AttentionMap(ros::NodeHandle& nh);
         void attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
         void occCallback(const common_msgs::uint8List& msg);
+        void occInflateCallback(const common_msgs::uint8List& msg);
         void findViewpoints(Object& object);
-        void loop();
+        void loopTimer(const ros::TimerEvent& event);
+        bool isNearUnknown(const Eigen::Vector3d& pos);
+        uint8_t getOccupancy(const Eigen::Vector3i& id);
+        uint8_t getOccupancy(const Eigen::Vector3d& pos);
+        void visualize(Object& object);
+
 
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_;
         ros::Publisher clustered_point_cloud_pub, bbox_pub;
+        ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
-        std::vector<uint8_t> occupancy_buffer;
+        std::vector<uint8_t> occupancy_buffer_;
+        std::vector<uint8_t> occupancy_inflate_buffer;
+        std::unique_ptr<fast_planner::SDFMap> sdf_map_;
+        double resolution_;
+        double min_candidate_clearance_;
 };
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh){
@@ -50,14 +77,49 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh){
     clustered_point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/3d_clustered", 1);
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
     
+    
+
+    // create sdf map separate instance just for function reuse
+    sdf_map_.reset(new fast_planner::SDFMap);
+    sdf_map_->setParams(nh, "exploration_manager/");
+    
+    resolution_ = sdf_map_->getResolution();
+    min_candidate_clearance_ = nh.param("/exploration_manager/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
+    loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
     viz = fast_planner::PlanningVisualization(nh);
     
 }
 
-void AttentionMap::loop(){
+void AttentionMap::visualize(Object& object){
+
+    // === Object bounding box
+    viz.drawBox((object.bbox_min_ + object.bbox_max_)/2.0, object.bbox_max_ - object.bbox_min_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(object.id), object.id, 7);
+
+    // === Enclosed point cloud with attention
+    // sensor_msgs::PointCloud2 cluster_msg;
+    // pcl::toROSMsg(*object.points, cluster_msg);
+    // clustered_point_cloud_pub.publish(cluster_msg);
+
+    // === Viewpoint candidates
+    
+    viz.drawSpheres(object.viewpoint_candidates, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
+    // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
+    // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
+    // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
+  
+}
+
+void AttentionMap::loopTimer(const ros::TimerEvent& event){
     // for each object
         // find top viewpoints
         // calculate optimal local tour
+
+    for (Object& object: objects){
+        findViewpoints(object);
+        ROS_INFO("obj %d, num viewpts: %d", object.id, object.viewpoint_candidates.size());
+        visualize(object);
+    }
+    
 }
 
 void AttentionMap::findViewpoints(Object& object){
@@ -71,13 +133,25 @@ void AttentionMap::findViewpoints(Object& object){
 
     // 
 
-
+    // Evaluate sample viewpoints on circles, find ones that cover most cells
+    for (double rc = 1, dr = (1.5 - 1.0) / 3; rc <= 1.5 + 1e-3; rc += dr)
+        for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
+            const Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
+            
+            if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
+                continue;
+            object.viewpoint_candidates.push_back(sample_pos);
+        }
 }       
 
 
 
 void AttentionMap::occCallback(const common_msgs::uint8List& msg){
-    occupancy_buffer = msg.data;
+    occupancy_buffer_ = msg.data;
+}
+
+void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
+    sdf_map_->md_->occupancy_buffer_inflate_ = msg.data;
 }
 
 
@@ -99,7 +173,7 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     ec.setMinClusterSize(10);    // Set the minimum cluster size (adjust as needed)
     ec.setMaxClusterSize(25000);   // Set the maximum cluster size (adjust as needed)
     ec.extract(cluster_indices);
-    ROS_INFO("%d", cluster_indices.size());
+    ROS_INFO("num obj: %d", cluster_indices.size());
     objects.clear();
     int i = 0;
     for (const auto& cluster_index : cluster_indices) {
@@ -114,19 +188,38 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
         
         // create objects from clustered clouds
         Object object;
+        object.id = ++i;
         object.points = *cluster_cloud;
         object.computeInfo();
         objects.push_back(object);
-
-        // sensor_msgs::PointCloud2 cluster_msg;
-        // pcl::toROSMsg(*cluster_cloud, cluster_msg);
-        Eigen::Vector3d bbox_min = Eigen::Vector3d(object.bbox_min.x, object.bbox_min.y, object.bbox_min.z);
-        Eigen::Vector3d bbox_max = Eigen::Vector3d(object.bbox_max.x, object.bbox_max.y, object.bbox_max.z);
-
-        // clustered_point_cloud_pub.publish(cluster_msg);
-        viz.drawBox((bbox_min+bbox_max)/2.0, bbox_max - bbox_min, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(i), ++i, 7);
-    
     }
+}
+
+
+// redefine functions for custom use
+
+bool AttentionMap::isNearUnknown(const Eigen::Vector3d& pos) {
+  const int vox_num = floor(min_candidate_clearance_ / resolution_);
+  for (int x = -vox_num; x <= vox_num; ++x)
+    for (int y = -vox_num; y <= vox_num; ++y)
+      for (int z = -1; z <= 1; ++z) {
+        Eigen::Vector3d vox;
+        vox << pos[0] + x * resolution_, pos[1] + y * resolution_, pos[2] + z * resolution_;
+        if (getOccupancy(vox) == fast_planner::SDFMap::UNKNOWN) return true;
+      }
+  return false;
+}
+
+
+inline uint8_t AttentionMap::getOccupancy(const Eigen::Vector3i& id) {
+  if (!sdf_map_->isInMap(id)) return -1;
+  return occupancy_buffer_[sdf_map_->toAddress(id)];
+}
+
+inline uint8_t AttentionMap::getOccupancy(const Eigen::Vector3d& pos) {
+  Eigen::Vector3i id;
+  sdf_map_->posToIndex(pos, id);
+  return getOccupancy(id);
 }
 
 

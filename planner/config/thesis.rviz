@@ -9,7 +9,6 @@ Panels:
         - /Robot1/Perception1/Attention map 2D1
         - /Environment1
         - /Environment1/Maps1
-        - /Environment1/Maps1/occupied_all11
         - /Environment1/Maps1/Attention map1
         - /Environment1/Exploration1/frontier11/Namespaces1
         - /Environment1/Exploration1/viewpoints1/viewpoint11
@@ -74,20 +73,21 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
+        base_link:
+          base_link_frd:
+            {}
+        camera_link:
+          {}
         map:
-          base_link:
-            base_link_frd:
-              {}
           map_ned:
             {}
-          odom:
-            camera_link:
-              {}
-            odom_ned:
-              {}
-          world:
-            navigation:
-              {}
+        navigation:
+          {}
+        odom:
+          odom_ned:
+            {}
+        world:
+          {}
       Update Interval: 0
       Value: true
     - Class: rviz/Group
@@ -290,7 +290,7 @@ Visualization Manager:
                   Marker Topic: /planning/travel_traj
                   Name: executed_traj1
                   Namespaces:
-                    "": true
+                    {}
                   Queue Size: 100
                   Value: true
                 - Class: rviz/Marker
@@ -298,7 +298,7 @@ Visualization Manager:
                   Marker Topic: /planning/position_cmd_vis
                   Name: position_cmd1
                   Namespaces:
-                    current_pose: true
+                    {}
                   Queue Size: 100
                   Value: true
                 - Class: rviz/Marker
@@ -340,7 +340,7 @@ Visualization Manager:
               Marker Topic: /planning_vis/trajectory
               Name: traj1
               Namespaces:
-                B-Spline: true
+                {}
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -587,7 +587,7 @@ Visualization Manager:
               Selectable: true
               Size (Pixels): 15
               Size (m): 0.10000000149011612
-              Style: Flat Squares
+              Style: Points
               Topic: /attention_map/3d
               Unreliable: false
               Use Fixed Frame: true
@@ -963,6 +963,7 @@ Visualization Manager:
             robot2: true
             robot3: true
           Value: true
+        Marker: true
         Others:
           AABB: true
           Pose: true
@@ -1020,6 +1021,14 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /map_vis/objects
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 63; 63; 60
@@ -1047,7 +1056,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 3.63883113861084
+      Distance: 6.081361293792725
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1055,17 +1064,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.04851645231246948
-        Y: -1.7937637567520142
-        Z: -2.7738837161450647e-05
+        X: -1.465653657913208
+        Y: -0.15377458930015564
+        Z: -2.5473860659985803e-05
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.394796371459961
+      Pitch: 0.39479583501815796
       Target Frame: <Fixed Frame>
-      Yaw: 4.420534610748291
+      Yaw: 3.3986973762512207
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 17.48538589477539
@@ -1189,5 +1198,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1268
-  X: 525
-  Y: 27
+  X: 275
+  Y: 313
