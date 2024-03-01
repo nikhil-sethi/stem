@@ -35,7 +35,7 @@ struct Object{
         bbox_min_ = Eigen::Vector3d(bbox_min.x, bbox_min.y, bbox_min.z);
         bbox_max_ = Eigen::Vector3d(bbox_max.x, bbox_max.y, bbox_max.z);
 
-        centroid_ = bbox_min_ + bbox_max_;
+        centroid_ = (bbox_min_ + bbox_max_)/2.0;
         
     }
 };
@@ -59,7 +59,7 @@ class AttentionMap{
 
     private:
         std::list<Object> objects;
-        ros::Subscriber att_3d_sub_, occ_sub_;
+        ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
         ros::Publisher clustered_point_cloud_pub, bbox_pub;
         ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
@@ -73,18 +73,19 @@ class AttentionMap{
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh){
     att_3d_sub_ = nh.subscribe("/attention_map/3d", 1, &AttentionMap::attCloudCallback, this);
-    occ_sub_ = nh.subscribe("/occupancy_map", 1, &AttentionMap::occCallback, this);
+    occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
+    occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     clustered_point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/3d_clustered", 1);
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
-    
-    
+
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
-    sdf_map_->setParams(nh, "exploration_manager/");
+    sdf_map_->setParams(nh, "/exploration_node/");
     
     resolution_ = sdf_map_->getResolution();
-    min_candidate_clearance_ = nh.param("/exploration_manager/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
+    std::cout << sdf_map_->mp_->box_mind_ << std::endl;
+    min_candidate_clearance_ = nh.param("/exploration_node/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
     viz = fast_planner::PlanningVisualization(nh);
     
@@ -116,7 +117,6 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
 
     for (Object& object: objects){
         findViewpoints(object);
-        ROS_INFO("obj %d, num viewpts: %d", object.id, object.viewpoint_candidates.size());
         visualize(object);
     }
     
@@ -137,7 +137,8 @@ void AttentionMap::findViewpoints(Object& object){
     for (double rc = 1, dr = (1.5 - 1.0) / 3; rc <= 1.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
             const Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
-            
+            // ROS_INFO("%d", sdf_map_->isInBox(sample_pos));
+            // std::cout<<sample_pos<<std::endl;
             if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
                 continue;
             object.viewpoint_candidates.push_back(sample_pos);
@@ -148,6 +149,7 @@ void AttentionMap::findViewpoints(Object& object){
 
 void AttentionMap::occCallback(const common_msgs::uint8List& msg){
     occupancy_buffer_ = msg.data;
+    // std::cout<<occupancy_buffer_.size()<<std::endl;
 }
 
 void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){

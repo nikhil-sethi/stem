@@ -16,8 +16,9 @@ class NoName():
         self.fig, self.ax = plt.subplots()
         self.im = self.ax.imshow(self.arr_att, animated=True, origin='upper',cmap='jet', extent=[0, res[1], res[0],0], vmax=1, vmin=0) # the vmax vmin is important so that inital colour range is set. 
         self.bridge = CvBridge()
-
-        cam_sub = rospy.Subscriber("camera/rgb/image_raw", Image, self.cam_callback, queue_size=10)
+        rgb_topic = rospy.get_param("~rgb_topic")
+        
+        cam_sub = rospy.Subscriber(rgb_topic, Image, self.cam_callback, queue_size=10)
         self.att_pub = rospy.Publisher("attention_map/2d", Image, queue_size=10)
 
         # att_timer = rospy.Timer(rospy.Duration(0.1), self.att_map_publisher)

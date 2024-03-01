@@ -30,12 +30,6 @@
     <param name="sim" value="$(arg sim)"/>
    
 
-    <!-- drone toolbox interface -->
-    <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="screen">
-        <rosparam command="load" file="$(find planner)/config/racer.yaml"/>
-        <param name="is_sim" value="$(arg sim)"/>
-        <param name="odometry_topic" value="$(arg odometry_topic)"/>
-    </node>
 
     <!-- simulator -->
     <group if="$(eval sim and sim_name=='sitl')">
@@ -65,6 +59,14 @@
             <param name="init_y" value="$(arg init_y)"/>
             <param name="init_z" value="$(arg init_z)"/>
         </node>
+
+        <!-- drone toolbox interface -->
+        <!-- This already runs onboard so only need it in sim -->
+        <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="screen">
+            <rosparam command="load" file="$(find planner)/config/racer.yaml"/>
+            <param name="is_sim" value="$(arg sim)"/>
+            <param name="odometry_topic" value="$(arg odometry_topic)"/>
+        </node>
     </group>
 
     <!-- drone toolbox template -->
@@ -88,6 +90,7 @@
     </include> -->
 
     <include file="$(find planner)/launch/fuel.launch">
+        <arg name="sim" value="$(arg sim)"/>
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
         <arg name="init_z"   value="1"/>
@@ -100,6 +103,9 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
-    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true"/>
+    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true">
+        <param unless="$(arg sim)" name="rgb_topic" value="/camera/color/image_raw"/>
+        <param if="$(arg sim)" name="rgb_topic" value="camera/rgb/image_raw"/>
+    </node>
 
 </launch>

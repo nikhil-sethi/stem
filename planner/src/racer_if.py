@@ -133,17 +133,17 @@ class RacerInterface(BaseInterface):
             stamp = rospy.Time.from_sec(time.time()) # because realsense depth cam uses unix time
         sensor_pose.header.stamp = stamp
         
-        # try:
-        sensor_pose.header.frame_id = "map"
-        self.t.waitForTransform("map", "camera_link", rospy.Time(), rospy.Duration(4.0))
-        pos, quat = self.t.lookupTransform("map", "camera_link", rospy.Time())
+        try:
+            sensor_pose.header.frame_id = "map"
+            self.t.waitForTransform("map", "camera_link", rospy.Time(), rospy.Duration(4.0))
+            pos, quat = self.t.lookupTransform("map", "camera_link", rospy.Time())
 
-        sensor_pose.pose.position = Point(*pos)
-        # sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
-        sensor_pose.pose.orientation = Quaternion(*quat)
-        self.sensor_pose_publisher.publish(sensor_pose)
-        # except:
-        #     pass
+            sensor_pose.pose.position = Point(*pos)
+            # sensor_pose.pose.position.z -= 0.2267 # compensation for the hovergames thing
+            sensor_pose.pose.orientation = Quaternion(*quat)
+            self.sensor_pose_publisher.publish(sensor_pose)
+        except:
+            pass
     
     def sanity_checks(self):
         self.ready = super().sanity_checks()*self.planner.ready
