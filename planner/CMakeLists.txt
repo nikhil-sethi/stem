@@ -2,16 +2,27 @@ cmake_minimum_required(VERSION 3.0.2)
 project(planner)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+set(CMAKE_BUILD_TYPE "Debug")
+# set(CMAKE_CXX_FLAGS "-std=c++11")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   geometry_msgs
+  sensor_msgs
+  traj_utils
   rospy
+  roscpp
+  visualization_msgs
+  common_msgs
+  plan_env
+  
 )
-
+find_package(PCL 1.7 REQUIRED)
+# find_package(traj_utils REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -104,7 +115,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES planner
-#  CATKIN_DEPENDS geometry_msgs rospy
+ CATKIN_DEPENDS geometry_msgs rospy traj_utils
 #  DEPENDS system_lib
 )
 
@@ -115,8 +126,10 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
+  SYSTEM
   ${catkin_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -132,7 +145,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/planner_node.cpp)
+add_executable(attention_processor_node src/attention_processor.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -145,9 +158,10 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(attention_processor_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+  )
 
 #############
 ## Install ##
@@ -159,10 +173,10 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  src/drone_teleop.py
+  src/teleop_if.py
   src/racer_if.py
+  src/attention_map.py
   scripts/planner/base_interface.py
-  src/key_teleop.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
