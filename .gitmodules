@@ -12,7 +12,7 @@
 	url = https://github.com/ethz-asl/mav_comm
 
 
-[submodule "RACER"]
-	path = RACER
-	url = https://github.com/nikhil-sethi/RACER
-    branch = new_lab
+[submodule "FUEL"]
+	path = FUEL
+	url = https://github.com/nikhil-sethi/FUEL
+    branch = devel

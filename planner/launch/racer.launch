@@ -9,9 +9,13 @@
     <arg name="init_y" default="1"/>
     <arg name="init_z" default="1"/> 
     <arg name="sim" default="false"/> 
+    <arg name="sim_name" default="'sitl'"/> 
 
     <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
-    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.1 0 0 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
+    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
+
+    <node if="$(eval sim_name=='perfect')" pkg ="map_generator" name ="map_pub" type ="map_pub" output = "screen" args="$(find map_generator)/resource/pillar.pcd">    
+    </node>
 
     <!-- Planner -->
     <include file="$(find exploration_manager)/launch/single_drone_exploration.xml">
@@ -25,14 +29,16 @@
         <arg name="odometry_topic" value="$(arg odometry_topic)"/>
         <arg name="depth_topic" value="$(arg depth_topic)"/>
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
-        <arg name="simulation" value="$(arg sim)"/>
+        <arg name="drone_id" value="1"/>
+        <arg name="drone_num" value="3"/>
+        <!-- Used to activate default racer perfect odometry simulator -->
+        <arg name="simulation" value="$(eval sim_name=='perfect')"/>
 
         <!-- Got these from gazebo camera info topic -->
-        
-        <arg if="$(arg sim)" name="cx" value="424.5"/>
-        <arg if="$(arg sim)" name="cy" value="240.5"/>
-        <arg if="$(arg sim)" name="fx" value="454.68577"/>
-        <arg if="$(arg sim)" name="fy" value="454.68577"/>
+        <arg if="$(eval sim_name=='sitl' and sim)" name="cx" value="424.5"/>
+        <arg if="$(eval sim_name=='sitl' and sim)" name="cy" value="240.5"/>
+        <arg if="$(eval sim_name=='sitl' and sim)" name="fx" value="454.68577"/>
+        <arg if="$(eval sim_name=='sitl' and sim)" name="fy" value="454.68577"/>
         
         <!-- Got these from realsense topic: /camera/depth/camera_info -->
         <arg unless="$(arg sim)" name="cx" value="422.865783"/>
@@ -42,5 +48,5 @@
 
         
       </include>
-
+    
 </launch>

@@ -1,3 +1,0 @@
-<launch>
-    <node name="drone_teleop" type="drone_teleop" pkg="planner">
-</launch>
