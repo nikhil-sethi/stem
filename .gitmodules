@@ -1,18 +1,23 @@
-[submodule "drone_toolbox"]
-	path = drone_toolbox
+[submodule "sw/control/drone_toolbox"]
+	path = sw/control/drone_toolbox
 	url = https://github.com/cor-drone-dev/drone_toolbox
-    branch = nikhil/main
+    branch = nikhil/devel
 
-[submodule "drone_toolbox_ext_control_template"]
-	path = drone_toolbox_ext_control_template
-	url = https://github.com/cor-drone-dev/drdrone_toolbox_ext_control_template
+[submodule "sw/control/drone_toolbox_ext_control_template"]
+	path = sw/control/drone_toolbox_ext_control_template
+	url = https://github.com/cor-drone-dev/drone_toolbox_ext_control_template
 
-[submodule "mav_comm"]
-	path = mav_comm
+[submodule "sw/third_party/mav_comm"]
+	path = sw/third_party/mav_comm
 	url = https://github.com/ethz-asl/mav_comm
 
 
-[submodule "FUEL"]
-	path = FUEL
+[submodule "sw/planning/FUEL"]
+	path = sw/planning/FUEL
 	url = https://github.com/nikhil-sethi/FUEL
+    branch = devel
+
+[submodule "sw/simulation/PX4-Autopilot"]
+	path = sw/simulation/PX4-Autopilot
+	url = https://github.com/nikhil-sethi/PX4-Autopilot
     branch = devel
