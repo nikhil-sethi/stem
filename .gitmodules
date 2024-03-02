@@ -21,3 +21,7 @@
 	path = sw/simulation/PX4-Autopilot
 	url = https://github.com/nikhil-sethi/PX4-Autopilot
     branch = devel
+
+[submodule "sw/third_party/nlopt"]
+	path = sw/third_party/nlopt
+	url = https://github.com/stevengj/nlopt.git
