@@ -45,7 +45,7 @@ source src/thesis/setup_paths.bash  # need this for px4 sitl and gazebo
 
 Simulation:
 ```bash
-terminal 1: roslaunch src/thesis/sw/launch/main.launch vehicle:=iris_depth_camera sim:=true
+terminal 1: roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
 
 terminal 2: roslaunch exploration_manager rviz.launch
 ```
@@ -56,7 +56,7 @@ Hardware testing
 
 - Your PC
 ```bash
-terminal 1: roslaunch src/thesis/sw/launch/main.launch sim:=false
+terminal 1: roslaunch bringup main.launch sim:=false
 terminal 2: roslaunch exploration_manager rviz.launch
 ```
 
