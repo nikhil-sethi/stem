@@ -1,0 +1,7 @@
+<launch>
+    <arg name="sim" default="true"/>
+    <arg if="$(arg sim)" name="conf" value="sim"/>
+    <arg unless="$(arg sim)" name="conf" value="hw"/>
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find bringup)/config/$(arg conf).rviz" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_53" args="0 0 0 0 0 0 world navigation 100" />
+  </launch>

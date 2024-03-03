@@ -131,7 +131,7 @@ private:
 int main(int argc, char **argv)
 {
     // Initialize the ROS node
-    ros::init(argc, argv, "fake_localization");
+    ros::init(argc, argv, "fake_localization_node");
     ros::NodeHandle nh("~");
     // Create an instance of the OdometryToPoseStamped class
     FakeEKFOriginLocalizer localizer(nh);

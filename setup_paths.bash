@@ -1,2 +1,5 @@
- export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/root/software/PX4-Autopilot/:/root/software/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/
- source $px4_path/Tools/simulation/gazebo-classic/setup_gazebo.bash $px4_path $px4_path/build/px4_sitl_default
+ 
+this_script_path=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+
+ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$this_script_path/sw/simulation/PX4-Autopilot/:$this_script_path/sw/simulation/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/
+ source $this_script_path/sw/simulation/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash $this_script_path/sw/simulation/PX4-Autopilot $this_script_path/sw/simulation/PX4-Autopilot/build/px4_sitl_default
