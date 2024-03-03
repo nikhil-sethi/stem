@@ -54,7 +54,7 @@
 
         <!-- <node name="ekf_origin_pub" pkg="rostopic" output="screen" type="rostopic" args="pub -l /mavros/global_position/set_gp_origin geographic_msgs/GeoPointStamped '{header: auto, position: { latitude: 47.3977420, longitude: 8.545594, altitude: 535.221}}'"/> -->
         
-        <node name="fake_localizer" pkg="simulator" output="screen" type="fake_localization_node">
+        <node name="fake_localization" pkg="fake_localization" output="screen" type="fake_localization_node">
             <param name="init_x" value="$(arg init_x)"/>
             <param name="init_y" value="$(arg init_y)"/>
             <param name="init_z" value="$(arg init_z)"/>
@@ -63,14 +63,14 @@
         <!-- drone toolbox interface -->
         <!-- This already runs onboard so only need it in sim -->
         <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="screen">
-            <rosparam command="load" file="$(find planner)/config/racer.yaml"/>
+            <rosparam command="load" file="$(find bringup)/config/fuel_px4_interface.yaml"/>
             <param name="is_sim" value="$(arg sim)"/>
             <param name="odometry_topic" value="$(arg odometry_topic)"/>
         </node>
     </group>
 
     <!-- drone toolbox template -->
-    <node name="planner_if" type="$(arg planner)_if.py" pkg="planner" output="screen" required="true" launch-prefix="xterm -e"/>
+    <node name="control_if" type="$(arg planner)_if.py" pkg="control_interface" output="screen" required="true" launch-prefix="xterm -e"/>
             
 
     <!-- Planner -->
@@ -89,7 +89,7 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include> -->
 
-    <include file="$(find planner)/launch/fuel.launch">
+    <include file="$(find bringup)/fuel.launch">
         <arg name="sim" value="$(arg sim)"/>
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
@@ -103,7 +103,7 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
-    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="planner" output="screen" required="true">
+    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="attention_map" output="screen" required="true">
         <param unless="$(arg sim)" name="rgb_topic" value="/camera/color/image_raw"/>
         <param if="$(arg sim)" name="rgb_topic" value="camera/rgb/image_raw"/>
     </node>
