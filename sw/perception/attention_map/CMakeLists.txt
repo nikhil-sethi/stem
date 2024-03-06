@@ -137,6 +137,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(attention_processor_node src/attention_processor.cpp)
+add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,7 +154,10 @@ target_link_libraries(attention_processor_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-
+target_link_libraries(pub_att_gt_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
 #############
 ## Install ##
 #############

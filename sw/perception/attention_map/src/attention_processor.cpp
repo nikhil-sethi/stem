@@ -4,6 +4,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/common/common.h>
 #include <pcl/point_types.h>
 #include <pcl/filters/extract_indices.h>
@@ -55,13 +56,14 @@ class AttentionMap{
         uint8_t getOccupancy(const Eigen::Vector3i& id);
         uint8_t getOccupancy(const Eigen::Vector3d& pos);
         void visualize(Object& object);
+        void attGTTimer(const ros::TimerEvent& event);
 
 
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
-        ros::Publisher clustered_point_cloud_pub, bbox_pub;
-        ros::Timer loop_timer_;
+        ros::Publisher att_3d_gt_pub_, bbox_pub;
+        ros::Timer loop_timer_, att_3d_gt_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
         std::vector<uint8_t> occupancy_buffer_;
@@ -69,14 +71,36 @@ class AttentionMap{
         std::unique_ptr<fast_planner::SDFMap> sdf_map_;
         double resolution_;
         double min_candidate_clearance_;
+
+        // ground truth attention map
+        bool is_att_gt;
+        pcl::PointCloud<pcl::PointXYZI> att_gt_cloud;
+        sensor_msgs::PointCloud2 att_gt_cloud_msg_;
 };
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh){
     att_3d_sub_ = nh.subscribe("/attention_map/3d", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
-    clustered_point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/3d_clustered", 1);
+    
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
+    is_att_gt = false;
+
+    if (is_att_gt){
+        if (pcl::io::loadPCDFile<pcl::PointXYZI> ("/root/thesis_ws/src/thesis/sw/perception/attention_map/src/att_cloud_gt.pcd", att_gt_cloud) == -1){ //* load the file
+            ROS_ERROR("Could not load ground truth attention map.");
+        }
+        else{
+            ROS_INFO("Loaded attention map succesfully");
+
+            pcl::toROSMsg(att_gt_cloud, att_gt_cloud_msg_);
+            att_gt_cloud_msg_.header.frame_id = "world";
+
+            att_3d_gt_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/3d", 1, true);
+            att_3d_gt_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::attGTTimer, this);
+        }
+        
+    }
 
 
     // create sdf map separate instance just for function reuse
@@ -88,7 +112,11 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh){
     min_candidate_clearance_ = nh.param("/exploration_node/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
     viz = fast_planner::PlanningVisualization(nh);
-    
+
+}
+
+void AttentionMap::attGTTimer(const ros::TimerEvent& event){
+    att_3d_gt_pub_.publish(att_gt_cloud_msg_);
 }
 
 void AttentionMap::visualize(Object& object){
@@ -134,13 +162,52 @@ void AttentionMap::findViewpoints(Object& object){
     // 
 
     // Evaluate sample viewpoints on circles, find ones that cover most cells
-    for (double rc = 1, dr = (1.5 - 1.0) / 3; rc <= 1.5 + 1e-3; rc += dr)
+    
+    
+    // find the minimum radius for cylindrical sampling
+        // find the smallest face of the bbox
+        // find the AR of the smallest face
+        // if this AR is larger than image ar
+            // bound the face in image using the width of smallest face
+        // else
+            // bound using the height
+        // find the rmin using the bound
+    std::cout<<object.id<<std::endl;
+    Eigen::Vector3d diag_3d = object.bbox_max_ - object.bbox_min_;
+    // int shortest_axis;
+    // Eigen::Vector2d diag_2d_min(0.0 ,diag_3d(2));
+    int shortest_axis = diag_3d(1) > diag_3d(0) ? 0: 1;
+    double AR_min = diag_3d(shortest_axis)/diag_3d(2); // bbox_width/bbox_height
+    double height = 480;
+    double width = 848;
+    
+    // double AR = diag_3d(2)/sqrt(diag_3d(1)**2) + diag_3d(0)**2) 
+    double u_max = floor(0.8*height);
+    double v_max = floor(0.8*width);
+    double AR_img = v_max/u_max;
+    double f_x = 454.68577;
+    double f_y = 454.68577;
+    double rmin;
+    
+    if (AR_min > AR_img) // width will go out of aspect first
+        {rmin = diag_3d(shortest_axis)*f_y/v_max;
+        std::cout<< "width "<<diag_3d(shortest_axis)<<" ARmin " << AR_min<<std::endl;}
+    else // height will go out of aspect first
+        {rmin = diag_3d(2)*f_x/u_max;
+        std::cout<< "height"<<diag_3d(2)<<" ARmin " << AR_min<<"rmin "<<rmin<<std::endl;}
+    
+    
+    rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
+    std::cout<<rmin<<" " <<diag_3d(1-shortest_axis)/2<<std::endl;
+    
+    
+    for (double rc = rmin, dr = (1.5 - rmin) / 3; rc <= 1.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
             const Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
-            // ROS_INFO("%d", sdf_map_->isInBox(sample_pos));
+            // ROS_INFO("%d", sdf_map_->isInBox(sample_pos));1
             // std::cout<<sample_pos<<std::endl;
-            if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
-                continue;
+            // if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
+            //     continue;
             object.viewpoint_candidates.push_back(sample_pos);
         }
 }       
@@ -175,7 +242,7 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     ec.setMinClusterSize(10);    // Set the minimum cluster size (adjust as needed)
     ec.setMaxClusterSize(25000);   // Set the maximum cluster size (adjust as needed)
     ec.extract(cluster_indices);
-    ROS_INFO("num obj: %d", cluster_indices.size());
+    // ROS_INFO("num obj: %d", cluster_indices.size());
     objects.clear();
     int i = 0;
     for (const auto& cluster_index : cluster_indices) {
