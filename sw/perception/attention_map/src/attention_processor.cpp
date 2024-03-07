@@ -17,6 +17,9 @@
 #include <common_msgs/uint8List.h>
 #include <plan_env/sdf_map.h>
 #include <memory>
+#include <sensor_model/camera.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 using namespace Eigen;
 struct Object{
@@ -27,6 +30,10 @@ struct Object{
     Eigen::Vector3d bbox_max_;
     Eigen::Vector3d centroid_;
     vector<Eigen::Vector3d> viewpoint_candidates;
+    std::vector<Eigen::Vector3d> projection_corners;
+
+    // initialise projection corners to fixed length
+    Object():projection_corners(4){}
 
     void computeInfo(){
         if (points.size() == 0) return;
@@ -38,6 +45,23 @@ struct Object{
 
         centroid_ = (bbox_min_ + bbox_max_)/2.0;
         
+        fillBboxCorners();
+    } 
+
+    void fillBboxCorners(){
+        // Only two 3d diagonals are enough to define the view
+        Eigen::Vector3d diag = bbox_max_ - bbox_min_;
+        Eigen::Vector3d bbox_max_2 = bbox_max_;
+        Eigen::Vector3d bbox_min_2 = bbox_min_;
+        bbox_max_2(0) -=  diag(0);
+        bbox_min_2(0) +=  diag(0); 
+          
+        // points 
+        projection_corners[0] = bbox_max_;
+        projection_corners[1] = bbox_min_;
+        projection_corners[2] = bbox_max_2;
+        projection_corners[3] = bbox_min_2;
+
     }
 };
 
@@ -76,15 +100,18 @@ class AttentionMap{
         bool is_att_gt;
         pcl::PointCloud<pcl::PointXYZI> att_gt_cloud;
         sensor_msgs::PointCloud2 att_gt_cloud_msg_;
+
+        Camera camera;
+
 };
 
-AttentionMap::AttentionMap(ros::NodeHandle& nh){
+AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh){
     att_3d_sub_ = nh.subscribe("/attention_map/3d", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
-    is_att_gt = false;
+    is_att_gt = true;
 
     if (is_att_gt){
         if (pcl::io::loadPCDFile<pcl::PointXYZI> ("/root/thesis_ws/src/thesis/sw/perception/attention_map/src/att_cloud_gt.pcd", att_gt_cloud) == -1){ //* load the file
@@ -130,6 +157,9 @@ void AttentionMap::visualize(Object& object){
     // clustered_point_cloud_pub.publish(cluster_msg);
 
     // === Viewpoint candidates
+    
+    for (auto& corner: object.projection_corners)
+        object.viewpoint_candidates.push_back(corner); // just for debugging
     
     viz.drawSpheres(object.viewpoint_candidates, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
     // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
@@ -200,7 +230,8 @@ void AttentionMap::findViewpoints(Object& object){
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     std::cout<<rmin<<" " <<diag_3d(1-shortest_axis)/2<<std::endl;
     
-    
+    Eigen::Vector2d point_img; // sample
+    Eigen::Vector3d point_cam; // sampled position in camera frame
     for (double rc = rmin, dr = (1.5 - rmin) / 3; rc <= 1.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
             const Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
@@ -208,6 +239,34 @@ void AttentionMap::findViewpoints(Object& object){
             // std::cout<<sample_pos<<std::endl;
             // if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
             //     continue;
+
+            // === Check if object is in view
+
+            // transform points to virtual camera frames
+            tf2::Transform T_world_sample; // world with respect to sample
+            // T_world_sample.translation.x = sample_pos(0);
+            // T_world_sample.translation.y = sample_pos(1);
+            // T_world_sample.translation.z = sample_pos(2);
+            // T_world_sample.translation.quaternion.setRPY(0,0,phi);
+            tf2::Vector3 origin = tf2::Vector3(sample_pos(0), sample_pos(1), sample_pos(2));
+            tf2::Quaternion rotation;
+            rotation.setRPY(0,0,phi);
+            T_world_sample.setOrigin(origin);
+            T_world_sample.setRotation(rotation);
+            // tf2::Transform Tf_odom_cam;
+            // tf2::fromMsg(camera.T_odom_cam, Tf_odom_cam);
+
+            tf2::Transform T_world_cam = T_world_sample*camera.T_odom_cam;
+            // tf2::Transform tf_stamped(T_world_cam, ros::Time::now(), "world");
+            geometry_msgs::Transform tf_msg = tf2::toMsg(T_world_cam);
+            
+            
+            // camera.transform(object.corners, T_world_sample); // in sample frame
+            camera.transform(object.projection_corners, tf_msg); // in camera frame
+
+            // if (!camera.isPtInView(point_cam, point_img))
+            //     continue;
+            
             object.viewpoint_candidates.push_back(sample_pos);
         }
 }       
