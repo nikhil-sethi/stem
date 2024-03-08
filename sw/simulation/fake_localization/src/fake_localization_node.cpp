@@ -114,7 +114,7 @@ public:
 
         // Fill in the header
         pose_stamped_msg.header = msg->header;
-
+        pose_stamped_msg.header.stamp = ros::Time::now();
         // Copy the pose from the odometry message
         pose_stamped_msg.pose = msg->pose.pose;
 
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "fake_localization_node");
     ros::NodeHandle nh("~");
     // Create an instance of the OdometryToPoseStamped class
-    FakeEKFOriginLocalizer localizer(nh);
+    FakeVisionLocalizer localizer(nh);
 
     // Spin to process callbacks
     ros::spin();
