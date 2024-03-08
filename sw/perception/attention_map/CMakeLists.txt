@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   sensor_model
   tf2_geometry_msgs
+  common
   )
 find_package(PCL 1.7 REQUIRED)
 
@@ -109,7 +110,7 @@ find_package(PCL 1.7 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES attention_map
- CATKIN_DEPENDS common_msgs plan_env roscpp sensor_msgs traj_utils visualization_msgs
+ CATKIN_DEPENDS common common_msgs plan_env roscpp sensor_msgs traj_utils visualization_msgs
 #  DEPENDS system_lib
 )
 
@@ -149,7 +150,7 @@ add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(attention_processor_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(attention_processor_node
