@@ -16,15 +16,15 @@ public:
     PointCloudPublisher() : nh_("~")
     {
         // Load PCD file
-        if (pcl::io::loadPCDFile<pcl::PointXYZI>("/root/thesis_ws/src/thesis/sw/perception/attention_map/src/att_cloud_gt.pcd", cloud_) == -1)
+        if (pcl::io::loadPCDFile<pcl::PointXYZI>("/root/thesis_ws/src/thesis/sw/perception/attention_map/src/att_cloud_gt_2.pcd", cloud_) == -1)
         {
             ROS_ERROR("Couldn't read file cloud.pcd");
             return;
         }
-
+        ROS_INFO("Loaded attention map succesfully");
         // Create PointCloud2 message
         pcl::toROSMsg(cloud_, cloud_msg_);
-        cloud_msg_.header.frame_id = "map"; // Set your desired frame ID
+        cloud_msg_.header.frame_id = "world"; // Set your desired frame ID
 
         // Create the publisher
         pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/attention_map/3d", 1);

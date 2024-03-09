@@ -34,7 +34,7 @@ struct Object{
     std::vector<Eigen::Vector3d> projection_corners;
 
     // initialise projection corners to fixed length
-    Object():projection_corners(4){}
+    Object():projection_corners(8){}
 
     void computeInfo(){
         if (points.size() == 0) return;
@@ -46,23 +46,33 @@ struct Object{
 
         centroid_ = (bbox_min_ + bbox_max_)/2.0;
         
-        fillBboxCorners();
+        computeBboxCorners();
     } 
 
-    void fillBboxCorners(){
+    void computeBboxCorners(){
         // Only two 3d diagonals are enough to define the view
-        Eigen::Vector3d diag = bbox_max_ - bbox_min_;
-        Eigen::Vector3d bbox_max_2 = bbox_max_;
-        Eigen::Vector3d bbox_min_2 = bbox_min_;
-        bbox_max_2(0) -=  diag(0);
-        bbox_min_2(0) +=  diag(0); 
+        Eigen::Vector3d size = bbox_max_ - bbox_min_;
+        
+        
+        
+        
+        
+        // Eigen::Vector3d bbox_max_2 = bbox_max_;
+        // Eigen::Vector3d bbox_min_2 = bbox_min_;
+        // bbox_max_2(0) -=  diag(0);
+        // bbox_min_2(0) +=  diag(0); 
           
         // points 
-        projection_corners[0] = bbox_max_;
-        projection_corners[1] = bbox_min_;
-        projection_corners[2] = bbox_max_2;
-        projection_corners[3] = bbox_min_2;
-
+        projection_corners[0] = bbox_min_;
+        projection_corners[1] = bbox_min_ + Vector3d(size(0), 0, 0);
+        projection_corners[2] = bbox_min_ + Vector3d(0, size(1), 0);
+        projection_corners[3] = bbox_min_ + Vector3d(size(0), size(1), 0);
+        
+        projection_corners[4] = bbox_max_;
+        projection_corners[5] = bbox_max_ - Vector3d(size(0), 0, 0);
+        projection_corners[6] = bbox_max_ - Vector3d(0, size(1), 0);
+        projection_corners[7] = bbox_max_ - Vector3d(size(0), size(1), 0);
+    
     }
 };
 
@@ -81,14 +91,13 @@ class AttentionMap{
         uint8_t getOccupancy(const Eigen::Vector3i& id);
         uint8_t getOccupancy(const Eigen::Vector3d& pos);
         void visualize(Object& object);
-        void attGTTimer(const ros::TimerEvent& event);
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
 
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
-        ros::Publisher att_3d_gt_pub_, bbox_pub;
-        ros::Timer loop_timer_, att_3d_gt_timer_;
+        ros::Publisher bbox_pub;
+        ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
         std::vector<uint8_t> occupancy_buffer_;
@@ -97,39 +106,17 @@ class AttentionMap{
         double resolution_;
         double min_candidate_clearance_;
 
-        // ground truth attention map
-        bool is_att_gt;
-        pcl::PointCloud<pcl::PointXYZI> att_gt_cloud;
-        sensor_msgs::PointCloud2 att_gt_cloud_msg_;
         Camera camera;
         std::vector<Eigen::Vector3d> corners_cam; //bbox corners in camera frame, just for precompute ease
 
 };
 
-AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(4){
+AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     att_3d_sub_ = nh.subscribe("/attention_map/3d", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
-    is_att_gt = true;
-
-    if (is_att_gt){
-        if (pcl::io::loadPCDFile<pcl::PointXYZI> ("/root/thesis_ws/src/thesis/sw/perception/attention_map/src/att_cloud_gt.pcd", att_gt_cloud) == -1){ //* load the file
-            ROS_ERROR("Could not load ground truth attention map.");
-        }
-        else{
-            ROS_INFO("Loaded attention map succesfully");
-
-            pcl::toROSMsg(att_gt_cloud, att_gt_cloud_msg_);
-            att_gt_cloud_msg_.header.frame_id = "world";
-
-            att_3d_gt_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/3d", 1, true);
-            att_3d_gt_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::attGTTimer, this);
-        }
-        
-    }
-
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
@@ -141,10 +128,6 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(4){
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
     viz = fast_planner::PlanningVisualization(nh);
 
-}
-
-void AttentionMap::attGTTimer(const ros::TimerEvent& event){
-    att_3d_gt_pub_.publish(att_gt_cloud_msg_);
 }
 
 void AttentionMap::visualize(Object& object){
@@ -159,8 +142,8 @@ void AttentionMap::visualize(Object& object){
 
     // === Viewpoint candidates
     
-    for (auto& corner: object.projection_corners)
-        object.viewpoint_candidates.push_back(corner); // just for debugging
+    // for (auto& corner: object.projection_corners)
+    //     object.viewpoint_candidates.push_back(corner); // just for debugging
     
     viz.drawSpheres(object.viewpoint_candidates, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
     // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
@@ -175,11 +158,8 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
         // calculate optimal local tour
 
     for (Object& object: objects){
-        
-            findViewpoints(object);
-            visualize(object);
-        
-        
+        findViewpoints(object);
+        visualize(object);
     }
     
 }
@@ -210,36 +190,28 @@ void AttentionMap::findViewpoints(Object& object){
     // int shortest_axis;
     // Eigen::Vector2d diag_2d_min(0.0 ,diag_3d(2));
     int shortest_axis = diag_3d(1) > diag_3d(0) ? 0: 1;
-    double AR_min = diag_3d(shortest_axis)/diag_3d(2); // bbox_width/bbox_height
-    double height = 480;
-    double width = 848;
+    Eigen::Vector2d diag_2d = {diag_3d(shortest_axis), diag_3d(2)};
     
-    // double AR = diag_3d(2)/sqrt(diag_3d(1)**2) + diag_3d(0)**2) 
-    double u_max = floor(0.8*height);
-    double v_max = floor(0.8*width);
-    double AR_img = v_max/u_max;
-    double f_x = 454.68577;
-    double f_y = 454.68577;
-    double rmin;
-    
-    if (AR_min > AR_img) // width will go out of aspect first
-        rmin = diag_3d(shortest_axis)*f_y/v_max;
-    else // height will go out of aspect first
-        rmin = diag_3d(2)*f_x/u_max;
+    // this distance might be obsolete now that we have isometric views. but still nice starting point
+    double rmin = camera.getMinDistance(diag_2d); 
     
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     
-    
     for (double rc = rmin, dr = 0.5/2; rc <= rmin + 0.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
-            const Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
-            // if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
-            //     continue;
-
-            // === Check if object is in view
-            if (!isObjectInView(object, sample_pos, Eigen::Vector3d(0,0,phi + M_PI)))
+            Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
+            sample_pos[2] = sample_pos[2] + 0.1; // add a height to view the object isometrically. this will depend on the data from the sensor model
+            if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
                 continue;
+            // === Check if object is in view
+            if (!isObjectInView(object, sample_pos, Eigen::Vector3d(0,0,phi + M_PI))){
+                // print_eigen(sample_pos);
+                continue;
+            }
             
+            // raycast from virtual camera to corners
+
+
             object.viewpoint_candidates.push_back(sample_pos);
         }
 

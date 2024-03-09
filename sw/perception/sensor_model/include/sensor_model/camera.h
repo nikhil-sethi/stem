@@ -14,6 +14,7 @@ class Camera{
         void transform(const std::vector<Eigen::Vector3d>& points, std::vector<Eigen::Vector3d>& points_transformed, const Eigen::Isometry3d& t);
         bool arePtsInView(const std::vector<Eigen::Vector3d>& points_cam);
         Eigen::Vector2d project(const Eigen::Vector3d& point_cam);
+        double getMinDistance(Eigen::Vector2d diag_2d);
 
         Eigen::Isometry3d T_odom_cam;
 
@@ -23,7 +24,7 @@ class Camera{
         double height_;
         double width_;
         float tol; // how much of the FOV can a point be at maximum
-
+        double AR_;
     
 };
 

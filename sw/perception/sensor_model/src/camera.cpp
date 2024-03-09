@@ -7,7 +7,8 @@ Camera::Camera(const ros::NodeHandle& nh){
     fy_ = 454;
     height_ = 480;
     width_ = 848;
-    tol = 0.8;
+    tol = 0.9;
+    AR_ = width_/height_;
 
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tfListener(tfBuffer);
@@ -31,6 +32,18 @@ Eigen::Vector2d Camera::project(const Eigen::Vector3d& point_cam){
     return point_img;
 }
 
+// get the minimum distance that would fit the diagonal in aspect without rotations
+double Camera::getMinDistance(Eigen::Vector2d diag_2d){
+    double AR_min = diag_2d(0)/diag_2d(1); // bbox_width/bbox_height
+    double rmin;
+    
+    if (AR_min > AR_) // width will go out of aspect first
+        rmin = (diag_2d(0)*fy_)/(tol*width_);
+    else // height will go out of aspect first
+        rmin = (diag_2d(1)*fx_)/(tol*height_);
+
+    return rmin + T_odom_cam(0,3); // add the distance along the x-axis. Because this will become z later with the transform
+}
 
 /* Checks if point_3d is in the 2D view, and saves it in point_2d*/
 bool Camera::isPtInView(const Eigen::Vector3d& point_cam){
