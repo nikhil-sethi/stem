@@ -15,7 +15,7 @@ Camera::Camera(const ros::NodeHandle& nh){
 
     // get all transforms here
     try{
-        geometry_msgs::TransformStamped transform_msg = tfBuffer.lookupTransform("odom", "camera_link", ros::Time::now(), ros::Duration(2.0));
+        geometry_msgs::TransformStamped transform_msg = tfBuffer.lookupTransform("odom", "camera_link", ros::Time(0), ros::Duration(2.0));
         T_odom_cam = tf2::transformToEigen(transform_msg);
     }
     catch (tf2::TransformException &ex){
