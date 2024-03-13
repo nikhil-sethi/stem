@@ -1,0 +1,13 @@
+<launch>
+
+    <!-- static frames -->
+    <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
+    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
+
+    <!-- rosbag -->
+    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="-l /root/2024-03-11-03-37-50.bag"/>
+
+    <!-- parameters -->
+    <rosparam file="$(find bringup)/config/fuel_algo.yaml" ns="exploration_node"/>
+
+</launch>

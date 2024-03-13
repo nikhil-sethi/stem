@@ -21,6 +21,7 @@
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <common/io.h>
+#include <plan_env/raycast.h>
 
 using namespace Eigen;
 struct Object{
@@ -50,18 +51,8 @@ struct Object{
     } 
 
     void computeBboxCorners(){
-        // Only two 3d diagonals are enough to define the view
         Eigen::Vector3d size = bbox_max_ - bbox_min_;
         
-        
-        
-        
-        
-        // Eigen::Vector3d bbox_max_2 = bbox_max_;
-        // Eigen::Vector3d bbox_min_2 = bbox_min_;
-        // bbox_max_2(0) -=  diag(0);
-        // bbox_min_2(0) +=  diag(0); 
-          
         // points 
         projection_corners[0] = bbox_min_;
         projection_corners[1] = bbox_min_ + Vector3d(size(0), 0, 0);
@@ -75,6 +66,15 @@ struct Object{
     
     }
 };
+
+bool isPtInBox(const Eigen::Vector3d& point, const Eigen::Vector3d& bbox_max, const Eigen::Vector3d& bbox_min){
+    for (int i=0; i<3; ++i){
+        if (point(i) < bbox_min(i) || point(i) > bbox_max(i))
+            return false;
+    }
+    return true;
+}
+
 
 // class fast_planner::SDFMap;
 
@@ -92,6 +92,8 @@ class AttentionMap{
         uint8_t getOccupancy(const Eigen::Vector3d& pos);
         void visualize(Object& object);
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
+        float computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw);
+
 
     private:
         std::list<Object> objects;
@@ -102,6 +104,8 @@ class AttentionMap{
         fast_planner::PlanningVisualization viz;
         std::vector<uint8_t> occupancy_buffer_;
         std::vector<uint8_t> occupancy_inflate_buffer;
+        std::vector<float> attention_buffer;
+
         std::unique_ptr<fast_planner::SDFMap> sdf_map_;
         double resolution_;
         double min_candidate_clearance_;
@@ -109,6 +113,8 @@ class AttentionMap{
         Camera camera;
         std::vector<Eigen::Vector3d> corners_cam; //bbox corners in camera frame, just for precompute ease
 
+        std::unique_ptr<RayCaster> raycaster_;
+        
 };
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
@@ -121,13 +127,25 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
     sdf_map_->setParams(nh, "/exploration_node/");
-    
     resolution_ = sdf_map_->getResolution();
-    std::cout << sdf_map_->mp_->box_mind_ << std::endl;
+    Eigen::Vector3d origin, size;
+    sdf_map_->getRegion(origin, size);
+    print_eigen(origin);
+    print_eigen(size);
+    // preallocate memory for buffers
+    occupancy_buffer_ = vector<uint8_t>(sdf_map_->buffer_size, 0);
+    occupancy_inflate_buffer = vector<uint8_t>(sdf_map_->buffer_size, 0);
+    attention_buffer = vector<float>(sdf_map_->buffer_size, 0);
+
     min_candidate_clearance_ = nh.param("/exploration_node/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
+    
+    // visualization
     viz = fast_planner::PlanningVisualization(nh);
 
+    // raycasting
+    raycaster_.reset(new RayCaster);
+    raycaster_->setParams(resolution_, origin);
 }
 
 void AttentionMap::visualize(Object& object){
@@ -158,26 +176,28 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
         // calculate optimal local tour
 
     for (Object& object: objects){
-        findViewpoints(object);
-        visualize(object);
+        // if (object.id==3){
+            findViewpoints(object);
+            visualize(object);
+        // }
     }
     
 }
 
 void AttentionMap::findViewpoints(Object& object){
     
-    // sample viewpoints around attentive regions of the object
+    // find the closest distance that would have the object still in view
+    // sample viewpoints around the object starting from the minimum distance
     // for each sample 
+        // if sample is near unknown region (OR) on an occupied cell (OR) not in the volume --> discard
+        // if the object's perspective view from the sample doesnt fit in the camera --> discard 
         // evaluate information gain by ray casting (need attention buffer for this)
         // if gain is more than min gain, add viewpoint to candidate list
     // sort viewpoints by their gain
-    // update top viewpoints for the object
+    // get some top viewpoints for the object
 
-    // 
 
-    // Evaluate sample viewpoints on circles, find ones that cover most cells
-    
-    
+
     // find the minimum radius for cylindrical sampling
         // find the smallest face of the bbox
         // find the AR of the smallest face
@@ -187,36 +207,77 @@ void AttentionMap::findViewpoints(Object& object){
             // bound using the height
         // find the rmin using the bound
     Eigen::Vector3d diag_3d = object.bbox_max_ - object.bbox_min_;
-    // int shortest_axis;
-    // Eigen::Vector2d diag_2d_min(0.0 ,diag_3d(2));
     int shortest_axis = diag_3d(1) > diag_3d(0) ? 0: 1;
     Eigen::Vector2d diag_2d = {diag_3d(shortest_axis), diag_3d(2)};
     
     // this distance might be obsolete now that we have isometric views. but still nice starting point
     double rmin = camera.getMinDistance(diag_2d); 
-    
+
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     
     for (double rc = rmin, dr = 0.5/2; rc <= rmin + 0.5 + 1e-3; rc += dr)
-        for (double phi = -M_PI; phi < M_PI; phi += 0.5235) {
+        for (double phi = -M_PI; phi < M_PI-0.5235; phi += 0.5235) {
             Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
             sample_pos[2] = sample_pos[2] + 0.1; // add a height to view the object isometrically. this will depend on the data from the sensor model
+
             if (!sdf_map_->isInBox(sample_pos) || sdf_map_->getInflateOccupancy(sample_pos) == 1 || isNearUnknown(sample_pos))
                 continue;
-            // === Check if object is in view
+
+            // === Check if object is in view            
             if (!isObjectInView(object, sample_pos, Eigen::Vector3d(0,0,phi + M_PI))){
                 // print_eigen(sample_pos);
                 continue;
             }
             
-            // raycast from virtual camera to corners
+            // raycast from virtual camera to corners. not implemented. might not need
 
-
+            // compute information gain from remaining viewpoints
+            float gain = computeInformationGain(object, sample_pos, phi);
+            // print(object.id, rc, phi, gain);
+            if (gain<10)
+                continue;
+            
+            // add whatever's left to candidates
             object.viewpoint_candidates.push_back(sample_pos);
         }
 
+        // sort list wrt information gain 
         
 }       
+
+// nonlinear transfer function that modifies the gain that you see based on it's value
+float infoTransfer(float gain){
+    int alpha = 4; // higher if you want more local object region importance over object coverage. But small low attention objects might get missed out then
+    return 1 + pow(alpha*(gain-0.5), 3);
+}
+
+float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw){
+    
+    Eigen::Vector3i idx;
+    Eigen::Vector3d pos;
+    float total_gain = 0;
+    for (pcl::PointXYZI& point : object.points) {
+        pos(0) = point.x;
+        pos(1) = point.y;
+        pos(2) = point.z;
+        raycaster_->input(pos, sample_pos);
+        bool visib = true;
+        raycaster_->nextId(idx); // because we're already on the surface, presumably
+        while (raycaster_->nextId(idx)) {
+            if (
+                attention_buffer[sdf_map_->toAddress(idx)] > 0 // the ray shouldnt have any other attentive cell in it's path
+                // sdf_map_->getInflateOccupancy(idx) == 1 ||   // not using inflation for now becauase most attentive cells will be missed out then
+                || getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED 
+                || getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN) {
+                    visib = false;
+                    break;
+            }
+        }
+        if (visib) total_gain += infoTransfer(point.intensity)*point.intensity;
+    }
+    return total_gain; 
+}
+
 
 // returns true if a full 6D viewpoint can completely view set of points
 bool AttentionMap::isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient){
@@ -245,8 +306,8 @@ bool AttentionMap::isObjectInView(const Object& object, const Eigen::Vector3d& p
 }
 
 void AttentionMap::occCallback(const common_msgs::uint8List& msg){
+    // sdfmap buffer isnt used here because of different compatible uint8 datatype
     occupancy_buffer_ = msg.data;
-    // std::cout<<occupancy_buffer_.size()<<std::endl;
 }
 
 void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
@@ -259,10 +320,18 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::fromROSMsg(*msg, *pcl_cloud);
 
-    // Remove NaN values
-    // pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZI>);
-    // std::vector<int> indices;
-    // pcl::removeNaNFromPointCloud(*pcl_cloud, *filtered_cloud, indices);
+    // update the attention buffer, need it for raycasting
+    Eigen::Vector3i idx;
+    Eigen::Vector3d pos;
+
+    for (auto& point: (*pcl_cloud).points){
+        pos(0) = point.x;
+        pos(1) = point.y;
+        pos(2) = point.z;
+         sdf_map_->posToIndex(pos, idx);
+        attention_buffer[sdf_map_->toAddress(idx)] = point.intensity;
+
+    }
 
     // Apply clustering
     std::vector<pcl::PointIndices> cluster_indices;
