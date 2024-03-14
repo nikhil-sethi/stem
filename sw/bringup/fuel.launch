@@ -18,44 +18,20 @@
     <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
 
     <!-- main algorithm params -->
-    <include file="$(find exploration_manager)/launch/algorithm.xml">
-  
-      <arg name="map_size_x_" value="$(arg map_size_x)"/>
-      <arg name="map_size_y_" value="$(arg map_size_y)"/>
-      <arg name="map_size_z_" value="$(arg map_size_z)"/>
-  
-      <arg name="box_min_x" value="-2.5"/>
-      <arg name="box_min_y" value="-2.5"/>
-      <arg name="box_min_z" value=" 0.0"/>
-      <arg name="box_max_x" value="2.5"/>
-      <arg name="box_max_y" value="2.5"/>
-      <arg name="box_max_z" value="1.7"/>
-  
-      <arg name="odometry_topic" value="$(arg odometry_topic)"/>
-      <!-- sensor pose: transform of camera frame in the world frame -->
-      <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
-      <!-- depth topic: depth image, 640x480 by default -->
-      <!-- cloud topic: point cloud measurement  -->
-      <!-- subscribe ONLY TO ONE of the two topics -->
-      <arg name="depth_topic" value="$(arg depth_topic)"/>
-      <arg name="cloud_topic" value="/pcl_render_node/cloud"/>
-  
-      <!-- intrinsic params of the depth camera -->
-      <arg if="$(arg sim)" name="cx" value="424.5"/>
-      <arg if="$(arg sim)" name="cy" value="240.5"/>
-      <arg if="$(arg sim)" name="fx" value="454.68577"/>
-      <arg if="$(arg sim)" name="fy" value="454.68577"/>
+    
+    <node pkg="exploration_manager" name="exploration_node" type="exploration_node" output="log">
+      <rosparam command="load" file="$(find bringup)/config/fuel_algo.yaml"/>
       
-      <!-- Got these from realsense topic: /camera/depth/camera_info -->
-      <arg unless="$(arg sim)" name="cx" value="422.865783"/>
-      <arg unless="$(arg sim)" name="cy" value="242.46154"/>
-      <arg unless="$(arg sim)" name="fx" value="427.75729"/>
-      <arg unless="$(arg sim)" name="fy" value="427.75729"/>
+      <!-- Some important remaps -->
+      <remap from ="/odom_world" to="$(arg odometry_topic)"/>
+      <remap from ="/map_ros/pose"   to = "$(arg sensor_pose_topic)"/> 
+      <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
+      
+      <!-- Need a redefine to give custom path -->
+      <param name ="~exploration/tsp_dir" value="$(find lkh_tsp_solver)/resource"/>
 
-      <!-- maximum velocity and acceleration the drone will reach -->
-      <arg name="max_vel" value="1.0" />
-      <arg name="max_acc" value="1.0" />
-    </include>
+    </node>
+
   
     <!-- trajectory server -->
     <node pkg="plan_manage" name="traj_server" type="traj_server" output="screen">
