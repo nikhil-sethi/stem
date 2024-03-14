@@ -22,6 +22,25 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <common/io.h>
 #include <plan_env/raycast.h>
+#include <active_perception/frontier_finder.h>
+
+struct TargetViewpoint: fast_planner::Viewpoint{
+    float gain_;
+
+    TargetViewpoint(Eigen::Vector3d pos, double yaw, float gain){
+        pos_ = pos;
+        yaw_ = yaw;
+        gain_ = gain;
+    }
+
+    Eigen::Vector4d poseToEigen(){
+        return Eigen::Vector4d(pos_(0), pos_(1),pos_(2), yaw_);
+    }
+    Eigen::Vector3d posToEigen(){
+        return Eigen::Vector3d(pos_(0), pos_(1),pos_(2));
+    }
+};
+
 
 using namespace Eigen;
 struct Object{
@@ -31,7 +50,7 @@ struct Object{
     Eigen::Vector3d bbox_min_;
     Eigen::Vector3d bbox_max_;
     Eigen::Vector3d centroid_;
-    vector<Eigen::Vector3d> viewpoint_candidates;
+    vector<TargetViewpoint> viewpoint_candidates;
     std::vector<Eigen::Vector3d> projection_corners;
 
     // initialise projection corners to fixed length
@@ -163,11 +182,21 @@ void AttentionMap::visualize(Object& object){
     // for (auto& corner: object.projection_corners)
     //     object.viewpoint_candidates.push_back(corner); // just for debugging
     
-    viz.drawSpheres(object.viewpoint_candidates, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
-    // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
-    // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
-    // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
+    if (!object.viewpoint_candidates.empty()){
+        // plotting only the best for now
+        std::vector<Eigen::Vector3d> vpt_positions = {object.viewpoint_candidates[0].posToEigen()};
+
+        // for (auto& vpt: object.viewpoint_candidates){
+        //     vpt_positions.push_back(Eigen::Vector3d(vpt.pos_(0), vpt.pos_(1), vpt.pos_(2)));
+        // }
+
+        viz.drawSpheres(vpt_positions, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
+        // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
+        // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
+        // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
   
+    }
+    
 }
 
 void AttentionMap::loopTimer(const ros::TimerEvent& event){
@@ -183,6 +212,11 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
     }
     
 }
+
+void sortViewpoints(std::vector<TargetViewpoint>& vpts){
+    sort(vpts.begin(), vpts.end(), [](const TargetViewpoint& v1, const TargetViewpoint& v2) { return v1.gain_ > v2.gain_; });   
+}
+
 
 void AttentionMap::findViewpoints(Object& object){
     
@@ -215,6 +249,7 @@ void AttentionMap::findViewpoints(Object& object){
 
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     
+    object.viewpoint_candidates.clear();
     for (double rc = rmin, dr = 0.5/2; rc <= rmin + 0.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI-0.5235; phi += 0.5235) {
             Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
@@ -238,11 +273,14 @@ void AttentionMap::findViewpoints(Object& object){
                 continue;
             
             // add whatever's left to candidates
-            object.viewpoint_candidates.push_back(sample_pos);
+            TargetViewpoint vpt(sample_pos, phi + M_PI, gain);
+            object.viewpoint_candidates.push_back(vpt);
         }
-
-        // sort list wrt information gain 
         
+        if (!object.viewpoint_candidates.empty())
+            // sort list wrt information gain 
+            sortViewpoints(object.viewpoint_candidates);       
+
 }       
 
 // nonlinear transfer function that modifies the gain that you see based on it's value
