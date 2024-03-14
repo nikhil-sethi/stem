@@ -47,7 +47,9 @@ Simulation:
 ```bash
 terminal 1: roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
 
-terminal 2: roslaunch exploration_manager rviz.launch
+terminal 2: roslaunch bringup rviz.launch
+
+terminal 3 (for now): rosrun attention_map attention_processor_node
 ```
 If everything went well you should see an axis marker for the drone and camera in Rviz along with occupancy map. If not, go to the debugging section.
 
@@ -57,7 +59,7 @@ Hardware testing
 - Your PC
 ```bash
 terminal 1: roslaunch bringup main.launch sim:=false
-terminal 2: roslaunch exploration_manager rviz.launch
+terminal 2: roslaunch bringup rviz.launch
 ```
 
 - OBC (Nvidia Jetson Xavier)
@@ -106,7 +108,10 @@ terminal 3: roslaunch px4_tools px4_tools.launch sim:=false
 5. **I get a segmentation fault in the exploration node**
 - You are at god's own mercy. best of luck
 
-6. While hardware testing, i get the error 'Global data lost for over half a second' 
+6. **While hardware testing, i get the error 'Global data lost for over half a second'**
 - There is something up with either the wifi router at the lab or time syncing between your pc and the drone OBC. 
 - For time syncing check the link mentioned before. 
 - For wifi router, ping the jetson from your pc and see if is under 20-30 ms. If you see very high and erratic ping times like 200ms, check issue #__ (TODO add issue for realsense pwr mgmt here). 
+
+7. **On a vscode remote docker container, I run roscore but nothing happens**
+- Check issue #13
