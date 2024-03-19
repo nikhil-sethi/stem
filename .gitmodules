@@ -1,11 +1,11 @@
 [submodule "sw/control/drone_toolbox"]
 	path = sw/control/drone_toolbox
-	url = https://github.com/cor-drone-dev/drone_toolbox
+	url = git@github.com:cor-drone-dev/drone_toolbox
     branch = nikhil/devel
 
 [submodule "sw/control/drone_toolbox_ext_control_template"]
 	path = sw/control/drone_toolbox_ext_control_template
-	url = https://github.com/cor-drone-dev/drone_toolbox_ext_control_template
+	url = git@github.com:cor-drone-dev/drone_toolbox_ext_control_template
 
 [submodule "sw/third_party/mav_comm"]
 	path = sw/third_party/mav_comm
