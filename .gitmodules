@@ -19,8 +19,7 @@
 
 [submodule "sw/simulation/PX4-Autopilot"]
 	path = sw/simulation/PX4-Autopilot
-	url = https://github.com/nikhil-sethi/PX4-Autopilot
-    branch = devel
+	url = https://github.com/cor-drone-dev/PX4-Autopilot
 
 [submodule "sw/third_party/nlopt"]
 	path = sw/third_party/nlopt
