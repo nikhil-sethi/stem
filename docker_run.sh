@@ -11,5 +11,6 @@ docker run -it \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     --gpus all \
     --runtime=nvidia \
+    --env=NVIDIA_DRIVER_CAPABILITIES=all  \
     nikhil:thesis \
     bash
