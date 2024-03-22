@@ -1,53 +1,24 @@
 
-## Clone and setup
-```bash
-mkdir thesis_ws
-cd thesis_ws
-git clone git@github.com:nikhil-sethi/thesis.git
-cd thesis
-git submodule update --init --recursive  # might take some time
-```
 
-## Build
-(Remove sudo if you're on docker priveliged mode)
+## Build docker image
 
-1. PX4
-```bash
-cd sw/simulation/PX4-Autopilot/
-bash ./PX4-Autopilot/Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx
-sudo apt-get install protobuf-compiler libeigen3-dev libopencv-dev -y
-sudo apt-get install ros-${ROS_DISTRO}-mavros ros-${ROS_DISTRO}-mavros-extras ros-${ROS_DISTRO}-mavros-msgs
-wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
-sudo bash ./install_geographiclib_datasets.sh   
+Download the 'Dockerfile' from the root of this repository and launch the following command where the file is located.
 ```
-At this point you can (and probably should) test PX4 SITL if you want before moving on.
-
-2. NLopt (because ros-nlopt doesn't work with FUEL)
-```bash
-cd sw/third_party/nlopt
-mkdir build
-cd build
-cmake ..
-make
-make install # will install the main library in /usr/local/lib
+docker build --ssh default -t nikhil:thesis .
 ```
-
-3. Main code
-```bash
-cd thesis_ws
-caktin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4
-catkin build
-source devel/setup.bash # standard ros source
-source src/thesis/setup_paths.bash  # need this for px4 sitl and gazebo
-```
+It should take about 15-20 minutes to build. time to doodle something on your notebook.
 
 ## Run
+Download and execute the 'docker_run.sh' script located in the root of this repository.
+
+Inside the container:
 
 Simulation:
 ```bash
-terminal 1: roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
+terminal 1: roslaunch bringup rviz.launch # preferable to host the master on rviz
 
-terminal 2: roslaunch bringup rviz.launch
+terminal 2: source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
+            roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
 
 terminal 3 (for now): rosrun attention_map attention_processor_node
 ```
@@ -56,6 +27,7 @@ If everything went well you should see an axis marker for the drone and camera i
 
 Hardware testing
 
+Make sure the ROS_MASTER_URI and ROS_IP are set correctly on both the OBC and your laptop.
 - Your PC
 ```bash
 terminal 1: roslaunch bringup main.launch sim:=false
