@@ -22,6 +22,9 @@ RUN apt-get update \
     ca-certificates \
     build-essential \
     unzip \
+    net-tools \
+    nano \
+    iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Add ROS to sources list
