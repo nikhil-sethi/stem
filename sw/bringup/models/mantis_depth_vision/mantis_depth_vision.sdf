@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name='mantis_depth_vision'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <include>
+      <uri>model://depth_camera_rs</uri>
+      <pose>0.065 0 0.065 0 0 0</pose>
+    </include>
+    <joint name="depth_camera_joint" type="revolute">
+      <child>depth_camera::link</child>
+      <parent>iris::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+    <!-- This vision plugin is noisy and makes fake_localization using vision_pose unpredictable
+    You can use it but there need to be additional checks then for fusion. Not using for now -->
+    
+    <!-- <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pubRate>30</pubRate>
+        <randomWalk>0.1</randomWalk>
+        <noiseDensity>0.01</noiseDensity>
+        <corellationTime>60.0</corellationTime>
+    </plugin> -->
+
+     <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <bodyName>iris::base_link</bodyName>
+        <topicName>gazebo/ground_truth/odom</topicName>
+        <gaussianNoise>0.0</gaussianNoise>
+        <frameName>map</frameName>
+        <xyzOffsets>0 0 0</xyzOffsets>
+        <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+
+  </model>
+</sdf>

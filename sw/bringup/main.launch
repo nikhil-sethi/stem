@@ -13,7 +13,7 @@
     <arg name="sim" default="true"/>
     <arg name="planner" default="racer"/>
     <arg name="sim_name" default="sitl"/>
-    <arg name="vehicle" default="iris_depth_camera"/>
+    <arg name="vehicle" default="mantis_depth_vision"/>
     
     <arg name="odometry_topic" default="/mavros/local_position/odom"/>
     
@@ -45,7 +45,7 @@
             <arg name="vehicle" value="iris_vision"/>
             <arg name="world" value="/root/.gazebo/experiment3.world"/>
             <arg name="gui" value="$(arg gui)" />
-            <arg name="sdf" value="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+            <arg name="sdf" value="$(find bringup)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
             
             <!-- mavros args -->
             <!-- <arg name="fcu_url" value="udp://@10.43.0.225:14540"/> -->
@@ -105,7 +105,9 @@
     
     <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="attention_map" output="screen" required="true">
         <param unless="$(arg sim)" name="rgb_topic" value="/camera/color/image_raw"/>
-        <param if="$(arg sim)" name="rgb_topic" value="camera/rgb/image_raw"/>
+        <param if="$(arg sim)" name="rgb_topic" value="/camera/rgb/image_raw"/>
     </node>
+    
+    <include file="$(find bringup)/rviz.launch"/>
 
 </launch>
