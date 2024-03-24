@@ -6,7 +6,7 @@ Download the 'Dockerfile' from the root of this repository and launch the follow
 ```
 docker build --ssh default -t nikhil:thesis .
 ```
-It should take about 15-20 minutes to build. time to doodle something on your notebook.
+It should take about 20-30 minutes to build. time to doodle something on your notebook.
 
 ## Run
 Download and execute the 'docker_run.sh' script located in the root of this repository.

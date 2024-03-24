@@ -54,11 +54,11 @@
 
         <!-- <node name="ekf_origin_pub" pkg="rostopic" output="screen" type="rostopic" args="pub -l /mavros/global_position/set_gp_origin geographic_msgs/GeoPointStamped '{header: auto, position: { latitude: 47.3977420, longitude: 8.545594, altitude: 535.221}}'"/> -->
         
-        <node name="fake_localization" pkg="fake_localization" output="screen" type="fake_localization_node">
+        <!-- <node name="fake_localization" pkg="fake_localization" output="screen" type="fake_localization_node">
             <param name="init_x" value="$(arg init_x)"/>
             <param name="init_y" value="$(arg init_y)"/>
             <param name="init_z" value="$(arg init_z)"/>
-        </node>
+        </node> -->
 
         <!-- drone toolbox interface -->
         <!-- This already runs onboard so only need it in sim -->

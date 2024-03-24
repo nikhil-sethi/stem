@@ -1,5 +1,5 @@
 # Base image
-FROM nvidia/cuda:12.1.1-devel-ubuntu20.04
+FROM nvidia/cudagl:11.3.1-devel-ubuntu20.04
 # Environment variables
 ENV ROS_DISTRO=noetic
 ENV ROS_PKG=desktop-full
@@ -118,7 +118,7 @@ RUN apt-get update \
 # build everything
 RUN cd ~/thesis_ws \ 
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server\
+    && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server odom_visualization\
     && catkin build
     
 # fake stop
