@@ -1,13 +1,29 @@
 <launch>
 
     <!-- static frames -->
-    <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
-    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
+    <!-- <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
+    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/> -->
 
-    <!-- rosbag -->
-    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="-l /root/2024-03-11-03-37-50.bag"/>
+    <include file="$(find bringup)/fuel.launch">
+        <arg name="init_x"   value="-2"/>
+        <arg name="init_y"   value="-1"/>
+        <arg name="init_z"   value="1"/>
+        <arg name="map_size_x" value="5"/>
+        <arg name="map_size_y" value="5"/>
+        <arg name="map_size_z" value="1.7"/>
+
+        <arg name="odometry_topic" value="/mavros/local_position/odom"/>
+        <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
+        <arg name="sensor_pose_topic" value="/camera/pose"/>
+    </include>
+
+    <!-- rosbag, gives out sensor_pose, odomtery, depth, rgb -->
+    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="-l /root/2024-03-15-20-58-06.bag"/>
 
     <!-- parameters -->
     <rosparam file="$(find bringup)/config/fuel_algo.yaml" ns="exploration_node"/>
+    <!-- <param name="use_sim_time" value="true"/> -->
+
+
 
 </launch>
