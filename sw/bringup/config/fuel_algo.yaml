@@ -9,12 +9,12 @@ sdf_map:
   obstacles_inflation: 0.199
   local_bound_inflate: 0.5
   local_map_margin: 50
-  ground_height: -0.2
+  ground_height: -0.1
   default_dist: 0.0
-  p_hit: 0.65
+  p_hit: 0.68
   p_miss: 0.35
   p_min: 0.12
-  p_max: 0.90
+  p_max: 0.99
   p_occ: 0.80
   min_ray_length: 0.5
   max_ray_length: 3
@@ -23,16 +23,16 @@ sdf_map:
   signed_dist: false
   box_min_x: -2.5
   box_min_y: -2.5
-  box_min_z:  0.0
+  box_min_z:  -0.1
   box_max_x: 2.5
   box_max_y: 2.5
-  box_max_z: 1.7
+  box_max_z: 1.6
 
 map_ros:         # Gazebo        # Intel realsense 4255  
-  cx: 424.50000  # 424.50000     # 422.86578  
-  cy: 240.50000  # 240.50000     # 242.46154
-  fx: 454.68577  # 454.68577     # 427.75729
-  fy: 454.68577  # 454.68577     # 427.75729
+  cx: 422.86578  # 424.50000     # 422.86578  
+  cy: 242.46154  # 240.50000     # 242.46154
+  fx: 427.75729  # 454.68577     # 427.75729
+  fy: 427.75729  # 454.68577     # 427.75729
   depth_filter_maxdist: 3
   depth_filter_mindist: 0.2
   depth_filter_margin: 2
