@@ -3,6 +3,11 @@
     <!-- static frames -->
     <!-- <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
     <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/> -->
+   
+    <!-- When false, sdf map is built fast but no odom axis markers
+    When true, markers exist but maps is slow.  -->
+    <param name="use_sim_time" value="false"/>
+
 
     <include file="$(find bringup)/fuel.launch">
         <arg name="init_x"   value="-2"/>
@@ -18,12 +23,15 @@
     </include>
 
     <!-- rosbag, gives out sensor_pose, odomtery, depth, rgb -->
-    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="-l /root/2024-03-15-20-58-06.bag"/>
+    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="--clock -l $(find bringup)/data/bags/2024-03-26-19-44-36_fuel_flight.bag"/>
 
     <!-- parameters -->
     <rosparam file="$(find bringup)/config/fuel_algo.yaml" ns="exploration_node"/>
-    <!-- <param name="use_sim_time" value="true"/> -->
+    
+    <node name="attention_map_2d" type="attention_map.py" pkg="attention_map" output="screen" required="true">
+        <param name="rgb_topic" value="/camera/color/image_raw"/>
+    </node>
 
-
+    <include file="$(find bringup)/rviz.launch"/>
 
 </launch>

@@ -43,7 +43,7 @@
             <arg name="P" value="$(arg init_P)"/>
             <arg name="Y" value="$(arg init_Y)"/>
             <arg name="vehicle" value="iris_vision"/>
-            <arg name="world" value="/root/.gazebo/experiment3.world"/>
+            <arg name="world" value="$(find bringup)/worlds/lab.world"/>
             <arg name="gui" value="$(arg gui)" />
             <arg name="sdf" value="$(find bringup)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
             

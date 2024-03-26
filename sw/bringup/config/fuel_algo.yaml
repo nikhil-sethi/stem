@@ -1,5 +1,5 @@
-define: &max_vel 1.0
-define: &max_acc 1.0
+define: &max_vel 0.5
+define: &max_acc 0.5
 
 sdf_map:
   resolution: 0.05
@@ -12,10 +12,10 @@ sdf_map:
   ground_height: -0.1
   default_dist: 0.0
   p_hit: 0.68
-  p_miss: 0.35
+  p_miss: 0.4
   p_min: 0.12
   p_max: 0.99
-  p_occ: 0.80
+  p_occ: 0.7
   min_ray_length: 0.5
   max_ray_length: 3
   virtual_ceil_height: -10
@@ -60,7 +60,7 @@ exploration:
   top_view_num: 15
   vm: *max_vel
   am: *max_acc
-  yd:  0.6108652     # "$(eval 35 * 3.1415926 / 180.0)"
+  yd:  0.785     # "$(eval 35 * 3.1415926 / 180.0)"
   ydd: 1.5707963     # "$(eval 90 * 3.1415926 / 180.0)"
   w_dir: 1.5
   tsp_dir: "$(find lkh_tsp_solver)/resource" # YAML limitation: needs to be remapped from outside if you want relative paths. 
@@ -70,15 +70,19 @@ frontier:
   cluster_min: 100
   cluster_size_xy: 1.5
   cluster_size_z: 10.0
-  min_candidate_dist: 0.75
+  min_candidate_dist: 0.5  # minimum distance a viewpoint needs to be from the centroid of a frontier to be considered
   min_candidate_clearance: 0.21
   candidate_dphi: 0.261799383  # "$(eval 15 * 3.1415926 / 180.0)"
   candidate_rnum: 3
-  candidate_rmin: 1.0
-  candidate_rmax: 2.0
+  candidate_rmin: 0.75
+  candidate_rmax: 1.75
   down_sample: 3
-  min_visib_num: 30
-  min_view_finish_fraction: 0.2
+  min_visib_num: 20
+  
+  # % change that must happen for the frontier to call for recompute
+  # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate
+  # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
+  min_view_finish_fraction: 0.9    
 
 perception_utils:
   top_angle: 0.56125
@@ -87,14 +91,16 @@ perception_utils:
   max_dist: 3
   vis_dist: 1.0
 
-heading_planner:
-  yaw_diff: 0.523598767 # "$(eval 30 * 3.1415926 / 180.0)"
-  half_vert_num: 5
-  lambda1: 2.0
-  lambda2: 1.0
-  max_yaw_rate: 0.174532922 # "$(eval 10 * 3.1415926 / 180.0)"
-  w: 20000.0
-  weight_type: 1
+
+# UNUSED
+# heading_planner:
+#   yaw_diff: 0.523598767 # "$(eval 30 * 3.1415926 / 180.0)"
+#   half_vert_num: 5
+#   lambda1: 2.0
+#   lambda2: 1.0
+#   max_yaw_rate: 0.174532922 # "$(eval 10 * 3.1415926 / 180.0)"
+#   w: 20000.0
+#   weight_type: 1
 
 manager:
   max_vel: *max_vel
