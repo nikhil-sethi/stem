@@ -9,7 +9,7 @@ sdf_map:
   obstacles_inflation: 0.199
   local_bound_inflate: 0.5
   local_map_margin: 50
-  ground_height: -0.1
+  ground_height: -0.2
   default_dist: 0.0
   p_hit: 0.68
   p_miss: 0.4
@@ -23,10 +23,10 @@ sdf_map:
   signed_dist: false
   box_min_x: -2.5
   box_min_y: -2.5
-  box_min_z:  -0.1
+  box_min_z:  -0.2
   box_max_x: 2.5
   box_max_y: 2.5
-  box_max_z: 1.6
+  box_max_z: 1.5
 
 map_ros:         # Gazebo        # Intel realsense 4255  
   cx: 422.86578  # 424.50000     # 422.86578  
@@ -60,9 +60,9 @@ exploration:
   top_view_num: 15
   vm: *max_vel
   am: *max_acc
-  yd:  0.785     # "$(eval 35 * 3.1415926 / 180.0)"
+  yd:  0.6     # "$(eval 45 * 3.1415926 / 180.0)"   DONT LOWER THIS BELOW 0.6 in hardware flights. DRONE GIVES UP
   ydd: 1.5707963     # "$(eval 90 * 3.1415926 / 180.0)"
-  w_dir: 1.5
+  w_dir: 6
   tsp_dir: "$(find lkh_tsp_solver)/resource" # YAML limitation: needs to be remapped from outside if you want relative paths. 
   relax_time: 1.0
 
@@ -82,7 +82,7 @@ frontier:
   # % change that must happen for the frontier to call for recompute
   # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate
   # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
-  min_view_finish_fraction: 0.9    
+  min_view_finish_fraction: 0.5    
 
 perception_utils:
   top_angle: 0.56125
