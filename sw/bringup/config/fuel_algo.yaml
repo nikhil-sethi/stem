@@ -60,9 +60,16 @@ exploration:
   top_view_num: 15
   vm: *max_vel
   am: *max_acc
-  yd:  0.6     # "$(eval 45 * 3.1415926 / 180.0)"   DONT LOWER THIS BELOW 0.6 in hardware flights. DRONE GIVES UP
-  ydd: 1.5707963     # "$(eval 90 * 3.1415926 / 180.0)"
-  w_dir: 6
+  
+  # Cost to change yaw angle 
+  # this should ideally be matched closely with the controller's maximum yaw rate, but might need to be more conservative because of noise and delays
+  yd:  0.7     # "$(eval 45 * 3.1415926 / 180.0)"   DONT LOWER THIS BELOW 0.6 in hardware flights. DRONE GIVES UP
+  ydd: 1.5707963     # "$(eval 90 * 3.1415926 / 180.0)"  not used
+  
+  # Cost to change velocity vector direction
+  # higher values resist changes and act more sluggish but result in better, stable movements
+  # lower values decrease flight times but with poor mapping
+  w_dir: 3 
   tsp_dir: "$(find lkh_tsp_solver)/resource" # YAML limitation: needs to be remapped from outside if you want relative paths. 
   relax_time: 1.0
 
@@ -116,6 +123,9 @@ manager:
   use_optimization: true
   use_active_perception: true
   min_time: true
+  max_yawdot: 0.7  # 60 * 3,1415926 / 180,0
+  relax_time1: 0.3
+  relax_time2: 1.5
 
 search:
   max_tau: 0.8
