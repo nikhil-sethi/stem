@@ -23,6 +23,8 @@
 #include <common/io.h>
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
+#include <geometry_msgs/PoseArray.h>
+
 
 struct TargetViewpoint: fast_planner::Viewpoint{
     float gain_;
@@ -39,7 +41,25 @@ struct TargetViewpoint: fast_planner::Viewpoint{
     Eigen::Vector3d posToEigen(){
         return Eigen::Vector3d(pos_(0), pos_(1),pos_(2));
     }
+
+    geometry_msgs::Pose toMsg(){
+        geometry_msgs::Pose msg;
+        // msg.header.stamp = ros::Time::now();
+        
+        msg.position.x = pos_(0);
+        msg.position.y = pos_(1);
+        msg.position.z = pos_(2);
+        
+        tf2::Quaternion quat_tf;
+        quat_tf.setRPY(0,0,yaw_);
+        quat_tf = quat_tf.normalize();
+        msg.orientation = tf2::toMsg(quat_tf);
+    
+        return msg;
+    }   
+
 };
+
 
 
 using namespace Eigen;
@@ -113,11 +133,10 @@ class AttentionMap{
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
         float computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw);
 
-
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
-        ros::Publisher bbox_pub;
+        ros::Publisher bbox_pub, vpt_pub;
         ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
@@ -142,6 +161,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
+    vpt_pub = nh.advertise<geometry_msgs::PoseArray>("/objects/target_vpts", 1);
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
@@ -204,13 +224,24 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
         // find top viewpoints
         // calculate optimal local tour
 
+    geometry_msgs::PoseArray vpts_msg;
+    vpts_msg.header.stamp = ros::Time::now();
+    vpts_msg.header.frame_id = "map";
+    // std::vector<geometry_msgs::Pose> vpts(object.size());
+
+    
     for (Object& object: objects){
         // if (object.id==3){
             findViewpoints(object);
             visualize(object);
+            if (!object.viewpoint_candidates.empty())
+                vpts_msg.poses.push_back(object.viewpoint_candidates[0].toMsg());
         // }
     }
-    
+
+    vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
+
+
 }
 
 void sortViewpoints(std::vector<TargetViewpoint>& vpts){
@@ -269,7 +300,7 @@ void AttentionMap::findViewpoints(Object& object){
             // compute information gain from remaining viewpoints
             float gain = computeInformationGain(object, sample_pos, phi);
             // print(object.id, rc, phi, gain);
-            if (gain<10)
+            if (gain<5)
                 continue;
             
             // add whatever's left to candidates
@@ -352,11 +383,19 @@ void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
     sdf_map_->md_->occupancy_buffer_inflate_ = msg.data;
 }
 
+// void filterAttCloud(pcl::PointCloud<pcl::PointXYZI> cloud){
+
+// }
+
 
 void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg){
     // Convert sensor_msgs::PointCloud2 to PCL PointCloud
     pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::fromROSMsg(*msg, *pcl_cloud);
+
+    // filter and preprocess the pointcloud
+    // filterAttCloud(pcl_cloud);
+    // addBottomUpAttention(pcl_cloud)
 
     // update the attention buffer, need it for raycasting
     Eigen::Vector3i idx;
@@ -375,8 +414,8 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     std::vector<pcl::PointIndices> cluster_indices;
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
     ec.setInputCloud(pcl_cloud);
-    ec.setClusterTolerance(0.1); // Set the cluster tolerance (adjust as needed)
-    ec.setMinClusterSize(10);    // Set the minimum cluster size (adjust as needed)
+    ec.setClusterTolerance(0.15); // Set the cluster tolerance (adjust as needed)
+    ec.setMinClusterSize(5);    // Set the minimum cluster size (adjust as needed)
     ec.setMaxClusterSize(25000);   // Set the maximum cluster size (adjust as needed)
     ec.extract(cluster_indices);
     // ROS_INFO("num obj: %d", cluster_indices.size());

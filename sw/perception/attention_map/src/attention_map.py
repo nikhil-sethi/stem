@@ -7,6 +7,7 @@ import rospy
 import cv2
 from cv_bridge import CvBridge
 import time
+from std_msgs.msg import Header
 
 class NoName():
     def __init__(self) -> None:
@@ -23,22 +24,24 @@ class NoName():
         self.att_pub = rospy.Publisher("/iris_depth_camera/attention_map/2d", Image, queue_size=10)
 
         rospy.wait_for_message(rgb_topic, Image, timeout=5)
+        self.att_header = Header()
         att_timer = rospy.Timer(rospy.Duration(0.1), self.att_map_publisher)
         
         # self.run_animation()
         rospy.spin()
 
     def att_map_publisher(self, event):
-        att_msg = self.bridge.cv2_to_imgmsg(self.arr_att, encoding='mono8')
-        att_msg.header.stamp = rospy.Time.now()
-        # print(att_msg.)
-        self.att_pub.publish(att_msg)
+        self.att_msg = self.bridge.cv2_to_imgmsg(self.arr_att, encoding='mono8')
+        self.att_msg.header = self.att_header
+        self.att_pub.publish(self.att_msg)
 
     def cam_callback(self, msg):
         # arr = msg.data
         start = time.time()
         arr = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         self.arr_att = get_attention_map(arr)
+        
+        self.att_header = msg.header  # to sync timestamps with RGB message
 
     def update_ani(self, frame):
         self.im.set_array(self.arr_att)
