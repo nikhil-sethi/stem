@@ -15,6 +15,7 @@
 #include <Eigen/Eigen>
 #include <traj_utils/planning_visualization.h>
 #include <common_msgs/uint8List.h>
+#include <common_msgs/AttentionMapMsg.h>
 #include <plan_env/sdf_map.h>
 #include <memory>
 #include <sensor_model/camera.h>
@@ -24,6 +25,7 @@
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
 #include <geometry_msgs/PoseArray.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 
 
 struct TargetViewpoint: fast_planner::Viewpoint{
@@ -121,7 +123,7 @@ class AttentionMap{
     friend fast_planner::SDFMap;
     public:
         AttentionMap(ros::NodeHandle& nh);
-        void attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
+        void attCloudCallback(const common_msgs::AttentionMapMsg& msg);
         void occCallback(const common_msgs::uint8List& msg);
         void occInflateCallback(const common_msgs::uint8List& msg);
         void findViewpoints(Object& object);
@@ -132,11 +134,15 @@ class AttentionMap{
         void visualize(Object& object);
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
         float computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw);
+        void createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl_cloud);
+        void publishAtt(pcl::PointCloud<pcl::PointXYZI>& pcl_cloud);;
+
+
 
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
-        ros::Publisher bbox_pub, vpt_pub;
+        ros::Publisher bbox_pub, vpt_pub, att_3d_pub;
         ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
@@ -156,12 +162,14 @@ class AttentionMap{
 };
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
-    att_3d_sub_ = nh.subscribe("/attention_map/3d", 1, &AttentionMap::attCloudCallback, this);
+    att_3d_sub_ = nh.subscribe("/attention_map/buffer", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
     vpt_pub = nh.advertise<geometry_msgs::PoseArray>("/objects/target_vpts", 1);
+    att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/points", 1);
+
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
@@ -300,8 +308,8 @@ void AttentionMap::findViewpoints(Object& object){
             // compute information gain from remaining viewpoints
             float gain = computeInformationGain(object, sample_pos, phi);
             // print(object.id, rc, phi, gain);
-            if (gain<5)
-                continue;
+            // if (gain<5)
+            //     continue;
             
             // add whatever's left to candidates
             TargetViewpoint vpt(sample_pos, phi + M_PI, gain);
@@ -383,32 +391,19 @@ void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
     sdf_map_->md_->occupancy_buffer_inflate_ = msg.data;
 }
 
-// void filterAttCloud(pcl::PointCloud<pcl::PointXYZI> cloud){
+void filterAttCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
+//   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
-// }
+  pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
+  sor.setInputCloud (cloud);
+  sor.setMeanK (50);
+  sor.setStddevMulThresh (1.0);
+  sor.filter (*cloud);
+
+}
 
 
-void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg){
-    // Convert sensor_msgs::PointCloud2 to PCL PointCloud
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZI>);
-    pcl::fromROSMsg(*msg, *pcl_cloud);
-
-    // filter and preprocess the pointcloud
-    // filterAttCloud(pcl_cloud);
-    // addBottomUpAttention(pcl_cloud)
-
-    // update the attention buffer, need it for raycasting
-    Eigen::Vector3i idx;
-    Eigen::Vector3d pos;
-
-    for (auto& point: (*pcl_cloud).points){
-        pos(0) = point.x;
-        pos(1) = point.y;
-        pos(2) = point.z;
-         sdf_map_->posToIndex(pos, idx);
-        attention_buffer[sdf_map_->toAddress(idx)] = point.intensity;
-
-    }
+void AttentionMap::createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl_cloud){
 
     // Apply clustering
     std::vector<pcl::PointIndices> cluster_indices;
@@ -438,6 +433,52 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
         object.computeInfo();
         objects.push_back(object);
     }
+}
+
+void AttentionMap::publishAtt(pcl::PointCloud<pcl::PointXYZI>& pcl_cloud){
+    
+    pcl_cloud.width = pcl_cloud.points.size();
+    pcl_cloud.height = 1;
+    pcl_cloud.is_dense = true;
+    pcl_cloud.header.frame_id = "map";
+    sensor_msgs::PointCloud2 cloud_msg;
+    pcl::toROSMsg(pcl_cloud, cloud_msg);
+    att_3d_pub.publish(cloud_msg);
+}
+
+
+void AttentionMap::attCloudCallback(const common_msgs::AttentionMapMsg& msg){
+    
+    // set att buffer to zero
+    std::fill(attention_buffer.begin(), attention_buffer.end(), 0);
+    
+    // update the attention buffer, need it for raycasting
+    Eigen::Vector3i idx;
+    Eigen::Vector3d pos;
+    pcl::PointXYZI pcl_pt;
+    
+    // Convert sensor_msgs::PointCloud2 to PCL PointCloud
+    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZI>);
+    // pcl::PointCloud<pcl::PointXYZI> pcl_cloud;
+    
+    for (int i=0; i<msg.len; i++){
+        attention_buffer[msg.indices[i]] = msg.data[i];
+        sdf_map_->indexToPos(msg.indices[i], pos);
+        pcl_pt.x = pos[0];
+        pcl_pt.y = pos[1];
+        pcl_pt.z = pos[2];
+        pcl_pt.intensity = msg.data[i];
+        pcl_cloud->push_back(pcl_pt);
+    }
+    
+    // filter and preprocess the pointcloud
+    // filterAttCloud(pcl_cloud); // doing this after object creation to do filtering only in 
+    // addBottomUpAttention(pcl_cloud)
+
+    publishAtt(*pcl_cloud);
+
+    createObjects(pcl_cloud);
+
 }
 
 
