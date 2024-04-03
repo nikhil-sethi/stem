@@ -51,7 +51,6 @@ add_message_files(
   FILES
   float64List.msg
   uint8List.msg
-  AttentionMapMsg.msg
   # Message2.msg
 )
 

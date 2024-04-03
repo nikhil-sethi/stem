@@ -15,7 +15,6 @@
 #include <Eigen/Eigen>
 #include <traj_utils/planning_visualization.h>
 #include <common_msgs/uint8List.h>
-#include <common_msgs/AttentionMapMsg.h>
 #include <plan_env/sdf_map.h>
 #include <memory>
 #include <sensor_model/camera.h>
@@ -327,8 +326,8 @@ void AttentionMap::findViewpoints(Object& object){
             // compute information gain from remaining viewpoints
             float gain = computeInformationGain(object, sample_pos, phi);
             // print(object.id, rc, phi, gain);
-            // if (gain<5)
-            //     continue;
+            if (gain<=2)
+                continue;
             
             // add whatever's left to candidates
             TargetViewpoint vpt(sample_pos, phi + M_PI, gain);
@@ -369,11 +368,12 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
                 || getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED 
                 || getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN) {
                     visib = false;
-                    attention_buffer[sdf_map_->toAddress(start_idx)] = 0; // mark this attention cell dead, because it's unreachable.
+                    // attention_buffer[sdf_map_->toAddress(start_idx)] = 0; // mark this attention cell dead, because it's unreachable.
                     break;
             }
         }
-        if (visib) total_gain += infoTransfer(point.intensity)*point.intensity;
+        // if (visib) total_gain += infoTransfer(point.intensity)*point.intensity;
+        if (visib) total_gain += point.intensity==1? point.intensity:0;
     }
     return total_gain; 
 }
@@ -501,11 +501,12 @@ void AttentionMap::filterAttBuffer(){
 
 
 void AttentionMap::createObjects(){
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_copy(new pcl::PointCloud<pcl::PointXYZI>(*global_att_cloud));
 
     // Apply clustering
     std::vector<pcl::PointIndices> cluster_indices;
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
-    ec.setInputCloud(global_att_cloud);
+    ec.setInputCloud(cloud_copy);
     ec.setClusterTolerance(0.15); // Set the cluster tolerance (adjust as needed)
     ec.setMinClusterSize(5);    // Set the minimum cluster size (adjust as needed)
     ec.setMaxClusterSize(25000);   // Set the maximum cluster size (adjust as needed)
@@ -519,7 +520,7 @@ void AttentionMap::createObjects(){
         pcl::PointCloud<pcl::PointXYZI>::Ptr cluster_cloud(new pcl::PointCloud<pcl::PointXYZI>);
         pcl::ExtractIndices<pcl::PointXYZI> extract;
         pcl::PointIndices::Ptr pcl_indices(new pcl::PointIndices(cluster_index));
-        extract.setInputCloud(global_att_cloud);
+        extract.setInputCloud(cloud_copy);
         extract.setIndices(pcl_indices);
         extract.filter(*cluster_cloud);
         
@@ -645,7 +646,7 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
 
     publishAtt();
 
-    // createObjects();
+    createObjects();
 
 
     // set att buffer to zero
