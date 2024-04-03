@@ -37,7 +37,7 @@ map_ros:         # Gazebo        # Intel realsense 4255
   depth_filter_mindist: 0.2
   depth_filter_margin: 2
   k_depth_scaling_factor: 1000.0
-  skip_pixel: 2
+  skip_pixel: 8
   esdf_slice_height: 0.3
   visualization_truncate_height: 10.09
   visualization_truncate_low: -2.0

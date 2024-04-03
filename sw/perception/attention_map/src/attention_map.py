@@ -25,7 +25,7 @@ class NoName():
 
         rospy.wait_for_message(rgb_topic, Image, timeout=5)
         self.att_header = Header()
-        att_timer = rospy.Timer(rospy.Duration(0.1), self.att_map_publisher)
+        att_timer = rospy.Timer(rospy.Duration(0.05), self.att_map_publisher)
         
         # self.run_animation()
         rospy.spin()

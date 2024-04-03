@@ -116,14 +116,26 @@ bool isPtInBox(const Eigen::Vector3d& point, const Eigen::Vector3d& bbox_max, co
     return true;
 }
 
-
+inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel) {
+  vector<Eigen::Vector3i> neighbors(26);
+  Eigen::Vector3i tmp;
+  int count = 0;
+  for (int x = -1; x <= 1; ++x)
+    for (int y = -1; y <= 1; ++y)
+      for (int z = -1; z <= 1; ++z) {
+        if (x == 0 && y == 0 && z == 0) continue;
+        tmp = voxel + Eigen::Vector3i(x, y, z);
+        neighbors[count++] = tmp;
+      }
+  return neighbors;
+}
 // class fast_planner::SDFMap;
 
 class AttentionMap{
     friend fast_planner::SDFMap;
     public:
         AttentionMap(ros::NodeHandle& nh);
-        void attCloudCallback(const common_msgs::AttentionMapMsg& msg);
+        void attCloudCallback(const sensor_msgs::PointCloud2& msg);
         void occCallback(const common_msgs::uint8List& msg);
         void occInflateCallback(const common_msgs::uint8List& msg);
         void findViewpoints(Object& object);
@@ -134,15 +146,15 @@ class AttentionMap{
         void visualize(Object& object);
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
         float computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw);
-        void createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl_cloud);
-        void publishAtt(pcl::PointCloud<pcl::PointXYZI>& pcl_cloud);;
-
+        void createObjects();
+        void publishAtt();
+        void filterAttBuffer();
 
 
     private:
         std::list<Object> objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
-        ros::Publisher bbox_pub, vpt_pub, att_3d_pub;
+        ros::Publisher bbox_pub, vpt_pub, att_3d_pub, unknown_pub_;
         ros::Timer loop_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
@@ -158,18 +170,19 @@ class AttentionMap{
         std::vector<Eigen::Vector3d> corners_cam; //bbox corners in camera frame, just for precompute ease
 
         std::unique_ptr<RayCaster> raycaster_;
+        pcl::PointCloud<pcl::PointXYZI>::Ptr global_att_cloud;
         
 };
 
 AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
-    att_3d_sub_ = nh.subscribe("/attention_map/buffer", 1, &AttentionMap::attCloudCallback, this);
+    att_3d_sub_ = nh.subscribe("/attention_map/local", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
     
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
     vpt_pub = nh.advertise<geometry_msgs::PoseArray>("/objects/target_vpts", 1);
-    att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/points", 1);
-
+    att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/global", 1);
+    unknown_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/sdf_map/unknown2", 10);
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
@@ -180,7 +193,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     print_eigen(origin);
     print_eigen(size);
     // preallocate memory for buffers
-    occupancy_buffer_ = vector<uint8_t>(sdf_map_->buffer_size, 0);
+    occupancy_buffer_ = vector<uint8_t>(sdf_map_->buffer_size, 1);
     occupancy_inflate_buffer = vector<uint8_t>(sdf_map_->buffer_size, 0);
     attention_buffer = vector<float>(sdf_map_->buffer_size, 0);
 
@@ -193,6 +206,12 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     // raycasting
     raycaster_.reset(new RayCaster);
     raycaster_->setParams(resolution_, origin);
+
+    global_att_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+    global_att_cloud->height = 1;
+    global_att_cloud->is_dense = true;
+    global_att_cloud->header.frame_id = "map";
+
 }
 
 void AttentionMap::visualize(Object& object){
@@ -331,6 +350,7 @@ float infoTransfer(float gain){
 float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw){
     
     Eigen::Vector3i idx;
+    Eigen::Vector3i start_idx;
     Eigen::Vector3d pos;
     float total_gain = 0;
     for (pcl::PointXYZI& point : object.points) {
@@ -339,7 +359,9 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
         pos(2) = point.z;
         raycaster_->input(pos, sample_pos);
         bool visib = true;
+        // sdf_map_->posToIndex(pos, start_idx); // save start to cleanup later 
         raycaster_->nextId(idx); // because we're already on the surface, presumably
+        start_idx = idx;
         while (raycaster_->nextId(idx)) {
             if (
                 attention_buffer[sdf_map_->toAddress(idx)] > 0 // the ray shouldnt have any other attentive cell in it's path
@@ -347,6 +369,7 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
                 || getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED 
                 || getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN) {
                     visib = false;
+                    attention_buffer[sdf_map_->toAddress(start_idx)] = 0; // mark this attention cell dead, because it's unreachable.
                     break;
             }
         }
@@ -385,30 +408,104 @@ bool AttentionMap::isObjectInView(const Object& object, const Eigen::Vector3d& p
 void AttentionMap::occCallback(const common_msgs::uint8List& msg){
     // sdfmap buffer isnt used here because of different compatible uint8 datatype
     occupancy_buffer_ = msg.data;
+    // pcl::PointCloud<pcl::PointXYZ> cloud;
+    // pcl::PointXYZ pt;
+    // Eigen::Vector3d pos;
+    // Eigen::Vector3i idx;
+    // for (int i=0; i<occupancy_buffer_.size(); i++){
+        
+    //     sdf_map_->indexToPos(i, pos);
+    //     sdf_map_->posToIndex(pos, idx);
+    //     if (getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN){
+    //         pt.x = pos(0);
+    //         pt.y = pos(1);
+    //         pt.z = pos(2);
+    //         cloud.push_back(pt);
+    //     }
+    // }
+    // cloud.width = cloud.points.size();
+    // cloud.height = 1;
+    // cloud.is_dense = true;
+    // cloud.header.frame_id = "map";
+    // sensor_msgs::PointCloud2 cloud_msg;
+    // pcl::toROSMsg(cloud, cloud_msg);
+    // unknown_pub_.publish(cloud_msg);
 }
 
 void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
     sdf_map_->md_->occupancy_buffer_inflate_ = msg.data;
 }
 
-void filterAttCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud){
-//   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
+// void AttentionMap::filterAttCloud(){
+// //   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZ>);
 
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
-  sor.setInputCloud (cloud);
-  sor.setMeanK (50);
-  sor.setStddevMulThresh (1.0);
-  sor.filter (*cloud);
+//   pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
+//   sor.setInputCloud (global_att_cloud);
+//   sor.setMeanK (20);
+//   sor.setStddevMulThresh (1.0);
+//   sor.filter (*global_att_cloud);
 
+// }
+
+void AttentionMap::filterAttBuffer(){
+    global_att_cloud->points.clear();
+    pcl::PointXYZI pcl_pt;
+    Eigen::Vector3i idx;
+    Eigen::Vector3d pos;
+    std::vector<int> salient_voxels_ids;
+    for (int i = 0; i<attention_buffer.size(); i++){
+        if (attention_buffer[i]<=0) // only check positive attention cells
+            continue;
+        
+        // if (attention_buffer[i]!=1){ // dont do anything for salient voxels except adding them to the cloud
+            sdf_map_->indexToPos(i, pos);
+            sdf_map_->posToIndex(pos, idx);
+        ROS_ERROR("%d", getOccupancy(idx));
+            //  if (getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN){
+            //         attention_buffer[i] = 1;
+            //     }
+            // auto nbrs = allNeighbors(idx); // 26 neighbors
+            // float att_nbr = 0.0;
+            
+            // for (auto nbr : nbrs) {
+            //     if (!sdf_map_->isInMap(nbr))
+            //         continue;
+            //     // int adr = sdf_map_->toAddress(nbr);
+            //     // att_nbr += attention_buffer[adr];
+            //     if (getOccupancy(nbr) == fast_planner::SDFMap::UNKNOWN){
+            //         pcl_pt.x = pos[0];
+            //         pcl_pt.y = pos[1];
+            //         pcl_pt.z = pos[2];
+            //         pcl_pt.intensity = 1;
+            //         global_att_cloud->push_back(pcl_pt);
+            //     }
+                        
+            // }
+            
+            // if ((att_nbr < 3*0.5) // at least 4 attentive neighbours
+            //     && (getOccupancy(idx) ==fast_planner::SDFMap::OCCUPIED))
+            //     attention_buffer[i] = 0;    
+        
+        // }
+
+        // add to global cloud
+        // sdf_map_->indexToPos(i, pos);
+        
+    }
+
+    // for (auto id: salient_voxels_ids){
+    //     attention_buffer[id] = 1;
+    // }
 }
 
 
-void AttentionMap::createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl_cloud){
+
+void AttentionMap::createObjects(){
 
     // Apply clustering
     std::vector<pcl::PointIndices> cluster_indices;
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
-    ec.setInputCloud(pcl_cloud);
+    ec.setInputCloud(global_att_cloud);
     ec.setClusterTolerance(0.15); // Set the cluster tolerance (adjust as needed)
     ec.setMinClusterSize(5);    // Set the minimum cluster size (adjust as needed)
     ec.setMaxClusterSize(25000);   // Set the maximum cluster size (adjust as needed)
@@ -422,7 +519,7 @@ void AttentionMap::createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl
         pcl::PointCloud<pcl::PointXYZI>::Ptr cluster_cloud(new pcl::PointCloud<pcl::PointXYZI>);
         pcl::ExtractIndices<pcl::PointXYZI> extract;
         pcl::PointIndices::Ptr pcl_indices(new pcl::PointIndices(cluster_index));
-        extract.setInputCloud(pcl_cloud);
+        extract.setInputCloud(global_att_cloud);
         extract.setIndices(pcl_indices);
         extract.filter(*cluster_cloud);
         
@@ -435,49 +532,134 @@ void AttentionMap::createObjects(const pcl::PointCloud<pcl::PointXYZI>::Ptr& pcl
     }
 }
 
-void AttentionMap::publishAtt(pcl::PointCloud<pcl::PointXYZI>& pcl_cloud){
+void AttentionMap::publishAtt(){
     
-    pcl_cloud.width = pcl_cloud.points.size();
-    pcl_cloud.height = 1;
-    pcl_cloud.is_dense = true;
-    pcl_cloud.header.frame_id = "map";
+    global_att_cloud->width = global_att_cloud->points.size();
     sensor_msgs::PointCloud2 cloud_msg;
-    pcl::toROSMsg(pcl_cloud, cloud_msg);
+    pcl::toROSMsg(*global_att_cloud, cloud_msg);
     att_3d_pub.publish(cloud_msg);
 }
 
 
-void AttentionMap::attCloudCallback(const common_msgs::AttentionMapMsg& msg){
+void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
     
-    // set att buffer to zero
-    std::fill(attention_buffer.begin(), attention_buffer.end(), 0);
     
     // update the attention buffer, need it for raycasting
     Eigen::Vector3i idx;
     Eigen::Vector3d pos;
-    pcl::PointXYZI pcl_pt;
+    
     
     // Convert sensor_msgs::PointCloud2 to PCL PointCloud
-    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI> local_att_cloud ;
+    pcl::fromROSMsg(msg, local_att_cloud);
     // pcl::PointCloud<pcl::PointXYZI> pcl_cloud;
     
-    for (int i=0; i<msg.len; i++){
-        attention_buffer[msg.indices[i]] = msg.data[i];
-        sdf_map_->indexToPos(msg.indices[i], pos);
+    // for (int i=0; i<msg.len; i++){
+    //     float attention = msg.data[i] >0.3 ? 1: 0;
+    //     attention_buffer[msg.indices[i]] = attention;
+    //     sdf_map_->indexToPos(msg.indices[i], pos);
+    //     pcl_pt.x = pos[0];
+    //     pcl_pt.y = pos[1];
+    //     pcl_pt.z = pos[2];
+    //     if (attention>0){
+    //         pcl_pt.intensity = attention;
+    //         pcl_cloud->push_back(pcl_pt);
+    //     }
+        
+        
+    // }
+
+    // update the global buffer. Very small loop
+    float alpha = 1;
+    for (auto& pt: local_att_cloud.points){
+        float attention = pt.intensity;
+        pos[0] = pt.x;
+        pos[1] = pt.y;
+        pos[2] = pt.z;
+        sdf_map_->posToIndex(pos, idx);
+        // attention_buffer[msg.indices[i]] = attention;
+        if (sdf_map_->isInMap(idx)){
+            int vox_adr = sdf_map_->toAddress(idx);
+            if (getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED){
+                float att_update = alpha*attention + (1-alpha)*attention_buffer[vox_adr];
+                attention_buffer[vox_adr] = att_update > 0.3 ? 0.5: 0; // discrete for now
+                // map_->md_->attention_buffer_[vox_adr]  = attention;
+            }
+        }
+    }
+    
+    // create global pcl cloud to apply convenient filtering and clustering. 
+    // try to get rid of this
+    global_att_cloud->points.clear();
+    pcl::PointXYZI pcl_pt;
+    for (int i=0; i<attention_buffer.size(); i++){
+        if (attention_buffer[i]<=0) // this is the main thing that saves compute
+            continue;
+        sdf_map_->indexToPos(i, pos);
+        sdf_map_->posToIndex(pos, idx);
+        auto nbrs = allNeighbors(idx); // 26 neighbors
+        float att_nbr = 0.0; 
+        std::vector<int> bu_voxels;
+        for (auto nbr : nbrs) {
+            if (!sdf_map_->isInMap(nbr))
+                continue;
+                
+            // calculate nearby attention
+            int adr = sdf_map_->toAddress(nbr);
+            att_nbr += attention_buffer[adr] < 1 ? attention_buffer[adr]: 0;
+            
+            // save list of unknown voxels near attentive regions
+            if (occupancy_buffer_[adr] == fast_planner::SDFMap::UNKNOWN){
+                bu_voxels.push_back(adr); 
+            }
+        }
+        if (attention_buffer[i]!=1){ // top down attentive cell
+
+            if (att_nbr < 3*0.5) // at least 3 attentive neighbours (filtering)
+                attention_buffer[i] = 0;    
+
+            // add bottom up attention to neighbors
+            for (auto vox: bu_voxels)
+                attention_buffer[vox] = 1;
+
+        }
+        else{ // bottom up attentive cell
+            if (occupancy_buffer_[i] > 1 // The cell is unknown space 
+                || att_nbr == 0) // Has at least 1 top down attentive neighbour (need this because old BU cell stick around)
+                attention_buffer[i] = 0;    
+        }
+        
+        if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
+            attention_buffer[i]=0;
+        }
         pcl_pt.x = pos[0];
         pcl_pt.y = pos[1];
         pcl_pt.z = pos[2];
-        pcl_pt.intensity = msg.data[i];
-        pcl_cloud->push_back(pcl_pt);
+        pcl_pt.intensity = attention_buffer[i];
+        global_att_cloud->push_back(pcl_pt);    
     }
-    
+    // print(global_att_cloud->points.size());
     // filter and preprocess the pointcloud
-    // filterAttCloud(pcl_cloud); // doing this after object creation to do filtering only in 
+    // filterAttBuffer(); // doing this after object creation to do filtering only in 
     // addBottomUpAttention(pcl_cloud)
 
-    publishAtt(*pcl_cloud);
+    publishAtt();
 
-    createObjects(pcl_cloud);
+    // createObjects();
+
+
+    // set att buffer to zero
+    // std::fill(attention_buffer.begin(), attention_buffer.end(), 0);
+    // for (auto& pt: global_att_cloud->points){ // should be a fairly small loop
+    //     pos[0] = pt.x;
+    //     pos[1] = pt.y;
+    //     pos[2] = pt.z;
+    //     sdf_map_->posToIndex(pos, idx);
+    //     attention_buffer[sdf_map_->toAddress(idx)] = pt.intensity;
+
+    // }
+
+    // Recreate the buffer after filtering
 
 }
 
