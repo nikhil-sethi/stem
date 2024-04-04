@@ -63,7 +63,7 @@ def blues(img):
 
     hsv_image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     # Define bluish hue range in HSV
-    lower_blue = np.array([80, 100, 100])
+    lower_blue = np.array([80, 150, 100])
     upper_blue = np.array([130, 255, 255])
 
     # Create mask for bluish pixels

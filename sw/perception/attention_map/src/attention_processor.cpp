@@ -625,14 +625,14 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
 
         }
         else{ // bottom up attentive cell
-            if (occupancy_buffer_[i] > 1 // The cell is unknown space 
+            if (occupancy_buffer_[i] >= 1 // The cell is not unknown space 
                 || att_nbr == 0) // Has at least 1 top down attentive neighbour (need this because old BU cell stick around)
                 attention_buffer[i] = 0;    
         }
         
-        if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
-            attention_buffer[i]=0;
-        }
+        // if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
+        //     attention_buffer[i]=0;
+        // }
         pcl_pt.x = pos[0];
         pcl_pt.y = pos[1];
         pcl_pt.z = pos[2];

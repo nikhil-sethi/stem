@@ -63,7 +63,7 @@ exploration:
   
   # Cost to change yaw angle 
   # this should ideally be matched closely with the controller's maximum yaw rate, but might need to be more conservative because of noise and delays
-  yd:  0.7     # "$(eval 45 * 3.1415926 / 180.0)"   DONT LOWER THIS BELOW 0.6 in hardware flights. DRONE GIVES UP
+  yd:  0.6     # "$(eval 45 * 3.1415926 / 180.0)"   DONT LOWER THIS BELOW 0.6 in hardware flights. DRONE GIVES UP
   ydd: 1.5707963     # "$(eval 90 * 3.1415926 / 180.0)"  not used
   
   # Cost to change velocity vector direction
@@ -123,7 +123,7 @@ manager:
   use_optimization: true
   use_active_perception: true
   min_time: true
-  max_yawdot: 0.7  # 60 * 3,1415926 / 180,0
+  max_yawdot: 0.6  # 60 * 3,1415926 / 180,0
   relax_time1: 0.3
   relax_time2: 1.5
 
