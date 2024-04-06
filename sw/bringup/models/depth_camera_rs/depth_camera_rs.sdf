@@ -34,7 +34,7 @@
           </image>
           <clip>
             <near>0.5</near>
-            <far>18</far>
+            <far>5</far>
           </clip>
         </camera>
         <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_controller">
@@ -45,7 +45,7 @@
           <pointCloudCutoffMax>20</pointCloudCutoffMax>
           <imageTopicName>color/image_raw</imageTopicName>
           <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
-          <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
+          <depthImageTopicName>aligned_depth_to_color/image_raw</depthImageTopicName>
           <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
           <pointCloudTopicName>depth/points</pointCloudTopicName>
           <frameName>camera_link</frameName>
