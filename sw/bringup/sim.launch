@@ -1,0 +1,45 @@
+<launch>
+    <arg name="init_x"   default="-2"/>
+    <arg name="init_y"   default="-1"/>
+    <arg name="init_z"   default="0"/> 
+    <arg name="init_R"   default="0"/>
+    <arg name="init_P"   default="0"/>
+    <arg name="init_Y"   default="0"/> 
+    <arg name="gui" default="false" />
+    <arg name="vehicle" default="mantis_depth_vision"/>
+    <arg name="odometry_topic" default="/mavros/local_position/odom"/>
+
+    <include file="$(find px4)/launch/mavros_posix_sitl.launch">
+            <!-- gazebo args -->
+            <arg name="x" value="$(arg init_x)"/>
+            <arg name="y" value="$(arg init_y)"/>
+            <arg name="z" value="$(arg init_z)"/>
+            <arg name="R" value="$(arg init_R)"/>
+            <arg name="P" value="$(arg init_P)"/>
+            <arg name="Y" value="$(arg init_Y)"/>
+            <arg name="vehicle" value="iris_vision"/>
+            <arg name="world" value="$(find bringup)/worlds/lab.world"/>
+            <arg name="gui" value="$(arg gui)" />
+            <arg name="sdf" value="$(find bringup)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+            <arg name="interactive" value="false"/>
+            <!-- mavros args -->
+            <!-- <arg name="fcu_url" value="udp://@10.43.0.225:14540"/> -->
+            <!-- <arg name="respawn_mavros" value="false"/> -->
+        </include>
+
+        <!-- <node name="ekf_origin_pub" pkg="rostopic" output="screen" type="rostopic" args="pub -l /mavros/global_position/set_gp_origin geographic_msgs/GeoPointStamped '{header: auto, position: { latitude: 47.3977420, longitude: 8.545594, altitude: 535.221}}'"/> -->
+        
+        <!-- <node name="fake_localization" pkg="fake_localization" output="screen" type="fake_localization_node">
+            <param name="init_x" value="$(arg init_x)"/>
+            <param name="init_y" value="$(arg init_y)"/>
+            <param name="init_z" value="$(arg init_z)"/>
+        </node> -->
+
+        <!-- drone toolbox interface -->
+        <!-- This already runs onboard so only need it in sim -->
+        <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="log">
+            <rosparam command="load" file="$(find bringup)/config/fuel_px4_interface.yaml"/>
+            <param name="is_sim" value="true"/>
+            <param name="odometry_topic" value="$(arg odometry_topic)"/>
+        </node>
+</launch>
