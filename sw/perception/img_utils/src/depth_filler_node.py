@@ -312,7 +312,7 @@ def depth_fill(msg):
     if is_sim: 
         depth_np = np.array(depth_cv)
     else: # realsense has depth values in mm and as uint16 values. Need to convert to meters 
-        depth_cv = np.float32(np.array(depth_cv, dtype=np.uint16)*0.001)
+        depth_np = np.float32(np.array(depth_cv, dtype=np.uint16)*0.001)
     
     # keep the max depth to larger than you want, this prevents white halos from being formed near object edges
     depth_filled = fill_in_fast(depth_np, max_depth=15.0, custom_kernel=DIAMOND_KERNEL_7)
