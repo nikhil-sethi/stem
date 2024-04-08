@@ -216,7 +216,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
 void AttentionMap::visualize(Object& object){
 
     // === Object bounding box
-    viz.drawBox((object.bbox_min_ + object.bbox_max_)/2.0, object.bbox_max_ - object.bbox_min_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(object.id), object.id, 7);
+    // viz.drawBox((object.bbox_min_ + object.bbox_max_)/2.0, object.bbox_max_ - object.bbox_min_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(object.id), object.id, 7);
 
     // === Enclosed point cloud with attention
     // sensor_msgs::PointCloud2 cluster_msg;
@@ -229,8 +229,19 @@ void AttentionMap::visualize(Object& object){
     //     object.viewpoint_candidates.push_back(corner); // just for debugging
     
     if (!object.viewpoint_candidates.empty()){
+        std::vector<Eigen::Vector3d> vpt_positions;
         // plotting only the best for now
-        std::vector<Eigen::Vector3d> vpt_positions = {object.viewpoint_candidates[0].posToEigen()};
+        // vpt_positions.push_back(object.viewpoint_candidates[0].posToEigen());
+
+        // plotting top K viewpoints
+        int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
+        for (int i = 0; i < num_vpts; i++){
+            vpt_positions.push_back(object.viewpoint_candidates[i].posToEigen());
+        
+        }
+         
+            
+
 
         // for (auto& vpt: object.viewpoint_candidates){
         //     vpt_positions.push_back(Eigen::Vector3d(vpt.pos_(0), vpt.pos_(1), vpt.pos_(2)));
@@ -258,11 +269,14 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
     
     for (Object& object: objects){
         // if (object.id==3){
-            findViewpoints(object);
-            visualize(object);
-            if (!object.viewpoint_candidates.empty())
-                vpts_msg.poses.push_back(object.viewpoint_candidates[0].toMsg());
-        // }
+        findViewpoints(object);
+        visualize(object);
+        if (!object.viewpoint_candidates.empty()){
+            int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
+
+            for (int i=0; i<num_vpts; i++)
+                vpts_msg.poses.push_back(object.viewpoint_candidates[i].toMsg());
+        }
     }
 
     vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
