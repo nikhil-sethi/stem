@@ -8,11 +8,12 @@ project(minimal)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  # sensor_msgs
+  sensor_msgs
   # cv_bridge
-  # roscpp
-  # std_msgs
-  # image_transport
+  roscpp
+  std_msgs
+  image_transport
+  message_filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -118,7 +119,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -136,8 +137,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node 
-  src/test.cpp
-  # src/test_depth.cpp
+  # src/test.cpp
+  src/test_depth.cpp
   )
 
 ## Rename C++ executable without prefix
