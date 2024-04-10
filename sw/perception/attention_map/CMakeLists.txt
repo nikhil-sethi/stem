@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_model
   tf2_geometry_msgs
   common
+  cv_bridge
   )
 find_package(PCL 1.7 REQUIRED)
 
@@ -141,6 +142,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(attention_processor_node src/attention_processor.cpp)
 add_executable(pub_att_gt_node src/pub_att_gt.cpp)
+add_executable(attention_map_2d_node src/attention_map_2d.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,6 +160,11 @@ target_link_libraries(attention_processor_node
   ${PCL_LIBRARIES}
 )
 target_link_libraries(pub_att_gt_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
+target_link_libraries(attention_map_2d_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )

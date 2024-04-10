@@ -14,7 +14,8 @@ class ImageSubscriber:
         self.image = None
 
         # Create a subscriber for the image topic
-        rospy.Subscriber('/iris_depth_camera/camera/rgb/image_raw', Image, self.image_callback)
+        topic = rospy.get_param("img_topic", "/camera/color/image_raw")
+        rospy.Subscriber(topic, Image, self.image_callback)
 
         # Initialize Matplotlib figure and axis
         self.fig, self.ax = plt.subplots()
@@ -38,6 +39,7 @@ class ImageSubscriber:
         if self.image is not None:
             # Update the displayed image
             self.img_plot.set_array(cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB))
+            # self.img_plot.set_array(self.image)
         return self.img_plot,
 
 def main():

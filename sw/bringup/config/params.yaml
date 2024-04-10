@@ -1,0 +1,20 @@
+perception:
+  attention_map:
+    2d:
+      # gazebo
+      # low_H: 80
+      # low_S: 120
+      # low_V: 100
+
+      # high_H: 170
+      # high_S: 255
+      # high_V: 255
+
+
+      low_H: 50
+      low_S: 120
+      low_V: 80
+
+      high_H: 130
+      high_S: 255
+      high_V: 255

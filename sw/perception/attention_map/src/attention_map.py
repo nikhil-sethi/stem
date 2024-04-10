@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from scipy.ndimage import gaussian_filter, sobel
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 import rospy
 import cv2
 from cv_bridge import CvBridge
@@ -18,27 +18,27 @@ class NoName():
         self.fig, self.ax = plt.subplots()
         self.im = self.ax.imshow(self.arr_att, animated=True, origin='upper',cmap='jet', extent=[0, res[1], res[0],0], vmax=1, vmin=0) # the vmax vmin is important so that inital colour range is set. 
         self.bridge = CvBridge()
-        rgb_topic = rospy.get_param("~rgb_topic", "/camera/color/image_raw")
+        rgb_topic = rospy.get_param("~rgb_topic", "/camera/color/image_raw/compressed")
         
-        cam_sub = rospy.Subscriber(rgb_topic, Image, self.cam_callback, queue_size=10)
-        self.att_pub = rospy.Publisher("/iris_depth_camera/attention_map/2d", Image, queue_size=10)
+        cam_sub = rospy.Subscriber(rgb_topic, CompressedImage, self.cam_callback, queue_size=10)
+        self.att_pub = rospy.Publisher("/iris_depth_camera/attention_map/compressed", CompressedImage, queue_size=10)
 
-        rospy.wait_for_message(rgb_topic, Image, timeout=5)
+        rospy.wait_for_message(rgb_topic, CompressedImage, timeout=5)
         self.att_header = Header()
-        att_timer = rospy.Timer(rospy.Duration(0.05), self.att_map_publisher)
+        att_timer = rospy.Timer(rospy.Duration(1/15), self.att_map_publisher)
         
         # self.run_animation()
         rospy.spin()
 
     def att_map_publisher(self, event):
-        self.att_msg = self.bridge.cv2_to_imgmsg(self.arr_att, encoding='mono8')
+        self.att_msg = self.bridge.cv2_to_compressed_imgmsg(self.arr_att)
         self.att_msg.header = self.att_header
         self.att_pub.publish(self.att_msg)
 
     def cam_callback(self, msg):
         # arr = msg.data
         start = time.time()
-        arr = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        arr = self.bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='bgr8')
         self.arr_att = get_attention_map(arr)
         
         self.att_header = msg.header  # to sync timestamps with RGB message

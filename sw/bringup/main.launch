@@ -1,6 +1,6 @@
 <launch>
     <arg name="init_x"   default="-2"/>
-    <arg name="init_y"   default="1"/>
+    <arg name="init_y"   default="-1"/>
     <arg name="init_z"   default="0"/> 
     <arg name="init_R"   default="0"/>
     <arg name="init_P"   default="0"/>
@@ -23,12 +23,13 @@
     <arg name="sensor_pose_topic" default="/camera/pose"/>
     <!-- <arg if="$(eval sim_name=='perfect')" name="odometry_topic" value="/state_ukf/odom_1"/> -->
 
-    <!-- <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>  -->
-    <arg name="depth_topic" value="/camera/aligned_depth_to_color/filled"/> 
+    <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/> 
+    <!-- <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>  -->
+    <!-- <arg name="depth_topic" value="/camera/aligned_depth_to_color/filled"/>  -->
     
     <!-- So that ros nodes can use it too -->
     <param name="sim" value="$(arg sim)"/>
-   
+    <rosparam command='load' file="$(find bringup)/config/params.yaml"/>
     <!-- simulator -->
     <include if="$(arg sim)" file="$(find bringup)/sim.launch">
         <arg name="init_x" value="$(arg init_x)"/>
@@ -60,7 +61,7 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
-    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map.py" pkg="attention_map" output="screen" required="true"/>
+    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/>
     <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/>
     <include file="$(find bringup)/rviz.launch"/>
 
