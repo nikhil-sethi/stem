@@ -37,7 +37,7 @@ map_ros:         # Gazebo        # Intel realsense 4255
   depth_filter_mindist: 0.2
   depth_filter_margin: 2
   k_depth_scaling_factor: 1000.0  # the realsense gives values in mm, so keep it to 1000 for real world testing
-  skip_pixel: 8  # how many pixels to to skip consecutively while going over the depth image to create the cloud
+  skip_pixel: 4  # how many pixels to to skip consecutively while going over the depth image to create the cloud
   esdf_slice_height: 0.1
   visualization_truncate_height: 10.09
   visualization_truncate_low: -2.0
@@ -58,7 +58,7 @@ fsm:
 
   # In any case, always replan after this much real time has elapsed. Helps the drone get out stuck places and keeps it going
   # This can be higher if your drone moves slower because you dont want to keep replanning always
-  thresh_replan3: 2.5 # [s]
+  thresh_replan3: 1.5 # [s]
   replan_time: 0.200
 
 exploration:
@@ -190,7 +190,7 @@ optimization:
 
   # cost to keep dist0 distance from the ESDF
   ld_dist: 10.0
-  ld_feasi: 2.0
+  ld_feasi: 10.0 # how much to respect max vel and max acc
   ld_start: 100.0
 
   # cost to arrive at the last pose

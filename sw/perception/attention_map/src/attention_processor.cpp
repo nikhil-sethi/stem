@@ -380,7 +380,7 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
                 attention_buffer[sdf_map_->toAddress(idx)] > 0 // the ray shouldnt have any other attentive cell in it's path
                 // sdf_map_->getInflateOccupancy(idx) == 1 ||   // not using inflation for now becauase most attentive cells will be missed out then
                 || getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED 
-                // || getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN
+                || getOccupancy(idx) == fast_planner::SDFMap::UNKNOWN
                 ) {
                     visib = false;
                     // attention_buffer[sdf_map_->toAddress(start_idx)] = 0; // mark this attention cell dead, because it's unreachable.
