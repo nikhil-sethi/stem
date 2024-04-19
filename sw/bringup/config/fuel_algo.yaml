@@ -54,12 +54,12 @@ fsm:
   
   # Replan if you have executed at least this amount of trajectory AND the next frontier is covered.
   # This helps the drone to execute at least something before replanning because we need to keep it moving
-  thresh_replan2: 0.5 # [s]
+  thresh_replan2: 0.3 # [s]
 
   # In any case, always replan after this much real time has elapsed. Helps the drone get out stuck places and keeps it going
   # This can be higher if your drone moves slower because you dont want to keep replanning always
   thresh_replan3: 1.5 # [s]
-  replan_time: 0.200
+  replan_time: 0.2
 
 exploration:
   refine_local: true
@@ -160,19 +160,23 @@ manager:
 
   # helps discard yaw angle plans that have large changes
   max_yawdot: 0.45  # 60 * 3,1415926 / 180,0
-  relax_time1: 0.3
+  relax_time1: 0.3  # not used
   relax_time2: 1.5
 
 search:
-  max_tau: 0.8
-  init_max_tau: 1.0
+
+  # max time to sample for the motion primitive. Increase this if you see a lot of searched being failed and paths getting cut
+  # when the drone is moving slower, usually a higher value is required to find longer horizon paths. 
+  max_tau: 2
+
+  init_max_tau: 2
   max_vel: *max_vel
   vel_margin: 0.25
   max_acc: *max_acc
   w_time: 10.0
-  horizon: 5.0
+  horizon: 6.0
   lambda_heu: 10.0
-  resolution_astar: 0.025
+  resolution_astar: 0.01
   time_resolution: 0.8
   margin: 0.2
   allocate_num: 100000
@@ -189,8 +193,8 @@ optimization:
   ld_smooth: 20.0
 
   # cost to keep dist0 distance from the ESDF
-  ld_dist: 10.0
-  ld_feasi: 10.0 # how much to respect max vel and max acc
+  ld_dist: 20.0
+  ld_feasi: 2.0 # how much to respect max vel and max acc
   ld_start: 100.0
 
   # cost to arrive at the last pose
@@ -204,7 +208,7 @@ optimization:
   # The minimum distance the trajectory should maintain from obstacles
   # in practice this should be higher than what you expect because of noise etc.
   # But this distance is also valid from the ground (in z axis), so if the drone wants to see something close to the ground, it will find it hard to do and keep oscillating
-  dist0: 0.4 # [m]
+  dist0: 0.5 # [m]
   max_vel: *max_vel
   max_acc: *max_acc
   algorithm1: 15

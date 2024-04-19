@@ -45,12 +45,17 @@ void AttentionMap2d::attCallback(const sensor_msgs::CompressedImageConstPtr& msg
     
     // cv::GaussianBlur(img_hsv, blurred_image, cv::Size(5, 5), 0, 0,  cv::BORDER_DEFAULT);
 
+    // threshold within desired range
     cv::inRange(img_hsv, cv::Scalar(low_H, low_S, low_V), cv::Scalar(high_H, high_S, high_V), img_mask);
 
     // cv::GaussianBlur(img_mask, blurred_image, cv::Size(5, 5), 0);
     
+    // close large holes with a big filter. this helps in removing the noise within the area of segmented objects.
+    // I do this agressively here, and then follow by opening
     cv::morphologyEx(img_mask, morphed_image, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
 
+    // open holes a little bit to account for actual large holes inside of objects.
+    // this combined with closing above removes noise but retains large open areas. 
     cv::morphologyEx(morphed_image, morphed_image, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
 
     // publish

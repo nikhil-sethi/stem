@@ -115,20 +115,35 @@ bool isPtInBox(const Eigen::Vector3d& point, const Eigen::Vector3d& bbox_max, co
     return true;
 }
 
-inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel) {
-  vector<Eigen::Vector3i> neighbors(26);
+// inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel) {
+//   vector<Eigen::Vector3i> neighbors(26);
+//   Eigen::Vector3i tmp;
+//   int count = 0;
+//   for (int x = -1; x <= 1; ++x)
+//     for (int y = -1; y <= 1; ++y)
+//       for (int z = -1; z <= 1; ++z) {
+//         if (x == 0 && y == 0 && z == 0) continue;
+//         tmp = voxel + Eigen::Vector3i(x, y, z);
+//         neighbors[count++] = tmp;
+//       }
+//   return neighbors;
+// }
+// class fast_planner::SDFMap;
+
+
+inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel, int depth) {
+  vector<Eigen::Vector3i> neighbors(pow(2*depth+1, 3)-1);
   Eigen::Vector3i tmp;
   int count = 0;
-  for (int x = -1; x <= 1; ++x)
-    for (int y = -1; y <= 1; ++y)
-      for (int z = -1; z <= 1; ++z) {
+  for (int x = -depth; x <= depth; ++x)
+    for (int y = -depth; y <= depth; ++y)
+      for (int z = -depth; z <= depth; ++z) {
         if (x == 0 && y == 0 && z == 0) continue;
         tmp = voxel + Eigen::Vector3i(x, y, z);
         neighbors[count++] = tmp;
       }
   return neighbors;
 }
-// class fast_planner::SDFMap;
 
 class AttentionMap{
     friend fast_planner::SDFMap;
@@ -340,7 +355,7 @@ void AttentionMap::findViewpoints(Object& object){
             // compute information gain from remaining viewpoints
             float gain = computeInformationGain(object, sample_pos, phi);
             // print(object.id, rc, phi, gain);
-            if (gain<=2)
+            if (gain<=3)
                 continue;
             
             // add whatever's left to candidates
@@ -613,11 +628,13 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
             continue;
         sdf_map_->indexToPos(i, pos);
         sdf_map_->posToIndex(pos, idx);
-        auto nbrs = allNeighbors(idx); // 26 neighbors
+        auto nbrs = allNeighbors(idx, 2); // 26 neighbors
         float att_nbr = 0.0; 
         std::vector<int> bu_voxels;
+        Eigen::Vector3d nbr_pos; // need a new pos var so the att map doesn't get overriden
         for (auto nbr : nbrs) {
-            if (!sdf_map_->isInMap(nbr))
+            sdf_map_->indexToPos(nbr, nbr_pos);
+            if (nbr_pos(2)<0.2 || !sdf_map_->isInMap(nbr))
                 continue;
                 
             // calculate nearby attention
@@ -645,9 +662,9 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
                 attention_buffer[i] = 0;    
         }
         
-        // if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
-        //     attention_buffer[i]=0;
-        // }
+        if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
+            attention_buffer[i]=0;
+        }
         pcl_pt.x = pos[0];
         pcl_pt.y = pos[1];
         pcl_pt.z = pos[2];
