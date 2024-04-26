@@ -18,3 +18,10 @@ perception:
       high_H: 130
       high_S: 255
       high_V: 255
+
+    3d:
+      att_min: 0.5 # lower cutoff for attention values. Keep higher if you want more spread
+      
+      # rate at which attention values decay. Keep higher if you want slower decay. 
+      # Might need to be tuned with att_min to keep spread constant
+      diffusion_factor: 0.90 

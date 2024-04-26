@@ -1,7 +1,7 @@
 1#!/usr/bin/env python
 
 import rospy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
 import cv2
 import matplotlib.pyplot as plt
@@ -14,8 +14,8 @@ class ImageSubscriber:
         self.image = None
 
         # Create a subscriber for the image topic
-        topic = rospy.get_param("img_topic", "/camera/color/image_raw")
-        rospy.Subscriber(topic, Image, self.image_callback)
+        topic = rospy.get_param("img_topic", "/attention_map/2d/compressed")
+        rospy.Subscriber(topic, CompressedImage, self.image_callback)
 
         # Initialize Matplotlib figure and axis
         self.fig, self.ax = plt.subplots()
@@ -29,7 +29,7 @@ class ImageSubscriber:
 
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV format
-        self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        self.image = self.bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
     def init_plot(self):
         self.img_plot.set_array(self.image)
