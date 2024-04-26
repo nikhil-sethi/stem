@@ -26,6 +26,8 @@
 #include <common/io.h>
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
+#include <active_perception/perception_utils.h>
+
 #include <geometry_msgs/PoseArray.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/radius_outlier_removal.h>
@@ -229,10 +231,11 @@ class AttentionMap{
         std::vector<std::vector<std::vector<double>>> weights;
         double kernel_size;
         float att_min, diffusion_factor;
+        fast_planner::PerceptionUtils percep_utils_;
 
 };
 
-AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
+AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), percep_utils_(nh){
     att_3d_sub_ = nh.subscribe("/attention_map/local", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
@@ -270,6 +273,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
     // raycasting
     raycaster_.reset(new RayCaster);
     raycaster_->setParams(resolution_, origin);
+    // percep_utils_ = fast_planner::PerceptionUtils(nh);
 
     global_att_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
     global_att_cloud->height = 1;
@@ -281,6 +285,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8){
 
     nh.param("/perception/attention_map/3d/att_min", att_min, 0.1f); 
     nh.param("/perception/attention_map/3d/diffusion_factor", diffusion_factor, 0.9f); 
+
 
 }
 
@@ -347,7 +352,7 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
         visualize(object);
         if (!object.viewpoint_candidates.empty()){
             int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
-
+            // int num_vpts =1;
             for (int i=0; i<num_vpts; i++)
                 vpts_msg.poses.push_back(object.viewpoint_candidates[i].toMsg());
         }
@@ -412,9 +417,9 @@ void AttentionMap::findViewpoints(Object& object){
             // raycast from virtual camera to corners. not implemented. might not need
 
             // compute information gain from remaining viewpoints
-            float gain = computeInformationGain(object, sample_pos, phi);
-            // print(object.id, rc, phi, gain);
-            if (gain<=3)
+            float gain = computeInformationGain(object, sample_pos, phi + M_PI);
+            print(object.id, rc, phi, gain);
+            if (gain<=5)
                 continue;
             
             // add whatever's left to candidates
@@ -440,10 +445,20 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
     Eigen::Vector3i start_idx;
     Eigen::Vector3d pos;
     float total_gain = 0;
-    for (pcl::PointXYZI& point : object.points) {
+    percep_utils_.setPose(sample_pos, yaw);
+
+    //inflated bounding box around object bbox
+    Eigen::Vector3d bbox_min = object.bbox_min_ - Eigen::Vector3d(0.5,0.5,0.5);
+    Eigen::Vector3d bbox_max = object.bbox_max_ + Eigen::Vector3d(0.5,0.5,0.5);
+
+    for (pcl::PointXYZI& point : global_att_cloud->points) {
         pos(0) = point.x;
         pos(1) = point.y;
         pos(2) = point.z;
+        Eigen::Vector3i idx_;
+        sdf_map_->posToIndex(pos, idx_);
+        if (!getOccupancy(idx_) == fast_planner::SDFMap::UNKNOWN || !percep_utils_.insideFOV(pos)) continue;
+        
         raycaster_->input(pos, sample_pos);
         bool visib = true;
         // sdf_map_->posToIndex(pos, start_idx); // save start to cleanup later 
@@ -462,7 +477,7 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
             }
         }
         // if (visib) total_gain += infoTransfer(point.intensity)*point.intensity;
-        if (visib) total_gain += point.intensity==1? point.intensity:0;
+        if (visib) total_gain += point.intensity;
     }
     return total_gain; 
 }

@@ -146,7 +146,7 @@ perception_utils:
 manager:
   max_vel: *max_vel
   max_acc: *max_acc
-  max_jerk: 4
+  max_jerk: 2
   dynamic_environment: 0
   local_segment_length: 6.0
   clearance_threshold: 0.2
@@ -176,7 +176,7 @@ search:
   w_time: 10.0
   horizon: 6.0
   lambda_heu: 10.0
-  resolution_astar: 0.01
+  resolution_astar: 0.025
   time_resolution: 0.8
   margin: 0.2
   allocate_num: 100000
@@ -194,7 +194,7 @@ optimization:
 
   # cost to keep dist0 distance from the ESDF
   ld_dist: 20.0
-  ld_feasi: 2.0 # how much to respect max vel and max acc
+  ld_feasi: 10.0 # how much to respect max vel and max acc
   ld_start: 100.0
 
   # cost to arrive at the last pose
