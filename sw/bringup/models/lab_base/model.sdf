@@ -1182,8 +1182,8 @@
         </surface>
       </collision>
     </link>
-    <model name='gun'>
-      <link name='link'>
+    <link name='gun_1'>
+      <!-- <link name='link'> -->
         <inertial>
           <pose>0 -0.1 0.95 0 -0 0</pose>
           <mass>80</mass>
@@ -1199,8 +1199,8 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>0 0 0 0 -0 0</pose>
-        <gravity>1</gravity>
+        <!-- <pose>0 0 0 0 -0 0</pose>
+        <gravity>1</gravity> -->
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -1234,13 +1234,13 @@
             </friction>
           </surface>
         </collision>
-      </link>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
+      <!-- </link> -->
+      <!-- <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable> -->
       <pose>3.30005 2.89522 0.750704 -1.44394 0 0</pose>
-    </model>
-    <model name='gun_clone'>
-      <link name='link'>
+    </link>
+    <link name='gun_2'>
+      <!-- <link name='link'> -->
         <inertial>
           <pose>0 -0.1 0.95 0 -0 0</pose>
           <mass>80</mass>
@@ -1256,8 +1256,8 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>0 0 0 0 -0 0</pose>
-        <gravity>1</gravity>
+        <!-- <pose>0 0 0 0 -0 0</pose>
+        <gravity>1</gravity> -->
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -1291,11 +1291,11 @@
             </friction>
           </surface>
         </collision>
-      </link>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
+      <!-- </link> -->
+      <!-- <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable> -->
       <pose>3.44008 2.62582 0.750704 -1.73527 -0.127636 -1.58281</pose>
-    </model>
+    </link>
     <model name='nist_elevated_floor_120'>
       <static>1</static>
       <link name='nist_elevated_floor_120'>
@@ -1335,8 +1335,8 @@
       </link>
       <pose>3.21076 2.71789 0 0 -0 0</pose>
     </model>
-    <model name='person_standing'>
-      <link name='link'>
+    <!-- <model name='person'> -->
+    <link name='person_1'>
         <inertial>
           <pose>0 -0.1 0.95 0 -0 0</pose>
           <mass>80</mass>
@@ -1404,10 +1404,10 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
+      <!-- </link> -->
+      <!-- <static>1</static> -->
       <pose>5.45069 0.601017 0.146431 1.5708 0 -2.91276</pose>
-    </model>
+    </link>
     <joint name='link_1_JOINT_10' type='fixed'>
       <parent>link_1</parent>
       <child>link_3</child>

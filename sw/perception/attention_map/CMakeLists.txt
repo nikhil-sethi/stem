@@ -142,6 +142,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(attention_processor_node src/attention_processor.cpp)
 add_executable(pub_att_gt_node src/pub_att_gt.cpp)
+add_executable(target_att_gt_node src/target_att_gt.cpp)
 add_executable(attention_map_2d_node src/attention_map_2d.cpp)
 
 ## Rename C++ executable without prefix
@@ -163,7 +164,10 @@ target_link_libraries(pub_att_gt_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-
+target_link_libraries(target_att_gt_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
 target_link_libraries(attention_map_2d_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
@@ -179,6 +183,9 @@ target_link_libraries(attention_map_2d_node
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/attention_map.py
+  src/att_gmm.py
+  src/att_gmm_dynamic.py
+  src/test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

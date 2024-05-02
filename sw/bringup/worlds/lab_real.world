@@ -58,5 +58,6 @@
       </camera>
     </gui>
     <plugin name='ros_interface_plugin' filename='librotors_gazebo_ros_interface_plugin.so'/>
+    <plugin name='gazebo_gt_plugin' filename='libgazebo_gt.so'/>
   </world>
 </sdf>
