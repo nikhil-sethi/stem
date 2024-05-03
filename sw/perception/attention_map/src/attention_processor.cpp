@@ -27,13 +27,14 @@
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
 #include <active_perception/perception_utils.h>
+#include <chrono>
 
 #include <geometry_msgs/PoseArray.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/radius_outlier_removal.h>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
-
+#include <std_srvs/Trigger.h>
 
 
 struct TargetViewpoint: fast_planner::Viewpoint{
@@ -123,6 +124,8 @@ bool isPtInBox(const Eigen::Vector3d& point, const Eigen::Vector3d& bbox_max, co
     }
     return true;
 }
+
+
 // Function to calculate the 3D Gaussian kernel weights
 std::vector<std::vector<std::vector<double>>> calculateGaussianWeights(int size, double sigma) {
     std::vector<std::vector<std::vector<double>>> weights(size, std::vector<std::vector<double>>(size, std::vector<double>(size, 0.0)));
@@ -149,20 +152,6 @@ std::vector<std::vector<std::vector<double>>> calculateGaussianWeights(int size,
 
     return weights;
 }
-// inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel) {
-//   vector<Eigen::Vector3i> neighbors(26);
-//   Eigen::Vector3i tmp;
-//   int count = 0;
-//   for (int x = -1; x <= 1; ++x)
-//     for (int y = -1; y <= 1; ++y)
-//       for (int z = -1; z <= 1; ++z) {
-//         if (x == 0 && y == 0 && z == 0) continue;
-//         tmp = voxel + Eigen::Vector3i(x, y, z);
-//         neighbors[count++] = tmp;
-//       }
-//   return neighbors;
-// }
-// class fast_planner::SDFMap;
 
 
 inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel, int depth) {
@@ -197,7 +186,6 @@ class AttentionMap{
         void createObjects();
         void publishAttTimer(const ros::TimerEvent& e);
         void filterAttBuffer();
-        void diffuseAttention(Eigen::Vector3i& cell, float attention, int depth);
         bool knownfree(const Eigen::Vector3i& idx) ;
         bool isNeighborUnknown(const Eigen::Vector3i& voxel) ;
         bool isNeighborFree(const Eigen::Vector3i& voxel);
@@ -205,6 +193,10 @@ class AttentionMap{
         
         bool isFrontier(Eigen::Vector3i idx);
         void diffusionTimer(const ros::TimerEvent& e);
+        float diffuse(Eigen::Vector3i bu_voxel);
+        std::vector<Eigen::Vector3i> getNearbyFrontiers(Eigen::Vector3i idx);
+        bool metricsCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
+
 
     private:
         std::list<Object> objects;
@@ -232,6 +224,8 @@ class AttentionMap{
         double kernel_size;
         float att_min, diffusion_factor;
         fast_planner::PerceptionUtils percep_utils_;
+        float total_entropy=0.0f;
+        float learning_rate;
 
 };
 
@@ -285,7 +279,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
 
     nh.param("/perception/attention_map/3d/att_min", att_min, 0.1f); 
     nh.param("/perception/attention_map/3d/diffusion_factor", diffusion_factor, 0.9f); 
-
+    nh.param("/perception/attention_map/3d/learning_rate", learning_rate, 0.5f); 
 
 }
 
@@ -418,7 +412,7 @@ void AttentionMap::findViewpoints(Object& object){
 
             // compute information gain from remaining viewpoints
             float gain = computeInformationGain(object, sample_pos, phi + M_PI);
-            print(object.id, rc, phi, gain);
+            // print(object.id, rc, phi, gain);
             if (gain<=5)
                 continue;
             
@@ -481,7 +475,6 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
     }
     return total_gain; 
 }
-
 
 // returns true if a full 6D viewpoint can completely view set of points
 bool AttentionMap::isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient){
@@ -746,40 +739,78 @@ bool AttentionMap::isFrontier(Eigen::Vector3i idx){
     return getOccupancy(idx)== fast_planner::SDFMap::UNKNOWN && isNeighborFree(idx);
 }
 
+// find all unique neihbhours around a cell that are frontiers
+std::vector<Eigen::Vector3i> AttentionMap::getNearbyFrontiers(Eigen::Vector3i idx){
+    auto nbrs = allNeighbors(idx,1); // 10 neighbors, increase this if frontiers aren't detected even though you see unknown space
+
+    std::vector<Eigen::Vector3i> frontier_nbrs;
+    Eigen::Vector3d nbr_pos; 
+    for (auto nbr : nbrs) {
+        sdf_map_->indexToPos(nbr, nbr_pos);
+        int nbr_adr = sdf_map_->toAddress(nbr);
+        // ignore if not already checked or invalid frontier
+        if (checked[nbr_adr] || nbr_pos(2)<0.2 || !sdf_map_->isInMap(nbr) || !isFrontier(nbr))
+            continue;
+        
+        frontier_nbrs.push_back(nbr);
+        checked[nbr_adr] = true;
+    }
+    return frontier_nbrs;
+}  
+
+// Get diffused value from nearby voxels. Filters can be used
+float AttentionMap::diffuse(Eigen::Vector3i bu_voxel){
+    auto nbrs = allNeighbors(bu_voxel, 1); // 26 neighbors
+    float att_nbr = 0.0; 
+    float count = 0;
+    Eigen::Vector3d nbr_pos;
+    for (auto nbr : nbrs) {
+        sdf_map_->indexToPos(nbr, nbr_pos);
+        int nbr_adr = sdf_map_->toAddress(nbr);
+
+        if (!sdf_map_->isInMap(nbr) || attention_buffer[nbr_adr] <att_min || nbr_pos(2)<0.2 )
+            continue;
+        
+        att_nbr += diffusion_factor*attention_buffer[nbr_adr];
+        count++;
+    }
+    float att_diffused = (count>0)? att_nbr/count:0;
+    
+    return att_diffused;
+}
 
 void gaussian_filter(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud,
                     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_filtered,
-                    double radius)
-{
-/*double radius = 0.02;*/
-// Set up the Gaussian Kernel
-pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>::Ptr kernel(
-    new pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>);
-(*kernel).setSigma(4);
-(*kernel).setThresholdRelativeToSigma(4);
-std::cout << "Kernel made" << std::endl;
+                    double radius){
+    /*double radius = 0.02;*/
+    // Set up the Gaussian Kernel
+    pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>::Ptr kernel(
+        new pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>);
+    (*kernel).setSigma(4);
+    (*kernel).setThresholdRelativeToSigma(4);
+    std::cout << "Kernel made" << std::endl;
 
-// Set up the KDTree
-pcl::search::KdTree<pcl::PointXYZI>::Ptr kdtree(
-    new pcl::search::KdTree<pcl::PointXYZI>);
-(*kdtree).setInputCloud(cloud);
-std::cout << "KdTree made" << std::endl;
+    // Set up the KDTree
+    pcl::search::KdTree<pcl::PointXYZI>::Ptr kdtree(
+        new pcl::search::KdTree<pcl::PointXYZI>);
+    (*kdtree).setInputCloud(cloud);
+    std::cout << "KdTree made" << std::endl;
 
-// Set up the Convolution Filter
-pcl::filters::Convolution3D<
-    pcl::PointXYZI,
-    pcl::PointXYZI,
-    pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>>
-    convolution;
-convolution.setKernel(*kernel);
-convolution.setInputCloud(cloud);
-convolution.setSearchMethod(kdtree);
-convolution.setRadiusSearch(radius);
-convolution.setNumberOfThreads(
-    10); // important! Set Thread number for openMP
-std::cout << "Convolution Start" << std::endl;
-convolution.convolve(*cloud_filtered);
-std::cout << "Convoluted" << std::endl;
+    // Set up the Convolution Filter
+    pcl::filters::Convolution3D<
+        pcl::PointXYZI,
+        pcl::PointXYZI,
+        pcl::filters::GaussianKernel<pcl::PointXYZI, pcl::PointXYZI>>
+        convolution;
+    convolution.setKernel(*kernel);
+    convolution.setInputCloud(cloud);
+    convolution.setSearchMethod(kdtree);
+    convolution.setRadiusSearch(radius);
+    convolution.setNumberOfThreads(
+        10); // important! Set Thread number for openMP
+    std::cout << "Convolution Start" << std::endl;
+    convolution.convolve(*cloud_filtered);
+    std::cout << "Convoluted" << std::endl;
 }
 
 
@@ -806,7 +837,7 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
     // ======= Global map update ======
 
     // update the global buffer. Very small loop
-    float alpha = 1;
+    // float alpha = 0.2;
     Eigen::Vector3d pos;
     Eigen::Vector3i idx;
     for (auto& pt: local_att_cloud_filtered->points){
@@ -819,8 +850,8 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
         if (sdf_map_->isInMap(idx)){
             int vox_adr = sdf_map_->toAddress(idx);
             if (getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED){
-                float att_update = alpha*attention + (1-alpha)*attention_buffer[vox_adr];
-                attention_buffer[vox_adr] = att_update > 0.2 ? attention: 0; // discrete for now
+                float att_update = learning_rate*attention + (1-learning_rate)*attention_buffer[vox_adr];
+                attention_buffer[vox_adr] = att_update;
             }
         }
     }
@@ -831,111 +862,40 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
 // Diffuse attentive semantics into neighboring frontiers. 
 // Run in a separate thread because computationally expensive and we dont need fast updates.
 void AttentionMap::diffusionTimer(const ros::TimerEvent& e){
+    
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     std::fill(checked.begin(), checked.end(), false);
     Eigen::Vector3i idx;
     Eigen::Vector3d pos;
-    
+
     for (int i=0; i<attention_buffer.size(); i++){
         float attention = attention_buffer[i];
-
-        if (attention<=att_min){ // this is the main thing that saves compute
+        
+        if (attention <= att_min || occupancy_buffer_[i] == fast_planner::SDFMap::FREE){ // this is the main thing that saves compute
             attention_buffer[i]=0;
             continue;
         }
-
         sdf_map_->indexToPos(i, pos);
         sdf_map_->posToIndex(pos, idx);
-
-        auto nbrs = tenNeighbors(idx); // 10 neighbors
-        float att_nbr = 0.0; 
+        auto bu_voxels = getNearbyFrontiers(idx); // bottom up voxels: frontier cells that are near attentive regions
         
-        Eigen::Vector3d nbr_pos; // need a new pos var so the att map doesn't get overriden
-        for (auto nbr : nbrs) {
-            sdf_map_->indexToPos(nbr, nbr_pos);
-            if (nbr_pos(2)<0.2 || !sdf_map_->isInMap(nbr))
-                continue;
-                
-            // calculate nearby attention
-            int nbr_adr = sdf_map_->toAddress(nbr);
-            // att_nbr += attention_buffer[nbr_adr] >0 ? attention_buffer[nbr_adr]: 0;
-            
-            // save list of unknown voxels near attentive regions
-            if (!checked[nbr_adr] && isFrontier(nbr)){
-                // bu_voxels.push_back(nbr_adr);
+        // apply kernel to each unknown voxel
+        for (auto& vox: bu_voxels){
+            int adr = sdf_map_->toAddress(vox);
 
-                auto nbrs2 = allNeighbors(idx, 1); // 26 neighbors
-                float att_nbr2 = 0.0; 
-                float count2 = 0;
-                for (auto nbr2 : nbrs2) {
-                    sdf_map_->indexToPos(nbr2, nbr_pos);
-                    int nbr2_adr = sdf_map_->toAddress(nbr2);
-                    if (attention_buffer[nbr2_adr] <att_min || nbr_pos(2)<0.2 || !sdf_map_->isInMap(nbr) )
-                        continue;
-                    
-                    att_nbr2 += diffusion_factor*attention_buffer[nbr2_adr];
-                    count2++;
-                }
-                float att_diffused = (count2>0)? att_nbr2/count2:0;
-                
-                // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
-                attention_buffer[nbr_adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[nbr_adr]):0;
-                checked[nbr_adr] = true;
-            }
-        
-        }
+            float att_diffused = diffuse(vox); // filter value
+            attention_buffer[adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[adr]):0;     // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
 
-        // clean up free space. Old cells stick around if not updated anymore
-        if (getOccupancy(idx) == fast_planner::SDFMap::FREE) {
-            attention_buffer[i]=0;
         }
 
     }
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt = end-start;
+    ROS_INFO("Time for diffusion: %f", dt);
 }
 
-void AttentionMap::diffuseAttention(Eigen::Vector3i& cell, float attention, int depth){
-    int adr = sdf_map_->toAddress(cell);
-    if (depth >7 || checked[adr] || !isFrontier(cell)){
-    // (occupancy_buffer_[adr] == fast_planner::SDFMap::UNKNOWN))
-        return;
-    }
-    float att_diffused= 0.9*attention;
-    // if (depth >5) {
-    //     att_diffused = 1;
-    // }
-    // else{
-    //     att_diffused = 0.9*attention; // exponential decrease
-    // }
-
-    int this_depth = depth + 1;
-    // Eigen::Vector3d pos; 
-    // Eigen::Vector3i idx; 
-    // sdf_map_->indexToPos(adr, pos);
-    // sdf_map_->posToIndex(pos, idx);
-    auto nbrs = allNeighbors(cell, 2);
-
-    Eigen::Vector3d nbr_pos; // need a new pos var so the att map doesn't get overriden
-    // std::cout<<this_depth<<std::endl;
-    // print(this_depth);
-    double sum = 0;
-    double count = 0;
-    for (auto& nbr: nbrs){
-
-        sdf_map_->indexToPos(nbr, nbr_pos);
-        int nbr_adr = sdf_map_->toAddress(nbr);
-        float att_nbr = attention_buffer[nbr_adr];
-        if (!sdf_map_->isInMap(nbr) || nbr_pos(2)<0.2)
-            continue;
-            
-        sum += att_nbr > 0? 0.9*att_nbr:0;
-        count += att_nbr > 0? 1: 0;
-        diffuseAttention(nbr, 0.9*att_nbr, this_depth); // redo the thing for each neighbor until max depth
-
-    }
-
-    attention_buffer[adr] = sum/count;
-    checked[adr] = true; // mark checked to prevent revisit. saves a lot of compute
-
-}
 
 // redefine functions for custom use
 

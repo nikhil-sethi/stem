@@ -24,4 +24,8 @@ perception:
       
       # rate at which attention values decay. Keep higher if you want slower decay. 
       # Might need to be tuned with att_min to keep spread constant
-      diffusion_factor: 0.90 
+      diffusion_factor: 0.99
+
+      # rate for semantic map update
+      # lower value means slower update, less confident, more robust to fast movements
+      learning_rate: 0.1

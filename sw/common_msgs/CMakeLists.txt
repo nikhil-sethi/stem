@@ -50,7 +50,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   float64List.msg
-  float32List.msg
   target.msg
   uint8List.msg
   # Message2.msg
