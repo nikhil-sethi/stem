@@ -442,6 +442,7 @@ class TSPSolver:
         rng: np.random.Generator = np.random.default_rng(),
         randomize_insertion_cost: bool = False,
         random_cost_factor: float = 0.1,
+        dist_mat_path = None
     ):
         self.graph = graph
         self.use_priority = use_priority
@@ -466,8 +467,13 @@ class TSPSolver:
             self.nodes = np.array(nodes)
             self.removed_nodes = [n for n in self.graph.nodes if n not in self.nodes]
 
-        # Compute distance matrix
-        self.dist = self.compute_distance_matrix()
+        if dist_mat_path is None:
+            # Compute distance matrix
+            self.dist = self.compute_distance_matrix()
+        else:
+            self.dist = self.load_distance_matrix(dist_mat_path)
+            self.nodes = np.array(list(range(self.dist.shape[0])))
+            print(self.nodes)
 
         # Store priorities
         if self.use_priority:
@@ -555,6 +561,19 @@ class TSPSolver:
 
         return dist
 
+    def load_distance_matrix(self, path) -> np.ndarray:
+        """Read LKH format cost matrix"""
+        with open(path) as f:
+            mat = []
+            lines = f.readlines()
+            
+            dim = int(lines[2][-2])
+            for i in range(dim):
+                row = np.array((lines[6+i][:-1]).split(' ')[:-1], dtype=int)
+                mat.append(row)
+        arr = np.array(mat, dtype=float)
+        return arr # norrmalise it to fit with this code
+
 
 def _create_test_graph(N, prio_factor=1, seed=0):
     # Create a graph with N nodes, and random positions in the unit square
@@ -591,14 +610,14 @@ def test_mtsp():
 
     # Create graph
     prio_factor = 1
-    graph_size = 50
+    graph_size = 5
     G = _create_test_graph(
         graph_size,
         prio_factor,
         seed=4,
     )
     starts = [0]
-
+    
     heuristic = "2opt_lns"
     param = dict(
         dist_unvisited=0,
@@ -623,12 +642,13 @@ def test_mtsp():
 
     costs = []
 
-    for i in tqdm(range(100)):
+    for i in tqdm(range(1)):
 
         rng = np.random.default_rng(seed=i)
 
         # Create graph
         G = _create_test_graph(graph_size, prio_factor, seed=i)
+        G.nodes[3]["priority"] = 100
         if G is None:
             continue
 
@@ -648,38 +668,38 @@ def test_mtsp():
     print("Avg cost: ", str(np.mean(costs)))
 
     # # Plot the graph with node indices
-    # fig, ax = plt.subplots()
-    # # Color nodes according to priority
-    # node_colors = [G.nodes[n]["priority"] for n in G.nodes]
-    # pos = nx.get_node_attributes(G, "pos")
-    # nx.draw_networkx_nodes(G, pos, node_color=node_colors, cmap=plt.cm.jet, ax=ax)
-    # idc = np.arange(len(G.nodes))
-    # labels = dict(zip(G.nodes, idc))
-    # nx.draw_networkx_labels(G, pos, labels, font_size=16, font_color="gray")
+    fig, ax = plt.subplots()
+    # Color nodes according to priority
+    node_colors = [G.nodes[n]["priority"] for n in G.nodes]
+    pos = nx.get_node_attributes(G, "pos")
+    nx.draw_networkx_nodes(G, pos, node_color=node_colors, cmap=plt.cm.jet, ax=ax)
+    idc = np.arange(len(G.nodes))
+    labels = dict(zip(G.nodes, idc))
+    nx.draw_networkx_labels(G, pos, labels, font_size=16, font_color="gray")
 
     # # Plot the edges
-    # nx.draw_networkx_edges(G, pos, alpha=0.5, ax=ax)
+    nx.draw_networkx_edges(G, pos, alpha=0.5, ax=ax)
 
     # # Plot the tour
-    # colors = ["r", "g", "b"]
-    # for idx, tour in enumerate(tours):
-    #     tour_edges = [
-    #         (tour[i], tour[(i + 1) % len(tour)]) for i in range(len(tour) - 1)
-    #     ]
-    #     nx.draw_networkx_edges(
-    #         G, pos, edgelist=tour_edges, width=8, alpha=0.5, edge_color=colors[idx]
-    #     )
-    #     # Label edges by tour order
-    #     tour_labels = dict(zip(tour_edges, range(len(tour))))
-    #     nx.draw_networkx_edge_labels(
-    #         G,
-    #         pos,
-    #         edge_labels=tour_labels,
-    #         font_size=12,
-    #         font_color=colors[idx],
-    #         label_pos=0.5,
-    #         verticalalignment="top",
-    #     )
+    colors = ["r", "g", "b"]
+    for idx, tour in enumerate(tours):
+        tour_edges = [
+            (tour[i], tour[(i + 1) % len(tour)]) for i in range(len(tour) - 1)
+        ]
+        nx.draw_networkx_edges(
+            G, pos, edgelist=tour_edges, width=8, alpha=0.5, edge_color=colors[idx]
+        )
+        # Label edges by tour order
+        tour_labels = dict(zip(tour_edges, range(len(tour))))
+        nx.draw_networkx_edge_labels(
+            G,
+            pos,
+            edge_labels=tour_labels,
+            font_size=12,
+            font_color=colors[idx],
+            label_pos=0.5,
+            verticalalignment="top",
+        )
 
     # # Get min and max x and y values from all nodes
     # x_min = min([pos[node][0] for node in pos])
@@ -691,21 +711,23 @@ def test_mtsp():
     # ax.set_ylim(y_min - 0.1, y_max + 0.1)
 
     # # Display colorbar
-    # priorities = [G.nodes[n]["priority"] for n in G.nodes]
-    # sm = plt.cm.ScalarMappable(
-    #     cmap=plt.cm.jet, norm=plt.Normalize(vmin=min(priorities), vmax=max(priorities))
-    # )
-    # sm._A = []
-    # # cbar = plt.colorbar(sm)
+    priorities = [G.nodes[n]["priority"] for n in G.nodes]
+    sm = plt.cm.ScalarMappable(
+        cmap=plt.cm.jet, norm=plt.Normalize(vmin=min(priorities), vmax=max(priorities))
+    )
+    sm._A = []
+    cbar = plt.colorbar(sm)
 
-    # plt.axis("on")  # turns on axis
-    # plt.grid(True)  # turns on grid
-    # ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-    # ax.set_aspect("equal")
-    # plt.show()
+    plt.axis("on")  # turns on axis
+    plt.grid(True)  # turns on grid
+    ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+    ax.set_aspect("equal")
+    plt.show()
 
     # a = 1
 
 
+
 if __name__ == "__main__":
     test_mtsp()
+    # test_lkh_mtsp()
