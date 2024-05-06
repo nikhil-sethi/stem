@@ -587,7 +587,8 @@ void AttentionMap::filterAttBuffer(){
 
 bool enforceIntensitySimilarity (const pcl::PointXYZI& point_a, const pcl::PointXYZI& point_b, float squared_distance)
 {
-  if (squared_distance < 1 && point_a.intensity>1.9 && std::abs (point_a.intensity - point_b.intensity) < 1e-2f)
+  // close enough + discrete enough + similar enough
+  if (squared_distance < 1 && std::abs(point_a.intensity - std::round(point_a.intensity))<0.1 && std::abs (point_a.intensity - point_b.intensity) < 5e-2f)
     return (true);
   else
     return (false);
@@ -610,8 +611,8 @@ void AttentionMap::createObjects(){
     pcl::ConditionalEuclideanClustering<pcl::PointXYZI> cec (true);
     cec.setInputCloud (cloud_copy);
     cec.setConditionFunction (&enforceIntensitySimilarity);
-    cec.setClusterTolerance (0.15);
-    cec.setMinClusterSize (5);
+    cec.setClusterTolerance (0.25);
+    cec.setMinClusterSize (10);
     cec.setMaxClusterSize (100);
     cec.segment (cluster_indices);
     // cec.getRemovedClusters (small_clusters, large_clusters);
@@ -749,7 +750,7 @@ std::vector<Eigen::Vector3i> AttentionMap::getNearbyFrontiers(Eigen::Vector3i id
         sdf_map_->indexToPos(nbr, nbr_pos);
         int nbr_adr = sdf_map_->toAddress(nbr);
         // ignore if not already checked or invalid frontier
-        if (checked[nbr_adr] || nbr_pos(2)<0.2 || !sdf_map_->isInMap(nbr) || !isFrontier(nbr))
+        if (checked[nbr_adr] || nbr_pos(2)<0.1 || !sdf_map_->isInMap(nbr) || !isFrontier(nbr))
             continue;
         
         frontier_nbrs.push_back(nbr);
@@ -768,13 +769,13 @@ float AttentionMap::diffuse(Eigen::Vector3i bu_voxel){
         sdf_map_->indexToPos(nbr, nbr_pos);
         int nbr_adr = sdf_map_->toAddress(nbr);
 
-        if (!sdf_map_->isInMap(nbr) || attention_buffer[nbr_adr] <att_min || nbr_pos(2)<0.2 )
+        if (!sdf_map_->isInMap(nbr) || attention_buffer[nbr_adr] <att_min || nbr_pos(2)<0.1 )
             continue;
         
-        att_nbr += diffusion_factor*attention_buffer[nbr_adr];
+        att_nbr += attention_buffer[nbr_adr];
         count++;
     }
-    float att_diffused = (count>0)? att_nbr/count:0;
+    float att_diffused = (count>0)? diffusion_factor*att_nbr/count:0;
     
     return att_diffused;
 }
@@ -893,7 +894,7 @@ void AttentionMap::diffusionTimer(const ros::TimerEvent& e){
 
     std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt = end-start;
-    ROS_INFO("Time for diffusion: %f", dt);
+    // ROS_INFO("Time for diffusion: %f", dt);
 }
 
 

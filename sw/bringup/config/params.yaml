@@ -20,7 +20,7 @@ perception:
       high_V: 255
 
     3d:
-      att_min: 0.5 # lower cutoff for attention values. Keep higher if you want more spread
+      att_min: 1 # lower cutoff for attention values. Keep higher if you want more spread
       
       # rate at which attention values decay. Keep higher if you want slower decay. 
       # Might need to be tuned with att_min to keep spread constant
@@ -28,4 +28,4 @@ perception:
 
       # rate for semantic map update
       # lower value means slower update, less confident, more robust to fast movements
-      learning_rate: 0.1
+      learning_rate: 0.5

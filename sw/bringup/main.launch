@@ -64,7 +64,8 @@
         <arg name="sensor_pose_topic" value="$(arg sensor_pose_topic)"/>
     </include>
     
-    <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/>
+    <!-- <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/> -->
+    <node ns="$(arg vehicle)" name="attention_map_2d" type="aruco_segment.py" pkg="semantics" output="screen" required="true"/>
     <!-- <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/> -->
     <include file="$(find bringup)/rviz.launch"/>
 

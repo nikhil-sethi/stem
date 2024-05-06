@@ -12,7 +12,7 @@ sdf_map:
   ground_height: -0.2
   default_dist: 0.0
   p_hit: 0.68
-  p_miss: 0.5  # 0.5 works best in sim. Higher values we are more liberal, so there are more false positives as well
+  p_miss: 0.47  # 0.5 works best in sim. Higher values we are more liberal, so there are more false positives as well
   p_min: 0.12
   p_max: 0.99
   p_occ: 0.7 # keep this lower if there is a lot of noise. But higher values also might lead to more false positives
@@ -208,7 +208,7 @@ optimization:
   # The minimum distance the trajectory should maintain from obstacles
   # in practice this should be higher than what you expect because of noise etc.
   # But this distance is also valid from the ground (in z axis), so if the drone wants to see something close to the ground, it will find it hard to do and keep oscillating
-  dist0: 0.7 # [m]
+  dist0: 0.5 # [m]
   max_vel: *max_vel
   max_acc: *max_acc
   algorithm1: 15
