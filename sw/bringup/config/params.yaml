@@ -1,3 +1,5 @@
+is_target_search: true
+
 perception:
   attention_map:
     2d:

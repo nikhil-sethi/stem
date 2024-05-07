@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+// #define BOOST_BIND_NO_PLACEHOLDERS
+#include <functional>
 
 #include <chrono>
 #include <visualization_msgs/Marker.h>
@@ -28,6 +30,9 @@
 #include <active_perception/frontier_finder.h>
 #include <active_perception/perception_utils.h>
 #include <chrono>
+#include <nav_msgs/Odometry.h>
+#include <thread>
+#include <tf/transform_datatypes.h>
 
 #include <geometry_msgs/PoseArray.h>
 #include <pcl/filters/statistical_outlier_removal.h>
@@ -71,7 +76,13 @@ struct TargetViewpoint: fast_planner::Viewpoint{
 
 };
 
-
+double quaternionToYaw(const geometry_msgs::Quaternion& quat) {
+    tf::Quaternion q(quat.x, quat.y, quat.z, quat.w);
+    tf::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    return yaw;
+}
 
 using namespace Eigen;
 struct Object{
@@ -196,11 +207,12 @@ class AttentionMap{
         float diffuse(Eigen::Vector3i bu_voxel);
         std::vector<Eigen::Vector3i> getNearbyFrontiers(Eigen::Vector3i idx);
         bool metricsCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
-
+        bool enforceIntensitySimilarity (const pcl::PointXYZI& point_a, const pcl::PointXYZI& point_b, float squared_distance);
+        void odometryCallback(const nav_msgs::OdometryConstPtr&  msg);
 
     private:
         std::list<Object> objects;
-        ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_;
+        ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_, odom_sub_;
         ros::Publisher bbox_pub, vpt_pub, att_3d_pub, att_diff_pub;
         ros::Timer loop_timer_, diffusion_timer_, att_pub_timer;
         vector<ros::Publisher> viz_pubs;
@@ -226,6 +238,8 @@ class AttentionMap{
         fast_planner::PerceptionUtils percep_utils_;
         float total_entropy=0.0f;
         float learning_rate;
+        Eigen::Vector3d self_pos, local_box_min, local_box_max;
+        std::function<bool(const pcl::PointXYZI&, const pcl::PointXYZI&, float)> condfunc;
 
 };
 
@@ -233,12 +247,13 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
     att_3d_sub_ = nh.subscribe("/attention_map/local", 1, &AttentionMap::attCloudCallback, this);
     occ_sub_ = nh.subscribe("/occupancy_buffer", 1, &AttentionMap::occCallback, this);
     occ_inflate_sub_ = nh.subscribe("/occupancy_buffer_inflate", 1, &AttentionMap::occInflateCallback, this);
+    odom_sub_ = nh.subscribe("/mavros/local_position/odom", 1, &AttentionMap::odometryCallback, this);
     // frontier_sub = = nh.subscribe("/frontier_cells", 1, &AttentionMap::frontierCallback, this);
 
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
     vpt_pub = nh.advertise<geometry_msgs::PoseArray>("/objects/target_vpts", 1);
     att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/global", 1);
-    att_diff_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/blur", 10);
+    // att_diff_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/blur", 10);
 
     // create sdf map separate instance just for function reuse
     sdf_map_.reset(new fast_planner::SDFMap);
@@ -259,7 +274,9 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
     att_pub_timer =  nh.createTimer(ros::Duration(0.05), &AttentionMap::publishAttTimer, this);
     diffusion_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::diffusionTimer, this);
-    
+
+    // std::thread thread(foo);
+    // thread.detach();
 
     // visualization
     viz = fast_planner::PlanningVisualization(nh);
@@ -280,6 +297,9 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
     nh.param("/perception/attention_map/3d/att_min", att_min, 0.1f); 
     nh.param("/perception/attention_map/3d/diffusion_factor", diffusion_factor, 0.9f); 
     nh.param("/perception/attention_map/3d/learning_rate", learning_rate, 0.5f); 
+
+    condfunc = std::bind(&AttentionMap::enforceIntensitySimilarity, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
 
 }
 
@@ -328,6 +348,9 @@ void AttentionMap::visualize(Object& object){
 }
 
 void AttentionMap::loopTimer(const ros::TimerEvent& event){
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     // for each object
         // find top viewpoints
         // calculate optimal local tour
@@ -339,11 +362,11 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
 
 
     createObjects(); // cluster the global point cloud 
-    
+
     for (Object& object: objects){
         // if (object.id==3){
         findViewpoints(object);
-        visualize(object);
+        // visualize(object);
         if (!object.viewpoint_candidates.empty()){
             int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
             // int num_vpts =1;
@@ -354,6 +377,11 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
 
     vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
 
+
+
+    // std::chrono::time_point<std::chrono::high_resolution_clock> end = ;
+    std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
+    // ROS_INFO("Time vpts: %f, num obj %d", dt_vpt, objects.size());
 
 }
 
@@ -421,9 +449,9 @@ void AttentionMap::findViewpoints(Object& object){
             object.viewpoint_candidates.push_back(vpt);
         }
         
-        if (!object.viewpoint_candidates.empty())
-            // sort list wrt information gain 
-            sortViewpoints(object.viewpoint_candidates);       
+    if (!object.viewpoint_candidates.empty())
+        // sort list wrt information gain 
+        sortViewpoints(object.viewpoint_candidates);       
 
 }       
 
@@ -442,10 +470,10 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
     percep_utils_.setPose(sample_pos, yaw);
 
     //inflated bounding box around object bbox
-    Eigen::Vector3d bbox_min = object.bbox_min_ - Eigen::Vector3d(0.5,0.5,0.5);
-    Eigen::Vector3d bbox_max = object.bbox_max_ + Eigen::Vector3d(0.5,0.5,0.5);
+    Eigen::Vector3d bbox_min = object.bbox_min_ - Eigen::Vector3d(1,1,0.5);
+    Eigen::Vector3d bbox_max = object.bbox_max_ + Eigen::Vector3d(1,1,0.5);
 
-    for (pcl::PointXYZI& point : global_att_cloud->points) {
+    for (pcl::PointXYZI& point : glob al_att_cloud->points) {
         pos(0) = point.x;
         pos(1) = point.y;
         pos(2) = point.z;
@@ -585,13 +613,13 @@ void AttentionMap::filterAttBuffer(){
     // }
 }
 
-bool enforceIntensitySimilarity (const pcl::PointXYZI& point_a, const pcl::PointXYZI& point_b, float squared_distance)
+bool AttentionMap::enforceIntensitySimilarity (const pcl::PointXYZI& point_a, const pcl::PointXYZI& point_b, float squared_distance)
 {
   // close enough + discrete enough + similar enough
-  if (squared_distance < 1 && std::abs(point_a.intensity - std::round(point_a.intensity))<0.1 && std::abs (point_a.intensity - point_b.intensity) < 5e-2f)
-    return (true);
-  else
+  
+  if (squared_distance > 1 || point_a.intensity<=att_min || point_b.intensity<=att_min || std::abs (point_a.intensity - point_b.intensity) > 1e-2f)
     return (false);
+  return (true);
 }
 
 
@@ -610,9 +638,11 @@ void AttentionMap::createObjects(){
 
     pcl::ConditionalEuclideanClustering<pcl::PointXYZI> cec (true);
     cec.setInputCloud (cloud_copy);
-    cec.setConditionFunction (&enforceIntensitySimilarity);
-    cec.setClusterTolerance (0.25);
-    cec.setMinClusterSize (10);
+    // using namespace std::placeholders;
+
+    cec.setConditionFunction (condfunc);
+    cec.setClusterTolerance (0.15);
+    cec.setMinClusterSize (5);
     cec.setMaxClusterSize (100);
     cec.segment (cluster_indices);
     // cec.getRemovedClusters (small_clusters, large_clusters);
@@ -640,6 +670,8 @@ void AttentionMap::createObjects(){
 }
 
 void AttentionMap::publishAttTimer(const ros::TimerEvent& e){
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     Eigen::Vector3d pos;
     // Create PCL cloud
     global_att_cloud->points.clear();
@@ -663,6 +695,10 @@ void AttentionMap::publishAttTimer(const ros::TimerEvent& e){
     sensor_msgs::PointCloud2 cloud_msg;
     pcl::toROSMsg(*global_att_cloud, cloud_msg);
     att_3d_pub.publish(cloud_msg);
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> dt = end-start;
+    // ROS_INFO("Time for pub: %f", dt);
 }
 
 vector<Eigen::Vector3i> sixNeighbors(const Eigen::Vector3i& voxel) {
@@ -863,38 +899,67 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
 // Diffuse attentive semantics into neighboring frontiers. 
 // Run in a separate thread because computationally expensive and we dont need fast updates.
 void AttentionMap::diffusionTimer(const ros::TimerEvent& e){
-    
+
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
     std::fill(checked.begin(), checked.end(), false);
+
+    // get local bounds
+    // Eigen::Vector3d box_min = self_pos - Eigen::Vector3d(2.5,2,0);
+    // Eigen::Vector3d box_max = self_pos + Eigen::Vector3d(2.5,2,0);
+    
+    Eigen::Vector3i min_cut;
+    Eigen::Vector3i max_cut;
+    sdf_map_->posToIndex(local_box_min, min_cut);
+    sdf_map_->posToIndex(local_box_max, max_cut);
+
+    sdf_map_->boundIndex(min_cut);
+    sdf_map_->boundIndex(max_cut);
+
+    // print_eigen(local_box_max);
+
     Eigen::Vector3i idx;
     Eigen::Vector3d pos;
 
-    for (int i=0; i<attention_buffer.size(); i++){
-        float attention = attention_buffer[i];
+    for (int x = min_cut(0); x <= max_cut(0); ++x)
+        for (int y = min_cut(1); y <= max_cut(1); ++y)
+            for (int z = sdf_map_->mp_->box_min_(2); z < sdf_map_->mp_->box_max_(2); ++z) {
+
+            int adr = sdf_map_->toAddress(x,y,z);
+    // }
+
+    // for (int adr=0; adr<attention_buffer.size(); adr++){
+        float attention = attention_buffer[adr];
         
-        if (attention <= att_min || occupancy_buffer_[i] == fast_planner::SDFMap::FREE){ // this is the main thing that saves compute
-            attention_buffer[i]=0;
+        if (attention <= att_min || occupancy_buffer_[adr] == fast_planner::SDFMap::FREE){ // this is the main thing that saves compute
+            attention_buffer[adr]=0;
             continue;
         }
-        sdf_map_->indexToPos(i, pos);
+        sdf_map_->indexToPos(adr, pos);
         sdf_map_->posToIndex(pos, idx);
-        auto bu_voxels = getNearbyFrontiers(idx); // bottom up voxels: frontier cells that are near attentive regions
-        
+        auto bu_voxels = getNearbyFrontiers(Eigen::Vector3i(x, y, z)); // bottom up voxels: frontier cells that are near attentive regions
+        // auto bu_voxels = getNearbyFrontiers(idx); // bottom up voxels: frontier cells that are near attentive regions
         // apply kernel to each unknown voxel
         for (auto& vox: bu_voxels){
-            int adr = sdf_map_->toAddress(vox);
+            int bu_voxel_adr = sdf_map_->toAddress(vox);
 
             float att_diffused = diffuse(vox); // filter value
-            attention_buffer[adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[adr]):0;     // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
+            attention_buffer[bu_voxel_adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[bu_voxel_adr]):0;     // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
 
         }
 
     }
 
+
+    // ros::Duration(0.4).sleep();
+
+
     std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt = end-start;
     // ROS_INFO("Time for diffusion: %f", dt);
+    // std::cout<<dt<<std::endl;
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    
 }
 
 
@@ -923,6 +988,36 @@ inline uint8_t AttentionMap::getOccupancy(const Eigen::Vector3d& pos) {
   sdf_map_->posToIndex(pos, id);
   return getOccupancy(id);
 }
+
+
+void AttentionMap::odometryCallback(const nav_msgs::OdometryConstPtr&  msg){
+    
+    self_pos(0) = msg->pose.pose.position.x;
+    self_pos(1) = msg->pose.pose.position.y;
+    self_pos(2) = msg->pose.pose.position.z;
+
+    // Eigen::Vector3d dir;
+    // vel(0) = msg->twist.twist.linear.x;
+    // vel(1) = msg->twist.twist.linear.y;
+    // vel(2) = msg->twist.twist.linear.z;
+    double yaw = quaternionToYaw(msg->pose.pose.orientation);
+    
+    Eigen::Vector3d dir(cos(yaw), sin(yaw), 0);
+
+    // update local box locations wrt world origin
+    // offset in direction of travel
+    local_box_min = self_pos - Eigen::Vector3d(2,2,0) + dir;
+    local_box_max = self_pos + Eigen::Vector3d(2,2,0) + dir;
+    
+    // doesnt matter will not be used
+    local_box_max(2) = -0.2;
+    local_box_min(2) = 1.5;
+
+    // Uncomment to visualise local update box
+    // viz.drawBox((local_box_min + local_box_max)/2.0, local_box_max - local_box_min, Eigen::Vector4d(0.5, 0, 1, 0.5), "box"+std::to_string(100), 100, 7);
+
+}
+
 
 
 int main(int argc, char** argv){

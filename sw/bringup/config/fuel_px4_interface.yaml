@@ -2,7 +2,7 @@
 loop_frequency: 50
 
 # Lab bounds (m)
-lab_bounds: [6, 5, 3]
+lab_bounds: [9, 9, 3]
 
 # Distance threshold for reaching a desired position
 dist_thres: 0.3
