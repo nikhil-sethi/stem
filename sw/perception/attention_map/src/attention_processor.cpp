@@ -26,115 +26,87 @@
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <common/io.h>
+#include <common/utils.h>
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
 #include <active_perception/perception_utils.h>
 #include <chrono>
 #include <nav_msgs/Odometry.h>
 #include <thread>
-#include <tf/transform_datatypes.h>
-
+#include <pcl/filters/voxel_grid.h>
+#include <mutex>
 #include <geometry_msgs/PoseArray.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/radius_outlier_removal.h>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 #include <std_srvs/Trigger.h>
+#include <target_search/target_viewpoint.h>
 
-
-struct TargetViewpoint: fast_planner::Viewpoint{
-    float gain_;
-
-    TargetViewpoint(Eigen::Vector3d pos, double yaw, float gain){
-        pos_ = pos;
-        yaw_ = yaw;
-        gain_ = gain;
-    }
-
-    Eigen::Vector4d poseToEigen(){
-        return Eigen::Vector4d(pos_(0), pos_(1),pos_(2), yaw_);
-    }
-    Eigen::Vector3d posToEigen(){
-        return Eigen::Vector3d(pos_(0), pos_(1),pos_(2));
-    }
-
-    geometry_msgs::Pose toMsg(){
-        geometry_msgs::Pose msg;
-        // msg.header.stamp = ros::Time::now();
-        
-        msg.position.x = pos_(0);
-        msg.position.y = pos_(1);
-        msg.position.z = pos_(2);
-        
-        tf2::Quaternion quat_tf;
-        quat_tf.setRPY(0,0,yaw_);
-        quat_tf = quat_tf.normalize();
-        msg.orientation = tf2::toMsg(quat_tf);
-    
-        return msg;
-    }   
-
-};
-
-double quaternionToYaw(const geometry_msgs::Quaternion& quat) {
-    tf::Quaternion q(quat.x, quat.y, quat.z, quat.w);
-    tf::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    return yaw;
-}
+Eigen::Vector3d origin(-5.5, -5.5, 0);
+typedef std::chrono::time_point<std::chrono::high_resolution_clock> time_point;
+typedef std::chrono::duration<double> time_diff;
 
 using namespace Eigen;
 struct Object{
     int id;
-    pcl::PointCloud<pcl::PointXYZI> points;
+    // pcl::PointCloud<pcl::PointXYZI> points;
     float max_gain;
     Eigen::Vector3d bbox_min_;
     Eigen::Vector3d bbox_max_;
     Eigen::Vector3d centroid_;
+    Eigen::Vector3d scale_;
     vector<TargetViewpoint> viewpoint_candidates;
     std::vector<Eigen::Vector3d> projection_corners;
+    bool seen_ = false;
+    float time_since_vpt = 1000;
 
     // initialise projection corners to fixed length
     Object():projection_corners(8){}
-
-    void computeInfo(){
+    Object(const pcl::PointCloud<pcl::PointXYZI>& points):projection_corners(8){
         if (points.size() == 0) return;
         pcl::PointXYZI bbox_min;
         pcl::PointXYZI bbox_max;
         pcl::getMinMax3D(points, bbox_min, bbox_max); 
-        bbox_min_ = Eigen::Vector3d(bbox_min.x, bbox_min.y, bbox_min.z);
-        bbox_max_ = Eigen::Vector3d(bbox_max.x, bbox_max.y, bbox_max.z);
 
+        bbox_min_ = Eigen::Vector3d(bbox_min.x-0.02, bbox_min.y-0.02, bbox_min.z-0.02);
+        bbox_max_ = Eigen::Vector3d(bbox_max.x+0.02, bbox_max.y+0.02, bbox_max.z+0.02);
+
+        computeInfo();
+    }
+
+    void computeInfo(){
         centroid_ = (bbox_min_ + bbox_max_)/2.0;
-        
+        scale_ = bbox_max_ - bbox_min_;
         computeBboxCorners();
     } 
 
     void computeBboxCorners(){
-        Eigen::Vector3d size = bbox_max_ - bbox_min_;
-        
         // points 
         projection_corners[0] = bbox_min_;
-        projection_corners[1] = bbox_min_ + Vector3d(size(0), 0, 0);
-        projection_corners[2] = bbox_min_ + Vector3d(0, size(1), 0);
-        projection_corners[3] = bbox_min_ + Vector3d(size(0), size(1), 0);
+        projection_corners[1] = bbox_min_ + Vector3d(scale_(0), 0, 0);
+        projection_corners[2] = bbox_min_ + Vector3d(0, scale_(1), 0);
+        projection_corners[3] = bbox_min_ + Vector3d(scale_(0), scale_(1), 0);
         
         projection_corners[4] = bbox_max_;
-        projection_corners[5] = bbox_max_ - Vector3d(size(0), 0, 0);
-        projection_corners[6] = bbox_max_ - Vector3d(0, size(1), 0);
-        projection_corners[7] = bbox_max_ - Vector3d(size(0), size(1), 0);
+        projection_corners[5] = bbox_max_ - Vector3d(scale_(0), 0, 0);
+        projection_corners[6] = bbox_max_ - Vector3d(0, scale_(1), 0);
+        projection_corners[7] = bbox_max_ - Vector3d(scale_(0), scale_(1), 0);
     
     }
-};
 
-bool isPtInBox(const Eigen::Vector3d& point, const Eigen::Vector3d& bbox_max, const Eigen::Vector3d& bbox_min){
-    for (int i=0; i<3; ++i){
-        if (point(i) < bbox_min(i) || point(i) > bbox_max(i))
-            return false;
+    // merge bbox corners
+    void merge(const Object& other){
+        bbox_min_ = bbox_min_.cwiseMin(other.bbox_min_);
+        bbox_max_ = bbox_max_.cwiseMax(other.bbox_max_);
+        computeInfo(); // update
     }
-    return true;
-}
+
+    bool isInBox(Eigen::Vector3d box_min, Eigen::Vector3d box_max){
+        return isPtInBox(bbox_min_, box_min, box_max) && isPtInBox(bbox_max_, box_min, box_max);
+    }
+
+};
 
 
 // Function to calculate the 3D Gaussian kernel weights
@@ -186,15 +158,16 @@ class AttentionMap{
         void attCloudCallback(const sensor_msgs::PointCloud2& msg);
         void occCallback(const common_msgs::uint8List& msg);
         void occInflateCallback(const common_msgs::uint8List& msg);
-        void findViewpoints(Object& object);
+        void sampleViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts);
+        void findTopViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts);
         void loopTimer(const ros::TimerEvent& event);
         bool isNearUnknown(const Eigen::Vector3d& pos);
         uint8_t getOccupancy(const Eigen::Vector3i& id);
         uint8_t getOccupancy(const Eigen::Vector3d& pos);
-        void visualize(Object& object);
+        void visualize();
         bool isObjectInView(const Object& object, const Eigen::Vector3d& pos, const Eigen::Vector3d& orient);
         float computeInformationGain(Object& object, const Eigen::Vector3d& sample_pos, const double& yaw);
-        void createObjects();
+        void createObjects(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, std::list<Object>& objects);
         void publishAttTimer(const ros::TimerEvent& e);
         void filterAttBuffer();
         bool knownfree(const Eigen::Vector3i& idx) ;
@@ -203,18 +176,21 @@ class AttentionMap{
         bool isNeighborAttentive(const Eigen::Vector3i& voxel);
         
         bool isFrontier(Eigen::Vector3i idx);
-        void diffusionTimer(const ros::TimerEvent& e);
+        void diffusionTimer();
+
         float diffuse(Eigen::Vector3i bu_voxel);
-        std::vector<Eigen::Vector3i> getNearbyFrontiers(Eigen::Vector3i idx);
+        void getNearbyFrontiers(Eigen::Vector3i idx, std::vector<Eigen::Vector3i>& frontier_nbrs);
         bool metricsCallback(std_srvs::Trigger::Request &req, std_srvs::Trigger::Response &res);
         bool enforceIntensitySimilarity (const pcl::PointXYZI& point_a, const pcl::PointXYZI& point_b, float squared_distance);
         void odometryCallback(const nav_msgs::OdometryConstPtr&  msg);
+        // bool areObjectsSimilar(const Object& obj_a, const Object& obj_b, double overlapThreshold);
+        void objectUpdateTimer(const ros::TimerEvent& e);
 
     private:
-        std::list<Object> objects;
+        std::list<Object> global_objects;
         ros::Subscriber att_3d_sub_, occ_sub_, occ_inflate_sub_, odom_sub_;
         ros::Publisher bbox_pub, vpt_pub, att_3d_pub, att_diff_pub;
-        ros::Timer loop_timer_, diffusion_timer_, att_pub_timer;
+        ros::Timer loop_timer_, diffusion_timer_, att_pub_timer, obj_timer_;
         vector<ros::Publisher> viz_pubs;
         fast_planner::PlanningVisualization viz;
         std::vector<uint8_t> occupancy_buffer_;
@@ -240,6 +216,9 @@ class AttentionMap{
         float learning_rate;
         Eigen::Vector3d self_pos, local_box_min, local_box_max;
         std::function<bool(const pcl::PointXYZI&, const pcl::PointXYZI&, float)> condfunc;
+        Eigen::Vector3d origin, size;
+        pcl::PointCloud<pcl::PointXYZI>::Ptr local_sem_cloud;
+        // std::list<TargetViewpoint> all_viewpoints; // for filtering
 
 };
 
@@ -259,7 +238,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
     sdf_map_.reset(new fast_planner::SDFMap);
     sdf_map_->setParams(nh, "/exploration_node/");
     resolution_ = sdf_map_->getResolution();
-    Eigen::Vector3d origin, size;
+    // Eigen::Vector3d origin, size;
     sdf_map_->getRegion(origin, size);
     print_eigen(origin);
     print_eigen(size);
@@ -272,8 +251,9 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
 
     min_candidate_clearance_ = nh.param("/exploration_node/frontier_finder/min_candidate_clearance", min_candidate_clearance_, -1.0);
     loop_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::loopTimer, this);
+    obj_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::objectUpdateTimer, this);
     att_pub_timer =  nh.createTimer(ros::Duration(0.05), &AttentionMap::publishAttTimer, this);
-    diffusion_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::diffusionTimer, this);
+    // diffusion_timer_ = nh.createTimer(ros::Duration(0.05), &AttentionMap::diffusionTimer, this);
 
     // std::thread thread(foo);
     // thread.detach();
@@ -300,73 +280,240 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
 
     condfunc = std::bind(&AttentionMap::enforceIntensitySimilarity, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
+    local_sem_cloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+
+    std::thread diffusion_thread(&AttentionMap::diffusionTimer, this);
+    diffusion_thread.detach();
+
+    std::thread viz_thread(&AttentionMap::visualize, this);
+    viz_thread.detach();
+}
+
+typedef std::pair<Vector3d, Vector3d> BoundingBox;
+
+
+bool checkOverlap(const BoundingBox& box1, const BoundingBox& box2) {
+    for (int i = 0; i < 3; ++i) {
+        if (box1.second[i] < box2.first[i] || box1.first[i] > box2.second[i])
+            return false; // No overlap along this axis
+    }
+    return true; // Overlap along all axes
+}
+
+double intersectionVolume(const BoundingBox& box1, const BoundingBox& box2) {
+    Vector3d minCorner = box1.first.cwiseMax(box2.first);
+    Vector3d maxCorner = box1.second.cwiseMin(box2.second);
+    Vector3d dims = (maxCorner - minCorner).cwiseAbs();// cwiseMax(Vector3d::Zero());
+    return dims.prod();
+}
+
+// double overlapThreshold = 0.5; 
+bool areObjectsSimilar(const Object& obj_a, const Object& obj_b, double overlapThreshold){
+    // if ((obj_a.bbox_min_-obj_b.bbox_min_).norm() < 0.1 && (obj_a.bbox_max_-obj_b.bbox_max_).norm() < 0.1)
+    //     return true;
+
+    BoundingBox box1(obj_a.bbox_min_-origin, obj_a.bbox_max_-origin);
+    BoundingBox box2(obj_b.bbox_min_-origin, obj_b.bbox_max_-origin);
+
+    // if overlap check IOU
+    if (checkOverlap(box1, box2)){
+        double intersectionVol = intersectionVolume(box1, box2);
+        double totalVol1 = (box1.second - box1.first).prod();
+        double totalVol2 = (box2.second - box2.first).prod();
+        double overlapRatio1 = intersectionVol / totalVol1;
+        double overlapRatio2 = intersectionVol / totalVol2;
+        // std::cout<<overlapRatio1 <<overlapRatio2 <<std::endl;
+        // Check if overlap ratio exceeds the threshold for either bounding box
+        if (overlapRatio1 > overlapThreshold || overlapRatio2 > overlapThreshold)
+            return true;
+    }
+    // 
+    // if (checkAdjacent(box1, box2)){
+    //     return true;
+    // }
+        
+
+    return false;
+}
+
+
+// merge newly detected objects into existing ones
+void mergeObjects(std::list<Object>& old_objects, std::list<Object> new_objects){
+    // merge new objects into old ones
+    for (Object obj_n: new_objects){
+        bool merged = false;
+        // find something to merge into
+        for (auto& obj_o: old_objects){
+            if (areObjectsSimilar(obj_n, obj_o, 0.5)){
+                obj_o.merge(obj_n);// 
+                // std::cout<<"rg"<<std::endl;
+                merged = true;
+                break;
+                
+            }
+        }
+        if (!merged){   
+            old_objects.push_back(obj_n);
+        }
+    }
+
+
+    // merge old objects into old ones
+    std::list<std::list<Object>::iterator> remove_iterators;
+    for (auto it1 = old_objects.begin(); it1!=old_objects.end();it1++){
+        for (auto it2 = std::next(it1); it2!=old_objects.end();it2++){
+            if (areObjectsSimilar(*it1, *it2, 0.5)){
+                it1->merge(*it2);
+                remove_iterators.push_back(it2);
+                break;   
+            }
+        }    
+    }
+    for (auto it: remove_iterators)
+        old_objects.erase(it);
 
 }
 
 
-void AttentionMap::visualize(Object& object){
+void AttentionMap::visualize(){
+    while (true){
+        int i=0;
+        for (Object& object: global_objects ){
+            // === Object bounding box
+            viz.drawBox(object.centroid_, object.scale_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(i), i, 7);
 
-    // === Object bounding box
-    viz.drawBox((object.bbox_min_ + object.bbox_max_)/2.0, object.bbox_max_ - object.bbox_min_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(object.id), object.id, 7);
+            // === Enclosed point cloud with attention
+            // sensor_msgs::PointCloud2 cluster_msg;
+            // pcl::toROSMsg(*object.points, cluster_msg);
+            // clustered_point_cloud_pub.publish(cluster_msg);
 
-    // === Enclosed point cloud with attention
-    // sensor_msgs::PointCloud2 cluster_msg;
-    // pcl::toROSMsg(*object.points, cluster_msg);
-    // clustered_point_cloud_pub.publish(cluster_msg);
-
-    // === Viewpoint candidates
-    
-    // for (auto& corner: object.projection_corners)
-    //     object.viewpoint_candidates.push_back(corner); // just for debugging
-    
-    if (!object.viewpoint_candidates.empty()){
-        std::vector<Eigen::Vector3d> vpt_positions;
-        // plotting only the best for now
-        // vpt_positions.push_back(object.viewpoint_candidates[0].posToEigen());
-
-        // plotting top K viewpoints
-        int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
-        for (int i = 0; i < num_vpts; i++){
-            vpt_positions.push_back(object.viewpoint_candidates[i].posToEigen());
-        
-        }
-         
+            // === Viewpoint candidates
             
+            // for (auto& corner: object.projection_corners)
+            //     object.viewpoint_candidates.push_back(corner); // just for debugging
+            
+            if (!object.viewpoint_candidates.empty()){
+                std::vector<Eigen::Vector3d> vpt_positions;
+                // plotting only the best for now
+                // vpt_positions.push_back(object.viewpoint_candidates[0].posToEigen());
 
+                // plotting top K viewpoints
+                int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
+                for (int i = 0; i < num_vpts; i++){
+                    vpt_positions.push_back(object.viewpoint_candidates[i].posToEigen());
+                
+                }
+                
 
-        // for (auto& vpt: object.viewpoint_candidates){
-        //     vpt_positions.push_back(Eigen::Vector3d(vpt.pos_(0), vpt.pos_(1), vpt.pos_(2)));
-        // }
+                // for (auto& vpt: object.viewpoint_candidates){
+                //     vpt_positions.push_back(Eigen::Vector3d(vpt.pos_(0), vpt.pos_(1), vpt.pos_(2)));
+                // }
 
-        viz.drawSpheres(vpt_positions, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
-        // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
-        // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
-        // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
-  
+                viz.drawSpheres(vpt_positions, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
+                // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
+                // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
+                // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
+        
+            }
+        
+            i++;
+        }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     
 }
 
+void AttentionMap::objectUpdateTimer(const ros::TimerEvent& e){
+     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
+    local_sem_cloud->clear();
+    Eigen::Vector3i min_cut;
+    Eigen::Vector3i max_cut;
+    sdf_map_->posToIndex(local_box_min, min_cut);
+    sdf_map_->posToIndex(local_box_max, max_cut);
+
+    sdf_map_->boundIndex(min_cut);
+    sdf_map_->boundIndex(max_cut);
+
+    Eigen::Vector3d pos;
+    pcl::PointXYZI pcl_pt;
+    
+    for (int x = min_cut(0); x <= max_cut(0); ++x)
+        for (int y = min_cut(1); y <= max_cut(1); ++y)
+            for (int z = sdf_map_->mp_->box_min_(2); z < sdf_map_->mp_->box_max_(2); ++z) {
+
+            int adr = sdf_map_->toAddress(x,y,z);
+
+            float attention = attention_buffer[adr];
+
+            if (attention >= att_min && occupancy_buffer_[adr] == fast_planner::SDFMap::OCCUPIED) {
+                sdf_map_->indexToPos(adr, pos);
+        
+                pcl_pt.x = pos[0];
+                pcl_pt.y = pos[1];
+                pcl_pt.z = pos[2];
+                pcl_pt.intensity = attention;
+                local_sem_cloud->push_back(pcl_pt);
+            }
+    }
+
+    std::list<Object> local_objects;    
+    createObjects(local_sem_cloud, local_objects); // cluster the global point cloud 
+    mergeObjects(global_objects, local_objects);
+
+    std::chrono::duration<double> dt_obj = std::chrono::high_resolution_clock::now() - start;
+    // ROS_INFO("Time obj: %f, local obj %d, global obj %d", dt_obj, local_objects.size(), global_objects.size());
+}
+
+
 void AttentionMap::loopTimer(const ros::TimerEvent& event){
-
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
-
-    // for each object
-        // find top viewpoints
-        // calculate optimal local tour
 
     geometry_msgs::PoseArray vpts_msg;
     vpts_msg.header.stamp = ros::Time::now();
     vpts_msg.header.frame_id = "map";
-    // std::vector<geometry_msgs::Pose> vpts(object.size());
+
+    std::list<std::vector<TargetViewpoint>> all_viewpoints;
+    for (Object& object: global_objects){   
+        if (!object.isInBox(local_box_min, local_box_max)) continue;
+          
+        std::vector<TargetViewpoint> sample_vpts; 
+        sampleViewpoints(object, sample_vpts);
+        all_viewpoints.push_back(sample_vpts);
+    }
+    
+    int i=0, j=0;
+    for (auto vpts: all_viewpoints){
+        i++;
+        std::vector<Eigen::Vector3d> vpt_positions;
+
+        for (auto vpt: vpts){
+            vpt_positions.push_back(vpt.posToEigen());
+            j++;
+        }
+            viz.drawSpheres(vpt_positions, 0.1, Vector4d(0.5, 0.5, 1, 1), "points_"+std::to_string(i), i, 6);
+
+    }
 
 
-    createObjects(); // cluster the global point cloud 
 
-    for (Object& object: objects){
-        // if (object.id==3){
-        findViewpoints(object);
-        // visualize(object);
+    removeSimilarPosesFromList(all_viewpoints);
+
+    // calculate information gain
+    std::list<std::vector<TargetViewpoint>>::iterator it = all_viewpoints.begin();
+
+    for (Object& object: global_objects){      
+        if (!object.isInBox(local_box_min, local_box_max)) continue;
+        findTopViewpoints(object, *it);
+        it++;
+    }
+
+    // std::chrono::duration<double> dt_sam = std::chrono::high_resolution_clock::now() - start;
+    // ROS_INFO("Time sample: %f, size: %d", dt_sam, all_viewpoints.size());
+    
+
+    for (Object& object: global_objects){   
         if (!object.viewpoint_candidates.empty()){
             int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
             // int num_vpts =1;
@@ -377,11 +524,8 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
 
     vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
 
-
-
-    // std::chrono::time_point<std::chrono::high_resolution_clock> end = ;
     std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
-    // ROS_INFO("Time vpts: %f, num obj %d", dt_vpt, objects.size());
+    ROS_INFO("Time vpts: %f, num: %d", dt_vpt, j);
 
 }
 
@@ -390,18 +534,16 @@ void sortViewpoints(std::vector<TargetViewpoint>& vpts){
 }
 
 
-void AttentionMap::findViewpoints(Object& object){
-    
-    // find the closest distance that would have the object still in view
-    // sample viewpoints around the object starting from the minimum distance
-    // for each sample 
-        // if sample is near unknown region (OR) on an occupied cell (OR) not in the volume --> discard
-        // if the object's perspective view from the sample doesnt fit in the camera --> discard 
-        // evaluate information gain by ray casting (need attention buffer for this)
-        // if gain is more than min gain, add viewpoint to candidate list
-    // sort viewpoints by their gain
-    // get some top viewpoints for the object
+/*
+Sample valid viewpoints around the object
+A viewpoint is valid if:
+1. exists in map
+2. Not too close to unknown or occupied space
+3. Has the object in view
 
+
+*/
+void AttentionMap::sampleViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
 
 
     // find the minimum radius for cylindrical sampling
@@ -412,6 +554,8 @@ void AttentionMap::findViewpoints(Object& object){
         // else
             // bound using the height
         // find the rmin using the bound
+    // object.viewpoint_candidates.clear();
+
     Eigen::Vector3d diag_3d = object.bbox_max_ - object.bbox_min_;
     int shortest_axis = diag_3d(1) > diag_3d(0) ? 0: 1;
     Eigen::Vector2d diag_2d = {diag_3d(shortest_axis), diag_3d(2)};
@@ -421,7 +565,6 @@ void AttentionMap::findViewpoints(Object& object){
 
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     
-    object.viewpoint_candidates.clear();
     for (double rc = rmin, dr = 0.5/2; rc <= rmin + 0.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI-0.5235; phi += 0.5235) {
             Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
@@ -435,23 +578,71 @@ void AttentionMap::findViewpoints(Object& object){
                 // print_eigen(sample_pos);
                 continue;
             }
-            
-            // raycast from virtual camera to corners. not implemented. might not need
 
-            // compute information gain from remaining viewpoints
-            float gain = computeInformationGain(object, sample_pos, phi + M_PI);
-            // print(object.id, rc, phi, gain);
-            if (gain<=5)
-                continue;
+            TargetViewpoint vpt(TargetViewpoint(sample_pos, phi + M_PI, 0)); // 0 gain. will be computed later
+            sampled_vpts.push_back(vpt);
+        }
+}
+
+
+// void AttentionMap::sampleShapeInformedViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
+
+
+
+// }
+
+
+
+// see if viewpoints are close enough to discard
+// void AttentionMap::filterViewpoints(){
+
+// }
+
+
+void AttentionMap::findTopViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
+
+
+    // find the closest distance that would have the object still in view
+    // sample viewpoints around the object starting from the minimum distance
+    // for each sample 
+        // if sample is near unknown region (OR) on an occupied cell (OR) not in the volume --> discard
+        // if the object's perspective view from the sample doesnt fit in the camera --> discard 
+        // evaluate information gain by ray casting (need attention buffer for this)
+        // if gain is more than min gain, add viewpoint to candidate list
+    // sort viewpoints by their gain
+    // get some top viewpoints for the object
+    object.viewpoint_candidates.clear();
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
+    // for (auto vpt: sample_vpts){
+        // compute information gain from remaining viewpoints
+        // std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
+    for (auto it=sampled_vpts.begin(); it!=sampled_vpts.end();++it){
+            float gain = computeInformationGain(object, it->pos_, it->yaw_);
+            // std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
+            // ROS_INFO("Time vpt: %f", dt_vpt);
             
-            // add whatever's left to candidates
-            TargetViewpoint vpt(sample_pos, phi + M_PI, gain);
-            object.viewpoint_candidates.push_back(vpt);
+            // print(object.id, rc, phi, gain);
+            if (gain<=5){
+                // object.viewpoint_candidates.erase(it);
+                continue;
+            }
+            // else{
+            //     it->gain_ = gain;
+            //     // it++;
+            // }
+            it->gain_ = gain;
+            object.viewpoint_candidates.push_back(*it);
         }
         
     if (!object.viewpoint_candidates.empty())
-        // sort list wrt information gain 
-        sortViewpoints(object.viewpoint_candidates);       
+        sortViewpoints(object.viewpoint_candidates);       // sort list wrt information gain 
+    else
+        object.seen_=true;
+
+    std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
+    // ROS_INFO("Time vpt: %f", dt_vpt);
 
 }       
 
@@ -473,7 +664,7 @@ float AttentionMap::computeInformationGain(Object& object, const Eigen::Vector3d
     Eigen::Vector3d bbox_min = object.bbox_min_ - Eigen::Vector3d(1,1,0.5);
     Eigen::Vector3d bbox_max = object.bbox_max_ + Eigen::Vector3d(1,1,0.5);
 
-    for (pcl::PointXYZI& point : glob al_att_cloud->points) {
+    for (pcl::PointXYZI& point : global_att_cloud->points) {
         pos(0) = point.x;
         pos(1) = point.y;
         pos(2) = point.z;
@@ -623,9 +814,9 @@ bool AttentionMap::enforceIntensitySimilarity (const pcl::PointXYZI& point_a, co
 }
 
 
-void AttentionMap::createObjects(){
-    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_copy(new pcl::PointCloud<pcl::PointXYZI>(*global_att_cloud));
-
+void AttentionMap::createObjects(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, std::list<Object>& objects){
+    // pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_copy(new pcl::PointCloud<pcl::PointXYZI>(*global_att_cloud));
+    
     // Apply clustering
     std::vector<pcl::PointIndices> cluster_indices;
     // pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
@@ -637,7 +828,7 @@ void AttentionMap::createObjects(){
 
 
     pcl::ConditionalEuclideanClustering<pcl::PointXYZI> cec (true);
-    cec.setInputCloud (cloud_copy);
+    cec.setInputCloud (cloud);
     // using namespace std::placeholders;
 
     cec.setConditionFunction (condfunc);
@@ -650,21 +841,18 @@ void AttentionMap::createObjects(){
 
 
     // ROS_INFO("num obj: %d", cluster_indices.size());
-    objects.clear();
     int i = 0;
     for (const auto& cluster_index : cluster_indices) {
         pcl::PointCloud<pcl::PointXYZI>::Ptr cluster_cloud(new pcl::PointCloud<pcl::PointXYZI>);
         pcl::ExtractIndices<pcl::PointXYZI> extract;
         pcl::PointIndices::Ptr pcl_indices(new pcl::PointIndices(cluster_index));
-        extract.setInputCloud(cloud_copy);
+        extract.setInputCloud(cloud);
         extract.setIndices(pcl_indices);
         extract.filter(*cluster_cloud);
         
         // create objects from clustered clouds
-        Object object;
+        Object object(*cluster_cloud);
         object.id = ++i;
-        object.points = *cluster_cloud;
-        object.computeInfo();
         objects.push_back(object);
     }
 }
@@ -699,6 +887,7 @@ void AttentionMap::publishAttTimer(const ros::TimerEvent& e){
     std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> dt = end-start;
     // ROS_INFO("Time for pub: %f", dt);
+
 }
 
 vector<Eigen::Vector3i> sixNeighbors(const Eigen::Vector3i& voxel) {
@@ -739,6 +928,37 @@ vector<Eigen::Vector3i> tenNeighbors(const Eigen::Vector3i& voxel) {
 }
 
 
+vector<Eigen::Vector3i> sixteenNeighbors(const Eigen::Vector3i& voxel) {
+  vector<Eigen::Vector3i> neighbors(16);
+  Eigen::Vector3i tmp;
+  int count = 0;
+
+  for (int x = -1; x <= 1; ++x) {
+    for (int y = -1; y <= 1; ++y) {
+      if (x == 0 && y == 0) continue;
+      tmp = voxel + Eigen::Vector3i(x, y, 0);
+      neighbors[count++] = tmp;
+    }
+  }
+  // z axis extend
+  neighbors[count++] = tmp - Eigen::Vector3i(0, 0, 1);
+  neighbors[count++] = tmp - Eigen::Vector3i(0, 0, 2);
+  neighbors[count++] = tmp + Eigen::Vector3i(0, 0, 1);
+  neighbors[count++] = tmp + Eigen::Vector3i(0, 0, 2);
+  
+  // y axis
+  neighbors[count++] = tmp - Eigen::Vector3i(0, 2, 0);
+  neighbors[count++] = tmp + Eigen::Vector3i(0, 2, 0);
+
+    // x axis
+  neighbors[count++] = tmp - Eigen::Vector3i(2, 0, 0);
+  neighbors[count++] = tmp + Eigen::Vector3i(2, 0, 0);
+
+
+  return neighbors;
+}
+
+
 bool AttentionMap::knownfree(const Eigen::Vector3i& idx) {
   return getOccupancy(idx) == fast_planner::SDFMap::FREE;
 }
@@ -765,7 +985,7 @@ bool AttentionMap::isNeighborAttentive(const Eigen::Vector3i& voxel) {
   // At least one neighbor is unknown
   auto nbrs = allNeighbors(voxel, 1);
   for (auto nbr : nbrs) {
-    if (attention_buffer[sdf_map_->toAddress(nbr)]>0) return true;
+    if (attention_buffer[sdf_map_->toAddress(nbr)]>att_min) return true;
   }
   return false;
 }
@@ -777,10 +997,10 @@ bool AttentionMap::isFrontier(Eigen::Vector3i idx){
 }
 
 // find all unique neihbhours around a cell that are frontiers
-std::vector<Eigen::Vector3i> AttentionMap::getNearbyFrontiers(Eigen::Vector3i idx){
-    auto nbrs = allNeighbors(idx,1); // 10 neighbors, increase this if frontiers aren't detected even though you see unknown space
+void AttentionMap::getNearbyFrontiers(Eigen::Vector3i idx, std::vector<Eigen::Vector3i>& frontier_nbrs){
+    auto nbrs = sixteenNeighbors(idx); // 16 neighbors, increase this if frontiers aren't detected even though you see unknown space
 
-    std::vector<Eigen::Vector3i> frontier_nbrs;
+    // std::vector<Eigen::Vector3i> frontier_nbrs;
     Eigen::Vector3d nbr_pos; 
     for (auto nbr : nbrs) {
         sdf_map_->indexToPos(nbr, nbr_pos);
@@ -792,7 +1012,7 @@ std::vector<Eigen::Vector3i> AttentionMap::getNearbyFrontiers(Eigen::Vector3i id
         frontier_nbrs.push_back(nbr);
         checked[nbr_adr] = true;
     }
-    return frontier_nbrs;
+    // return frontier_nbrs;
 }  
 
 // Get diffused value from nearby voxels. Filters can be used
@@ -862,6 +1082,7 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
     pcl::PointCloud<pcl::PointXYZI>::Ptr local_att_cloud_filtered(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::RadiusOutlierRemoval<pcl::PointXYZI> outrem;
     
+
     if (local_att_cloud->size()>0){
         outrem.setInputCloud(local_att_cloud);
         outrem.setRadiusSearch(0.2);
@@ -869,7 +1090,13 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
         outrem.setKeepOrganized(true);
         outrem.filter (*local_att_cloud_filtered);
 
+        // pcl::VoxelGrid<pcl::PointXYZI> sor;
+        // sor.setInputCloud (local_att_cloud_filtered);
+        // sor.setLeafSize (0.1f, 0.1f, 0.1f);
+        // sor.filter (*local_att_cloud_filtered);
+
     }
+    
     
     // ======= Global map update ======
 
@@ -888,79 +1115,70 @@ void AttentionMap::attCloudCallback(const sensor_msgs::PointCloud2& msg){
             int vox_adr = sdf_map_->toAddress(idx);
             if (getOccupancy(idx) == fast_planner::SDFMap::OCCUPIED){
                 float att_update = learning_rate*attention + (1-learning_rate)*attention_buffer[vox_adr];
-                attention_buffer[vox_adr] = att_update;
+                attention_buffer[vox_adr] = att_update; 
             }
         }
     }
 
-    // publishAtt();
 }
 
 // Diffuse attentive semantics into neighboring frontiers. 
 // Run in a separate thread because computationally expensive and we dont need fast updates.
-void AttentionMap::diffusionTimer(const ros::TimerEvent& e){
+void AttentionMap::diffusionTimer(){
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+    while (true){
+        time_point start = std::chrono::high_resolution_clock::now();
+        time_diff dt;
+        std::fill(checked.begin(), checked.end(), false); // TODO make this local 
 
-    std::fill(checked.begin(), checked.end(), false);
+        Eigen::Vector3i min_cut;
+        Eigen::Vector3i max_cut;
+        sdf_map_->posToIndex(local_box_min, min_cut);
+        sdf_map_->posToIndex(local_box_max, max_cut);
 
-    // get local bounds
-    // Eigen::Vector3d box_min = self_pos - Eigen::Vector3d(2.5,2,0);
-    // Eigen::Vector3d box_max = self_pos + Eigen::Vector3d(2.5,2,0);
-    
-    Eigen::Vector3i min_cut;
-    Eigen::Vector3i max_cut;
-    sdf_map_->posToIndex(local_box_min, min_cut);
-    sdf_map_->posToIndex(local_box_max, max_cut);
+        sdf_map_->boundIndex(min_cut);
+        sdf_map_->boundIndex(max_cut);
 
-    sdf_map_->boundIndex(min_cut);
-    sdf_map_->boundIndex(max_cut);
+        // print_eigen(local_box_max);
 
-    // print_eigen(local_box_max);
+        Eigen::Vector3i idx;
+        Eigen::Vector3d pos;
 
-    Eigen::Vector3i idx;
-    Eigen::Vector3d pos;
+        for (int x = min_cut(0); x <= max_cut(0); ++x)
+            for (int y = min_cut(1); y <= max_cut(1); ++y)
+                for (int z = sdf_map_->mp_->box_min_(2); z < sdf_map_->mp_->box_max_(2); ++z) {
 
-    for (int x = min_cut(0); x <= max_cut(0); ++x)
-        for (int y = min_cut(1); y <= max_cut(1); ++y)
-            for (int z = sdf_map_->mp_->box_min_(2); z < sdf_map_->mp_->box_max_(2); ++z) {
+                int adr = sdf_map_->toAddress(x,y,z);
+                float attention = attention_buffer[adr];
+                
+                if (attention <= att_min || occupancy_buffer_[adr] == fast_planner::SDFMap::FREE){ // this is the main thing that saves compute
+                    attention_buffer[adr]=0;
+                    continue;
+                }
+                sdf_map_->indexToPos(adr, pos);
+                sdf_map_->posToIndex(pos, idx);
 
-            int adr = sdf_map_->toAddress(x,y,z);
-    // }
+                std::vector<Eigen::Vector3i> bu_voxels;
+                getNearbyFrontiers(Eigen::Vector3i(x, y, z), bu_voxels); // bottom up voxels: frontier cells that are near attentive regions
+                // apply kernel to each unknown voxel
 
-    // for (int adr=0; adr<attention_buffer.size(); adr++){
-        float attention = attention_buffer[adr];
-        
-        if (attention <= att_min || occupancy_buffer_[adr] == fast_planner::SDFMap::FREE){ // this is the main thing that saves compute
-            attention_buffer[adr]=0;
-            continue;
-        }
-        sdf_map_->indexToPos(adr, pos);
-        sdf_map_->posToIndex(pos, idx);
-        auto bu_voxels = getNearbyFrontiers(Eigen::Vector3i(x, y, z)); // bottom up voxels: frontier cells that are near attentive regions
-        // auto bu_voxels = getNearbyFrontiers(idx); // bottom up voxels: frontier cells that are near attentive regions
-        // apply kernel to each unknown voxel
-        for (auto& vox: bu_voxels){
-            int bu_voxel_adr = sdf_map_->toAddress(vox);
+                for (auto& vox: bu_voxels){
+                    int bu_voxel_adr = sdf_map_->toAddress(vox);
 
-            float att_diffused = diffuse(vox); // filter value
-            attention_buffer[bu_voxel_adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[bu_voxel_adr]):0;     // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
+                    float att_diffused = diffuse(vox); // filter value
+                    attention_buffer[bu_voxel_adr] = att_diffused>att_min?  (0.9*att_diffused + 0.1*attention_buffer[bu_voxel_adr]):0;     // the weighted update just allows it to stabilise a bit, otherwise a lot of flickering
 
-        }
+                }
+            }
 
+
+        time_point end = std::chrono::high_resolution_clock::now();
+        dt = end-start;
+        ROS_INFO("Time for diffusion: %f", dt);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
-
-
-    // ros::Duration(0.4).sleep();
-
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> dt = end-start;
-    // ROS_INFO("Time for diffusion: %f", dt);
-    // std::cout<<dt<<std::endl;
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    
 }
+
 
 
 // redefine functions for custom use
@@ -1000,7 +1218,7 @@ void AttentionMap::odometryCallback(const nav_msgs::OdometryConstPtr&  msg){
     // vel(0) = msg->twist.twist.linear.x;
     // vel(1) = msg->twist.twist.linear.y;
     // vel(2) = msg->twist.twist.linear.z;
-    double yaw = quaternionToYaw(msg->pose.pose.orientation);
+    double yaw = quaternionMsgToYaw(msg->pose.pose.orientation);
     
     Eigen::Vector3d dir(cos(yaw), sin(yaw), 0);
 
@@ -1009,9 +1227,8 @@ void AttentionMap::odometryCallback(const nav_msgs::OdometryConstPtr&  msg){
     local_box_min = self_pos - Eigen::Vector3d(2,2,0) + dir;
     local_box_max = self_pos + Eigen::Vector3d(2,2,0) + dir;
     
-    // doesnt matter will not be used
-    local_box_max(2) = -0.2;
-    local_box_min(2) = 1.5;
+    local_box_min(2) = -0.2;
+    local_box_max(2) = 1.5;
 
     // Uncomment to visualise local update box
     // viz.drawBox((local_box_min + local_box_max)/2.0, local_box_max - local_box_min, Eigen::Vector4d(0.5, 0, 1, 0.5), "box"+std::to_string(100), 100, 7);
