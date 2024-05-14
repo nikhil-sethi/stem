@@ -42,6 +42,8 @@ struct TargetViewpoint: fast_planner::Viewpoint{
         return (pos_-other.pos_).norm() < 0.4 && abs(std::min(dpsi, 2*M_PI-dpsi))<0.4;
     }
 
+    Eigen::Vector4d getColor(float min, float max, Eigen::Matrix<double,4,4> colormap);
+
 };
 
 
@@ -63,4 +65,15 @@ void removeSimilarPosesFromList(std::list<std::vector<TargetViewpoint>>& myList)
         }
     }
 
+}
+
+Eigen::Vector4d TargetViewpoint::getColor(float min, float max, Eigen::Matrix<double, 4,4> colormap){
+    float rel_gain  = std::max(0.0f, std::min((gain_-min)/(max-min), 1.0f)); // bounds prevent nan values
+    int idx = (int)(rel_gain*2.999); // size of colormap is 3
+    
+    Eigen::Vector4d cmin = colormap.row(idx);
+    Eigen::Vector4d cmax = colormap.row(idx+1);
+    Eigen::Vector4d color = cmin + (rel_gain*3 - idx)*(cmax-cmin); 
+    color(3) = 1;
+    return color;
 }

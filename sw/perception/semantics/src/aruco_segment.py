@@ -42,8 +42,8 @@ class ArUcoSegmenter:
             # segmented_image = cv2.aruco.drawDetectedMarkers(segmented_image, corners)
             for i in range(len(ids)):
                 corner = np.int0(corners[i]).reshape(-1, 2)
-                cv2.fillPoly(segmented_image, [corner], (int((ids[i]+1)*255/5))) 
-        
+                cv2.fillPoly(segmented_image, [corner], (int((ids[i])*255/5))) 
+            # print(ids)
 
         # Publish the segmented image
         try:

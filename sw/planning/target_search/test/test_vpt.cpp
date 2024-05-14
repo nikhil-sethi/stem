@@ -91,6 +91,26 @@ void TEST_removeSimilarPosesFromList(){
 
 }
 
+void TEST_getColor(){
+    Eigen::Matrix<double, 4, 4> colormap;
+        colormap <<
+        0 ,0,255,1, // blue
+        0,255,0,1, // green
+        255,255,0,1, //yellow
+        255,0,0,1; // red
+    colormap = colormap/255;
+    Eigen::Vector3d pos;
+    TargetViewpoint vpt(pos, 1.2, 2);
+    TargetViewpoint vpt2(pos, 1.2, 5);
+
+    Eigen::Vector4d color= vpt.getColor(0,10, colormap);
+    Eigen::Vector4d color2= vpt2.getColor(0,10, colormap);
+
+    std::cout<<color.transpose()<<std::endl;
+    std::cout<<color2.transpose()<<std::endl;
+}
+
+
 // void TEST_removeSimilarPosesFromListWithObject(){
 //     std::list<std::vector<TargetViewpoint>> myList;
  
@@ -141,5 +161,8 @@ void TEST_removeSimilarPosesFromList(){
 int main() {
 
     TEST_removeSimilarPosesFromList();    
+
+    TEST_getColor();
+
     return 0;
 }

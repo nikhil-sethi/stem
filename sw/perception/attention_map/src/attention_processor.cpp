@@ -219,6 +219,8 @@ class AttentionMap{
         Eigen::Vector3d origin, size;
         pcl::PointCloud<pcl::PointXYZI>::Ptr local_sem_cloud;
         // std::list<TargetViewpoint> all_viewpoints; // for filtering
+        Eigen::Matrix<double, 4, 4> colormap;
+
 
 };
 
@@ -284,6 +286,15 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
 
     std::thread diffusion_thread(&AttentionMap::diffusionTimer, this);
     diffusion_thread.detach();
+
+    // jet colormap
+    colormap <<
+        0 ,0,255,1, // blue
+        0,255,0,1, // green
+        255,255,0,1, //yellow
+        255,0,0,1; // red
+    colormap = colormap/255;
+
 
     std::thread viz_thread(&AttentionMap::visualize, this);
     viz_thread.detach();
@@ -377,6 +388,18 @@ void mergeObjects(std::list<Object>& old_objects, std::list<Object> new_objects)
 
 void AttentionMap::visualize(){
     while (true){
+    
+        // find min and max gain of viewpoints. need this for color scaling
+        float min_gain = 10000, max_gain=-10000;
+        
+        for (Object& object: global_objects ){
+            for (auto vpt: object.viewpoint_candidates){
+                if (vpt.gain_<min_gain) min_gain = vpt.gain_;
+                if (vpt.gain_>max_gain) max_gain = vpt.gain_;
+            }
+        }
+        
+
         int i=0;
         for (Object& object: global_objects ){
             // === Object bounding box
@@ -394,6 +417,7 @@ void AttentionMap::visualize(){
             
             if (!object.viewpoint_candidates.empty()){
                 std::vector<Eigen::Vector3d> vpt_positions;
+                std::vector<Eigen::Vector4d> vpt_colors;
                 // plotting only the best for now
                 // vpt_positions.push_back(object.viewpoint_candidates[0].posToEigen());
 
@@ -401,18 +425,12 @@ void AttentionMap::visualize(){
                 int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
                 for (int i = 0; i < num_vpts; i++){
                     vpt_positions.push_back(object.viewpoint_candidates[i].posToEigen());
+                    // print(min_gain, object.viewpoint_candidates[i].gain_, max_gain);
+                    vpt_colors.push_back(object.viewpoint_candidates[i].getColor(min_gain, max_gain, colormap));
                 
                 }
-                
 
-                // for (auto& vpt: object.viewpoint_candidates){
-                //     vpt_positions.push_back(Eigen::Vector3d(vpt.pos_(0), vpt.pos_(1), vpt.pos_(2)));
-                // }
-
-                viz.drawSpheres(vpt_positions, 0.2, Vector4d(0, 0.5, 0, 1), "points"+std::to_string(object.id), object.id, 6);
-                // visualization_->drawLines(ed_ptr->global_tour_, 0.07, Vector4d(0, 0.5, 0, 1), "global_tour", 0, 6);
-                // visualization_->drawLines(ed_ptr->points_, ed_ptr->views_, 0.05, Vector4d(0, 1, 0.5, 1), "view", 0, 6);
-                // visualization_->drawLines(ed_ptr->points_, ed_ptr->averages_, 0.03, Vector4d(1, 0, 0, 1),
+                viz.drawSpheres(vpt_positions, 0.2, vpt_colors, "top viewpoints"+std::to_string(object.id), object.id, 6);
         
             }
         
@@ -483,18 +501,18 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
         all_viewpoints.push_back(sample_vpts);
     }
     
-    int i=0, j=0;
-    for (auto vpts: all_viewpoints){
-        i++;
-        std::vector<Eigen::Vector3d> vpt_positions;
+    // int i=0, j=0;
+    // for (auto vpts: all_viewpoints){
+    //     i++;
+    //     std::vector<Eigen::Vector3d> vpt_positions;
 
-        for (auto vpt: vpts){
-            vpt_positions.push_back(vpt.posToEigen());
-            j++;
-        }
-            viz.drawSpheres(vpt_positions, 0.1, Vector4d(0.5, 0.5, 1, 1), "points_"+std::to_string(i), i, 6);
+    //     for (auto vpt: vpts){
+    //         vpt_positions.push_back(vpt.posToEigen());
+    //         j++;
+    //     }
+    //         viz.drawSpheres(vpt_positions, 0.1, Vector4d(0.5, 0.5, 1, 1), "points_"+std::to_string(i), i, 6);
 
-    }
+    // }
 
 
 
@@ -525,7 +543,7 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
     vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
 
     std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
-    ROS_INFO("Time vpts: %f, num: %d", dt_vpt, j);
+    // ROS_INFO("Time vpts: %f", dt_vpt);
 
 }
 
@@ -565,7 +583,7 @@ void AttentionMap::sampleViewpoints(Object& object, std::vector<TargetViewpoint>
 
     rmin += diag_3d(1-shortest_axis)/2; // add the longer axis to rmin because the cylinder starts at the centroid
     
-    for (double rc = rmin, dr = 0.5/2; rc <= rmin + 0.5 + 1e-3; rc += dr)
+    for (double rc = rmin, dr = 0.4; rc <= rmin + 0.5 + 1e-3; rc += dr)
         for (double phi = -M_PI; phi < M_PI-0.5235; phi += 0.5235) {
             Vector3d sample_pos = object.centroid_ + rc * Vector3d(cos(phi), sin(phi), 0);
             sample_pos[2] = sample_pos[2] + 0.1; // add a height to view the object isometrically. this will depend on the data from the sensor model
@@ -619,7 +637,7 @@ void AttentionMap::findTopViewpoints(Object& object, std::vector<TargetViewpoint
         // std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
     for (auto it=sampled_vpts.begin(); it!=sampled_vpts.end();++it){
-            float gain = computeInformationGain(object, it->pos_, it->yaw_);
+            float gain = (int)computeInformationGain(object, it->pos_, it->yaw_);
             // std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
             // ROS_INFO("Time vpt: %f", dt_vpt);
             
@@ -1174,8 +1192,8 @@ void AttentionMap::diffusionTimer(){
 
         time_point end = std::chrono::high_resolution_clock::now();
         dt = end-start;
-        ROS_INFO("Time for diffusion: %f", dt);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        // ROS_INFO("Time for diffusion: %f", dt);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
