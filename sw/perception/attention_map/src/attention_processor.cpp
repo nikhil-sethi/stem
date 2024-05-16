@@ -42,6 +42,8 @@
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 #include <std_srvs/Trigger.h>
 #include <target_search/target_viewpoint.h>
+#include <common_msgs/Viewpoints.h>
+
 
 Eigen::Vector3d origin(-5.5, -5.5, 0);
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> time_point;
@@ -232,7 +234,8 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
     // frontier_sub = = nh.subscribe("/frontier_cells", 1, &AttentionMap::frontierCallback, this);
 
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
-    vpt_pub = nh.advertise<geometry_msgs::PoseArray>("/objects/target_vpts", 1);
+    // vpt_pub_viz = nh.advertise<geometry_msgs::PoseArray>("/objects/target_poses_viz", 1);
+    vpt_pub = nh.advertise<common_msgs::Viewpoints>("/objects/target_vpts", 1);
     att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/global", 1);
     // att_diff_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/blur", 10);
 
@@ -388,10 +391,8 @@ void mergeObjects(std::list<Object>& old_objects, std::list<Object> new_objects)
 
 void AttentionMap::visualize(){
     while (true){
-    
         // find min and max gain of viewpoints. need this for color scaling
         float min_gain = 10000, max_gain=-10000;
-        
         for (Object& object: global_objects ){
             for (auto vpt: object.viewpoint_candidates){
                 if (vpt.gain_<min_gain) min_gain = vpt.gain_;
@@ -401,6 +402,13 @@ void AttentionMap::visualize(){
         
 
         int i=0;
+        // geometry_msgs::PoseArray vpts_poses_msg;
+
+        // vpts_poses_msg.header.stamp = ros::Time::now();
+        // vpts_poses_msg.header.frame_id = "map";
+
+        std::vector<Eigen::Vector3d> vpt_positions;
+        std::vector<Eigen::Vector4d> vpt_colors;
         for (Object& object: global_objects ){
             // === Object bounding box
             viz.drawBox(object.centroid_, object.scale_, Eigen::Vector4d(0.5, 0, 1, 0.3), "box"+std::to_string(i), i, 7);
@@ -410,32 +418,22 @@ void AttentionMap::visualize(){
             // pcl::toROSMsg(*object.points, cluster_msg);
             // clustered_point_cloud_pub.publish(cluster_msg);
 
-            // === Viewpoint candidates
-            
+            // === Object corners
             // for (auto& corner: object.projection_corners)
             //     object.viewpoint_candidates.push_back(corner); // just for debugging
             
-            if (!object.viewpoint_candidates.empty()){
-                std::vector<Eigen::Vector3d> vpt_positions;
-                std::vector<Eigen::Vector4d> vpt_colors;
-                // plotting only the best for now
-                // vpt_positions.push_back(object.viewpoint_candidates[0].posToEigen());
-
-                // plotting top K viewpoints
-                int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
-                for (int i = 0; i < num_vpts; i++){
-                    vpt_positions.push_back(object.viewpoint_candidates[i].posToEigen());
-                    // print(min_gain, object.viewpoint_candidates[i].gain_, max_gain);
-                    vpt_colors.push_back(object.viewpoint_candidates[i].getColor(min_gain, max_gain, colormap));
-                
-                }
-
-                viz.drawSpheres(vpt_positions, 0.2, vpt_colors, "top viewpoints"+std::to_string(object.id), object.id, 6);
-        
+            // === Viewpoint candidates
+            for (uint j = 0; j < std::min((int)object.viewpoint_candidates.size(), 3); j++){
+                auto vpt = object.viewpoint_candidates[j];
+                vpt_positions.push_back(vpt.posToEigen());
+                // print(min_gain, object.viewpoint_candidates[i].gain_, max_gain);
+                // vpts_msg_viz.poses.push_back(vpt.toGeometryMsg());
+                vpt_colors.push_back(vpt.getColor(min_gain, max_gain, colormap));
             }
-        
             i++;
         }
+        viz.drawSpheres(vpt_positions, 0.2, vpt_colors, "top viewpoints", 1, 6);
+        // vpt_pub_viz.publish(vpts_poses_msg);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -488,10 +486,11 @@ void AttentionMap::objectUpdateTimer(const ros::TimerEvent& e){
 void AttentionMap::loopTimer(const ros::TimerEvent& event){
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
-    geometry_msgs::PoseArray vpts_msg;
-    vpts_msg.header.stamp = ros::Time::now();
-    vpts_msg.header.frame_id = "map";
+    common_msgs::Viewpoints vpts_msg;
+    vpts_msg.viewpoints.header.stamp = ros::Time::now();
+    vpts_msg.viewpoints.header.frame_id = "map";
 
+    // Sample viewpoints around all objects
     std::list<std::vector<TargetViewpoint>> all_viewpoints;
     for (Object& object: global_objects){   
         if (!object.isInBox(local_box_min, local_box_max)) continue;
@@ -515,29 +514,22 @@ void AttentionMap::loopTimer(const ros::TimerEvent& event){
     // }
 
 
-
     removeSimilarPosesFromList(all_viewpoints);
-
-    // calculate information gain
-    std::list<std::vector<TargetViewpoint>>::iterator it = all_viewpoints.begin();
-
+    
+    // Calculate priority of each viewpoint 
+    std::list<std::vector<TargetViewpoint>>::iterator iter = all_viewpoints.begin();
     for (Object& object: global_objects){      
         if (!object.isInBox(local_box_min, local_box_max)) continue;
-        findTopViewpoints(object, *it);
-        it++;
-    }
 
-    // std::chrono::duration<double> dt_sam = std::chrono::high_resolution_clock::now() - start;
-    // ROS_INFO("Time sample: %f, size: %d", dt_sam, all_viewpoints.size());
-    
+        // calculate information gain
+        findTopViewpoints(object, *iter);
 
-    for (Object& object: global_objects){   
-        if (!object.viewpoint_candidates.empty()){
-            int num_vpts = std::min((int)object.viewpoint_candidates.size(), 3);
-            // int num_vpts =1;
-            for (int i=0; i<num_vpts; i++)
-                vpts_msg.poses.push_back(object.viewpoint_candidates[i].toMsg());
+        // Get first 3 three viewpoints for publishing
+        for (int i=0; i<std::min((int)object.viewpoint_candidates.size(), 3); i++){
+            vpts_msg.viewpoints.poses.push_back(object.viewpoint_candidates[i].toGeometryMsg());  
+            vpts_msg.priorities.push_back(object.viewpoint_candidates[i].gain_);
         }
+        iter++;
     }
 
     vpt_pub.publish(vpts_msg); // publish poses for use by lkh tsp inside fuel
@@ -558,8 +550,6 @@ A viewpoint is valid if:
 1. exists in map
 2. Not too close to unknown or occupied space
 3. Has the object in view
-
-
 */
 void AttentionMap::sampleViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
 
@@ -603,23 +593,7 @@ void AttentionMap::sampleViewpoints(Object& object, std::vector<TargetViewpoint>
 }
 
 
-// void AttentionMap::sampleShapeInformedViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
-
-
-
-// }
-
-
-
-// see if viewpoints are close enough to discard
-// void AttentionMap::filterViewpoints(){
-
-// }
-
-
 void AttentionMap::findTopViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts){
-
-
     // find the closest distance that would have the object still in view
     // sample viewpoints around the object starting from the minimum distance
     // for each sample 
@@ -632,24 +606,10 @@ void AttentionMap::findTopViewpoints(Object& object, std::vector<TargetViewpoint
     object.viewpoint_candidates.clear();
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
-    // for (auto vpt: sample_vpts){
-        // compute information gain from remaining viewpoints
-        // std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
-
     for (auto it=sampled_vpts.begin(); it!=sampled_vpts.end();++it){
             float gain = (int)computeInformationGain(object, it->pos_, it->yaw_);
-            // std::chrono::duration<double> dt_vpt = std::chrono::high_resolution_clock::now() - start;
-            // ROS_INFO("Time vpt: %f", dt_vpt);
+            if (gain<=5) continue;
             
-            // print(object.id, rc, phi, gain);
-            if (gain<=5){
-                // object.viewpoint_candidates.erase(it);
-                continue;
-            }
-            // else{
-            //     it->gain_ = gain;
-            //     // it++;
-            // }
             it->gain_ = gain;
             object.viewpoint_candidates.push_back(*it);
         }

@@ -3,7 +3,6 @@
 #include <active_perception/frontier_finder.h>
 #include <common/utils.h>
 
-
 struct TargetViewpoint: fast_planner::Viewpoint{
     float gain_;
 
@@ -20,22 +19,30 @@ struct TargetViewpoint: fast_planner::Viewpoint{
         return Eigen::Vector3d(pos_(0), pos_(1),pos_(2));
     }
 
-    geometry_msgs::Pose toMsg(){
+    geometry_msgs::Pose toGeometryMsg(){
         geometry_msgs::Pose msg;
-        // msg.header.stamp = ros::Time::now();
         
         msg.position.x = pos_(0);
         msg.position.y = pos_(1);
         msg.position.z = pos_(2);
         
-        // tf2::Quaternion quat_tf;
-        // quat_tf.setRPY(0,0,yaw_);
-        // quat_tf = quat_tf.normalize();
-        // msg.orientation = tf2::toMsg(quat_tf);
-    
         msg.orientation = rpyToQuaternionMsg(0, 0, yaw_);
+        
         return msg;
     }   
+
+    // common_msgs::Viewpoint toMsg(){
+    //     target_search::Viewpoint msg;
+        
+    //     msg.position.x = pos_(0);
+    //     msg.position.y = pos_(1);
+    //     msg.position.z = pos_(2);
+        
+    //     msg.yaw = yaw_;
+    //     msg.priority = gain_;
+        
+    //     return msg;
+    // }  
 
     bool isClose(const TargetViewpoint& other){
         double dpsi = yaw_-other.yaw_;

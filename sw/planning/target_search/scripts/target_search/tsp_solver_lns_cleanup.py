@@ -442,7 +442,7 @@ class TSPSolver:
         rng: np.random.Generator = np.random.default_rng(),
         randomize_insertion_cost: bool = False,
         random_cost_factor: float = 0.1,
-        dist_mat_path = None
+        dist_mat = None
     ):
         self.graph = graph
         self.use_priority = use_priority
@@ -465,15 +465,18 @@ class TSPSolver:
             self.removed_nodes = []
         else:
             self.nodes = np.array(nodes)
-            self.removed_nodes = [n for n in self.graph.nodes if n not in self.nodes]
+            # self.removed_nodes = [n for n in self.graph.nodes if n not in self.nodes]
 
-        if dist_mat_path is None:
+        if dist_mat is None:
             # Compute distance matrix
             self.dist = self.compute_distance_matrix()
-        else:
-            self.dist = self.load_distance_matrix(dist_mat_path)
+        elif type(dist_mat) ==str:
+            self.dist = self.load_distance_matrix(dist_mat)
             self.nodes = np.array(list(range(self.dist.shape[0])))
-            print(self.nodes)
+            # print(self.nodes)
+        else:
+            self.dist = dist_mat
+            self.nodes = np.arange(self.dist.shape[0])
 
         # Store priorities
         if self.use_priority:

@@ -3,7 +3,7 @@ project(attention_map)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
-
+set(CMAKE_BUILD_TYPE "Debug")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -19,6 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_geometry_msgs
   common
   cv_bridge
+  nav_msgs
+  target_search
   )
 find_package(PCL 1.7 REQUIRED)
 
@@ -144,6 +146,7 @@ add_executable(attention_processor_node src/attention_processor.cpp)
 add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 add_executable(target_att_gt_node src/target_att_gt.cpp)
 add_executable(attention_map_2d_node src/attention_map_2d.cpp)
+add_executable(test_node src/test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -172,6 +175,10 @@ target_link_libraries(attention_map_2d_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+target_link_libraries(test_node
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
