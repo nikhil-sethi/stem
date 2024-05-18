@@ -1,5 +1,15 @@
 is_target_search: true
 
+
+diffusion:
+  sigma: 2
+  kernel_size: 5 # only odd numbers     
+
+object_finder:
+  local_iou_thresh: 0.5
+  global_iou_thresh: 0.5
+
+
 perception:
   attention_map:
     2d:

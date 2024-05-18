@@ -89,8 +89,8 @@ exploration:
   relax_time: 1.0
 
 frontier:
-  cluster_min: 100
-  cluster_size_xy: 1.5
+  cluster_min: 1 # used to discard frontiers smaller than this value
+  cluster_size_xy: 1.5 # used by PCA to split large frontiers 
   cluster_size_z: 10.0
   
   # minimum distance a viewpoint needs to be from the centroid of a frontier to be considered
