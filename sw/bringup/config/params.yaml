@@ -9,6 +9,9 @@ object_finder:
   local_iou_thresh: 0.5
   global_iou_thresh: 0.5
 
+target_planner:
+  rmin: 0.3
+  min_vpt_clearance: 0.2
 
 perception:
   attention_map:

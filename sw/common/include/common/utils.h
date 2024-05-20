@@ -38,7 +38,7 @@ inline geometry_msgs::Quaternion rpyToQuaternionMsg(const double& roll, const do
 // Interpolate a scalar to a color given a color map
 inline Eigen::Vector4d getColor(float value, float min, float max, Eigen::Matrix<double, 4,4> colormap){
     float rel_gain  = std::max(0.0f, std::min((value-min)/(max-min), 1.0f)); // bounds prevent nan values
-    int idx = (int)(rel_gain*(colormap.rows()-0.001)); // size of colormap 
+    int idx = (int)(rel_gain*(colormap.rows()-1.001)); // size of colormap 
     
     Eigen::Vector4d cmin = colormap.row(idx);
     Eigen::Vector4d cmax = colormap.row(idx+1);
