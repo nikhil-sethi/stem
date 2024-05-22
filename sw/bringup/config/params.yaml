@@ -1,4 +1,5 @@
-is_target_search: true
+use_active_perception: true
+use_semantic_search: true
 
 # coverage vs. semantic priority
 # 0: pure coverage
@@ -16,8 +17,8 @@ object_finder:
 target_planner:
   rmin: 0.3
   min_vpt_clearance: 0.2
-  min_info_gain: 10
-  
+  min_info_gain: 15
+
 perception:
   attention_map:
     2d:
