@@ -1,5 +1,9 @@
 is_target_search: true
 
+# coverage vs. semantic priority
+# 0: pure coverage
+# higher means more semantic importance
+gamma: 4
 
 diffusion:
   sigma: 2
@@ -12,7 +16,8 @@ object_finder:
 target_planner:
   rmin: 0.3
   min_vpt_clearance: 0.2
-
+  min_info_gain: 10
+  
 perception:
   attention_map:
     2d:
@@ -43,4 +48,4 @@ perception:
 
       # rate for semantic map update
       # lower value means slower update, less confident, more robust to fast movements
-      learning_rate: 0.5
+      learning_rate: 0.7

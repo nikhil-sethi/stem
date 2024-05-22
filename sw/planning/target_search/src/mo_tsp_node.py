@@ -17,7 +17,8 @@ class MultiObjectiveTSP():
     def handle_solver(self, req):
         priorities = list(req.priorities) # deserialised as tuple
         priorities.insert(0,0) # add any priority for self node
-        print(req.cost_mat_flat, priorities, req.dim)
+        priorities = 10*np.round(np.array(priorities)/10)
+        print(priorities)
         cost_mat = self.mat_from_list(req.cost_mat_flat, req.dim)
         tour, cost = self.solve_prio_atsp(cost_mat, priorities, req.dim)
         return TSPResponse(tour, cost)
