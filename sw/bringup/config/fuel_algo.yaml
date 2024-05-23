@@ -89,9 +89,9 @@ exploration:
   relax_time: 1.0
 
 frontier:
-  cluster_min: 1 # used to discard frontiers smaller than this value
+  cluster_min: 100 # used to discard frontiers smaller than this value
   cluster_size_xy: 1.5 # used by PCA to split large frontiers 
-  cluster_size_z: 10.0
+  cluster_size_z: 1.5
   
   # minimum distance a viewpoint needs to be from the centroid of a frontier to be considered
   # If higher than rmin, it will discard some bad viewpoints
@@ -123,7 +123,7 @@ frontier:
   # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate
   # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
   # it should be tuned such that your observe smooth motions, without stops or fast acclerations
-  min_view_finish_fraction: 0.2   
+  min_view_finish_fraction: 0.1   
 
 perception_utils:
   top_angle: 0.56125
@@ -155,7 +155,6 @@ manager:
   use_kinodynamic_path: true
   use_topo_path: true
   use_optimization: true
-  use_active_perception: true
   min_time: true
 
   # helps discard yaw angle plans that have large changes
