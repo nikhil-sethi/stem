@@ -265,7 +265,7 @@ def are_gaussians_similar(mu1, cov1, mu2, cov2):
     # if np.linalg.norm(mu1[:3] - mu2[:3]) > 0.5 or abs(mu1[-1] - mu2 [-1]) > 0.5:
     #     return False 
 
-    if bhattacharyya_distance(mu1, cov1, mu2, cov2) < 0.3:
+    if bhattacharyya_distance(mu1, cov1, mu2, cov2) < 1:
         return True
 
 
@@ -285,7 +285,7 @@ def are_gaussians_similar(mu1, cov1, mu2, cov2):
     return False
 
 def cluster_extraction(data):
-    dbscan = cluster.DBSCAN(eps=0.13, min_samples=5)
+    dbscan = cluster.DBSCAN(eps=0.13, min_samples=7)
     labels = dbscan.fit_predict(data)
 
     max_label = labels.max()
@@ -308,66 +308,76 @@ class GIFMap():
         self.global_gmm.precisions_cholesky_ = np.empty(shape=(0,4,4))
         self.global_gmm.weights_ = np.empty(shape=(0,))
         self.global_support = 0
+        self.local_gmm = self.global_gmm # just for initing
 
         self.gmm_ell_pub = rospy.Publisher("/attention_map/local/ellipses", Marker, queue_size=10)
         self.cloud_pub = rospy.Publisher("/attention_map/local/sampled", PointCloud2, queue_size=10)
 
         msg = rospy.wait_for_message("/attention_map/local/filtered", PointCloud2)
         self.cloud_callback(msg)
-        # msg = rospy.wait_for_message("/attention_map/local/filtered", PointCloud2)
-        # self.cloud_callback(msg)
 
-        self.cloud_sub = rospy.Subscriber("/attention_map/local", PointCloud2, self.cloud_callback)
-        
+        self.cloud_sub = rospy.Subscriber("/attention_map/local/filtered", PointCloud2, self.cloud_callback)
+        # self.vis_timer = rospy.Timer(rospy.Duration(0.1), self.vis_timer_callback)
         # init variables for timer
         # self.local_gmm = self.infer_gmm(self.data)
 
     def update_timer(self, event):
         pass
 
-    def cloud_callback(self, msg):
-        # self.data = np.array(list(pc2.read_points(msg)))
-        start = time.perf_counter()
-        data = np.array(list(pc2.read_points(msg)))
-        # print(data)
-        if data.size == 0:
-            return
-        data[:, -1] = np.round(data[:, -1])
 
-        # dbscan on depth intensity data. 
-        cluster_means, labels = cluster_extraction(data)
-
-        
-    
-        local_gmm = self.create_gmm(data, cluster_means)
-        local_support = len(data)
-        self.update_gmm(local_gmm, local_support)
-        print(self.global_gmm.n_components)
-        # print(self.global_gmm.weights_)
-        
-        print(time.perf_counter()-start)
-
-        # PLOT ELLIPSES
-        poses, scales = get_ellipsoids(self.global_gmm)
-    
+    def vis_timer_callback(self, event):
         # for i in range(15):
         #     self.publish_empty_marker(i)
         #     self.publish_empty_marker(i*10)
         #     self.publish_empty_marker(i*20)
 
-        for i in range(len(poses)):
-            self.publish_marker(poses[i], scales[i], i+1, color=(0,1,0,self.global_gmm.weights_[i]*3))
-        
-        poses, scales = get_ellipsoids(local_gmm)
+
+        # PLOT ELLIPSES
+        # global GMM
+        poses, scales = get_ellipsoids(self.global_gmm)
 
         for i in range(len(poses)):
-            self.publish_marker(poses[i], scales[i], (i+1)*300, color=(0,0,1,0.4))
+            self.publish_marker(poses[i], scales[i], i+1, color=(0,1,0,0.6))
+        
+
+        # local GMM
+        poses, scales = get_ellipsoids(self.local_gmm)
+
+        for i in range(len(poses)):
+            self.publish_marker(poses[i], scales[i], (i+1)*300, color=(0,0,1,0.3))
     
-        # PLOT SAMPLES
+        # PLOT INFERENCE SAMPLES
         samples = self.sample(self.global_gmm)
-        cloud_msg = pc2.create_cloud(msg.header, msg.fields, samples)
+        cloud_msg = pc2.create_cloud(self.header, self.fields, samples)
 
         self.cloud_pub.publish(cloud_msg)
+
+    def cloud_callback(self, msg):
+        # self.data = np.array(list(pc2.read_points(msg)))
+        start = time.perf_counter()
+        data = np.array(list(pc2.read_points(msg)))
+        # print(data)
+        if data.size != 0:
+            data[:, -1] = np.round(data[:, -1])
+
+            # dbscan on depth intensity data. 
+            cluster_means, labels = cluster_extraction(data)    
+
+            if cluster_means.size != 0:
+                self.local_gmm = self.create_gmm(data, cluster_means)
+                local_support = len(data)
+                self.update_gmm(self.local_gmm, local_support)
+
+        print(self.global_gmm.n_components)
+        print(time.perf_counter()-start)
+        
+        self.header = msg.header
+        self.fields = msg.fields
+        self.vis_timer_callback(None)
+
+        # vis will use them
+        
+       
 
     def publish_empty_marker(self, i):
         marker = Marker ()
@@ -392,7 +402,7 @@ class GIFMap():
 
     def create_gmm(self, data, means_init):
         # Create GMM from cluster centroids
-        gmm = mixture.GaussianMixture(means_init=means_init, n_components=len(means_init), covariance_type=cov_type, reg_covar=5e-4)
+        gmm = mixture.GaussianMixture(means_init=means_init, n_components=len(means_init), covariance_type=cov_type, reg_covar=1e-3)
         gmm.fit(data)
         return gmm
 
@@ -404,12 +414,15 @@ class GIFMap():
         
         for i in range(new_gmm.n_components):
             w_i, mu_i, cov_i, prec_i = new_gmm.weights_[i], new_gmm.means_[i], new_gmm.covariances_[i], new_gmm.precisions_cholesky_[i]
+            if w_i<0.1:
+                continue
             merged = False
+
             for j in range(n_components_old):
                 w_j, mu_j, cov_j = old_gmm.weights_[j], old_gmm.means_[j], old_gmm.covariances_[j]
                 if are_gaussians_similar(mu_i, cov_i, mu_j, cov_j):
                     # _, old_gmm.means_[j], old_gmm.covariances_[j] = merge_gaussians(w_j, mu_j, cov_j, self.global_support, w_i, mu_i, cov_i, local_support)
-                    print("merge")
+                    # print("merge")
                     # old_gmm.weights_ = list(old_gmm.weights_/np.linalg.norm(old_gmm.weights_))
                     # old_gmm.precisions_cholesky_[j] = compute_precision_cholesky(old_gmm.covariances_[j], old_gmm.covariance_type)
                     merged = True
@@ -420,8 +433,6 @@ class GIFMap():
                 old_gmm.n_components += 1
                 self.global_support += w_i*local_support
 
-            # print(self.global_support)
-        print(old_gmm.weights_)        
         _check_weights(old_gmm.weights_, old_gmm.n_components)
 
         # normalise weights
@@ -442,7 +453,7 @@ class GIFMap():
         ll = gmm.score_samples(samples)    
         ll = (ll - ll.min())/(ll.max() - ll.min()) # normalise likelihood. treat it as probability
 
-        samples = samples[ll>0.8]
+        samples = samples[ll>0.5]
         
         # samples = samples[samples[:, -1]>0.5] # priority: only keep objects of interest
         # samples[:, -1]*=ll[ll>0.7] # confidence: only keep data points which we make a lot of observations for

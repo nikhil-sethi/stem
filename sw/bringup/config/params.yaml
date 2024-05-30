@@ -1,4 +1,4 @@
-use_active_perception: true 
+use_active_perception: false 
 use_semantic_search: true # LNS with or without priorities
 use_lkh: false # LKH without priorities
 
