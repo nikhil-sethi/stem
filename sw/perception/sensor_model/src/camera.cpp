@@ -3,11 +3,11 @@
 #include <common/io.h>
 Camera::Camera(const ros::NodeHandle& nh){
     // get these from the parameter server later on
-    fx_ = 454;
-    fy_ = 454;
+    fx_ = 427.75729;
+    fy_ = 427.75729;
     height_ = 480;
     width_ = 848;
-    tol = 0.9;
+    tol = 1;
     AR_ = width_/height_;
 
     tf2_ros::Buffer tfBuffer;

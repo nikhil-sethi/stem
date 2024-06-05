@@ -1,25 +1,36 @@
-# ========== FUEL ========
-
-define: &max_vel 0.4
-define: &max_acc 0.25
+define: &max_vel 0.5
+define: &max_acc 0.5
 
 sdf_map:
   resolution: 0.1
-  map_size_x: 30 # 11
-  map_size_y: 30 # 11
-  map_size_z: 2.5
+  map_size_x: 5
+  map_size_y: 5
+  map_size_z: 1.7
   ground_height: -0.2
-  box_min_x: -1 #-5.5
-  box_min_y: -15 #-5.5
-  box_max_x:  29 #5.5
-  box_max_y:  15 #5.5
-  box_min_z:  -0.0
-  box_max_z: 2.5
+  p_hit: 0.68
+  p_miss: 0.48
+  p_min: 0.12
+  p_max: 0.99
+  p_occ: 0.7
+  box_min_x: -2.5
+  box_min_y: -2.5
+  box_min_z:  -0.1
+  box_max_x: 2.5
+  box_max_y: 2.5
+  box_max_z: 1.6
+
 
 fsm:
-  # Replan if you have executed at least this amount of trajectory AND the next frontier is covered.
-  # This helps the drone to execute at least something before replanning because we need to keep it moving
-  thresh_replan2: 0.2 # [s]
+  thresh_replan1: 0.5
+  thresh_replan2: 0.3
+  thresh_replan3: 1.5
+  replan_time: 0.200
+
+exploration:
+  vm: *max_vel
+  am: *max_acc
+  yd:  0.5     # "$(eval 25 * 3.1415926 / 180.0)"
+  w_dir: 1.5
 
 frontier:
   cluster_min: 0 # used to discard frontiers smaller than this value
@@ -57,3 +68,20 @@ frontier:
   # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
   # it should be tuned such that your observe smooth motions, without stops or fast acclerations
   min_view_finish_fraction: 0.2
+   
+manager:
+  max_vel: *max_vel
+  max_acc: *max_acc
+
+search:
+  max_vel: *max_vel
+  max_acc: *max_acc
+
+optimization:
+  dist0: 0.5
+  max_vel: *max_vel
+  max_acc: *max_acc
+  bspline:
+    limit_vel: *max_vel
+    limit_acc: *max_acc
+    limit_ratio: 1.1

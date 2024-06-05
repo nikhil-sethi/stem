@@ -1,5 +1,5 @@
 <sdf version='1.7'>
-  <world name='lab_real'>
+  <world name='amrlab'>
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
@@ -39,17 +39,17 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    <state world_name='lab_real'>
-      <model name='lab_base'>
-        <pose>-3.05 -2.5 -0.05 0 -0 0</pose>
+    <include>
+      <uri>model://amrlab</uri>
+    </include> 
+    <state world_name='amrlab'>
+      <model name='amrlab_model'>
+        <pose>-3.5 -2.5 -0.05 0 -0 0</pose>
       </model>
       <light name='sun'>
         <pose>-1.4189 0 4.44892 0 -0.994976 0</pose>
       </light>
     </state>
-    <include>
-      <uri>model://lab_base</uri>
-    </include> 
     <gui fullscreen='0'>
       <camera name='user_camera'>
         <pose>0.555031 0.420589 11.1919 3.14159 1.57079 3.14159</pose>

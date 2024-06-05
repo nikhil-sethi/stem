@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
-  <model name='lab_walless_blue'>
+  <model name='amrlab_blue'>
     <link name='link_1'>
       <inertial>
         <mass>0.758123</mass>

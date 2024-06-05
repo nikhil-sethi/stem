@@ -3,16 +3,16 @@ define: &max_acc 0.25
 
 sdf_map:
   resolution: 0.1
-  map_size_x: 11 # 11
-  map_size_y: 11 # 11
-  map_size_z: 1.7
+  map_size_x: 12 # 11
+  map_size_y: 12 # 11
+  map_size_z: 1.5
   obstacles_inflation: 0.199
   local_bound_inflate: 0.5
   local_map_margin: 50
   ground_height: -0.2
   default_dist: 0.0
   p_hit: 0.68
-  p_miss: 0.47  # 0.47 works best in sim. Higher values we are more liberal, so there are more false positives as well
+  p_miss: 0.48  # 0.47 works best in sim. Higher values we are more liberal, so there are more false positives as well
   p_min: 0.12
   p_max: 0.99
   p_occ: 0.7 # keep this lower if there is a lot of noise. But higher values also might lead to more false positives
@@ -21,10 +21,10 @@ sdf_map:
   virtual_ceil_height: -10
   optimistic: false
   signed_dist: false
-  box_min_x: -5.5 #-5.5
-  box_min_y: -5.5 #-5.5
-  box_max_x:  5.5 #5.5
-  box_max_y:  5.5 #5.5
+  box_min_x: -6 #-5.5
+  box_min_y: -6 #-5.5
+  box_max_x:  6 #5.5
+  box_max_y:  6 #5.5
   box_min_z:  -0.0
   box_max_z: 1.5
 
@@ -89,9 +89,9 @@ exploration:
   relax_time: 1.0
 
 frontier:
-  cluster_min: 100 # used to discard frontiers smaller than this value
+  cluster_min: 0 # used to discard frontiers smaller than this value
   cluster_size_xy: 1.5 # used by PCA to split large frontiers 
-  cluster_size_z: 1.5
+  cluster_size_z: 10
   
   # minimum distance a viewpoint needs to be from the centroid of a frontier to be considered
   # If higher than rmin, it will discard some bad viewpoints
@@ -117,18 +117,18 @@ frontier:
   # lower values mean we have a lot of viewpoints even in small places
   # higher values means we are conservative about what a viewpoint sees
   # also depends a lot on your map resolution
-  min_visib_num: 10
+  min_visib_num: 20
   
   # % change that must happen for the frontier to call for recompute
   # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate
   # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
   # it should be tuned such that your observe smooth motions, without stops or fast acclerations
-  min_view_finish_fraction: 0.1   
+  min_view_finish_fraction: 0.1
 
 perception_utils:
-  top_angle: 0.56125
-  left_angle: 0.69222
-  right_angle: 0.68901
+  top_angle: 0.51129 # np.arctan2(H/2, fx)
+  left_angle: 0.7809 # np.arctan2(W/2, fx)
+  right_angle: 0.7809 # np.arctan2(W/2, fx)
   max_dist: 3
   vis_dist: 1.0
 

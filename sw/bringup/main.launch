@@ -1,11 +1,11 @@
 <launch>
-    <arg name="init_x"   default="0.5"/>
-    <arg name="init_y"   default="1.5"/>
-    <arg name="init_z"   default="0"/> 
+    <arg name="init_x"   default="0"/>
+    <arg name="init_y"   default="0"/>
+    <arg name="init_z"   default="0.05"/> 
     <arg name="init_R"   default="0"/>
     <arg name="init_P"   default="0"/>
-    <arg name="init_Y"   default="5"/> 
-    <arg name="map_size_x" default="5"/>
+    <arg name="init_Y"   default="0"/> 
+    <arg name="map_size_x" default="0"/>
     <arg name="map_size_y" default="5"/>
     <arg name="map_size_z" default="1.7"/>
 
@@ -14,7 +14,7 @@
     <arg name="planner" default="racer"/>
     <arg name="sim_name" default="sitl"/>
     <arg name="vehicle" default="mantis_depth_vision"/>
-    
+    <arg name="world" default="amrlab"/>
     <arg name="odometry_topic" default="/mavros/local_position/odom"/>
     
     <!-- enable for perfect odometry -->
@@ -29,7 +29,14 @@
     
     <!-- So that ros nodes can use it too -->
     <param name="sim" value="$(arg sim)"/>
-    <rosparam command='load' file="$(find bringup)/config/params.yaml"/>
+    
+    <!-- Default parameter file -->
+    <rosparam command='load' file="$(find bringup)/config/default_params.yaml"/>
+    
+    <!-- World specific overrides -->
+    <rosparam command='load' file="$(find bringup)/config/$(arg world).yaml"/>
+
+
     <!-- simulator -->
     <include if="$(arg sim)" file="$(find bringup)/sim.launch">
         <arg name="init_x" value="$(arg init_x)"/>
@@ -40,6 +47,7 @@
         <arg name="init_Y" value="$(arg init_Y)"/>
         <arg name="vehicle" default="$(arg vehicle)"/>
         <arg name="gui" default="$(arg gui)" />
+        <arg name="world" default="$(arg world)" />
     </include>
 
     <!-- drone toolbox template -->
@@ -68,5 +76,6 @@
     <node ns="$(arg vehicle)" name="attention_map_2d" type="aruco_segment.py" pkg="semantics" output="screen" required="true"/>
     <!-- <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/> -->
     <include file="$(find bringup)/rviz.launch"/>
+    <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
 
 </launch>
