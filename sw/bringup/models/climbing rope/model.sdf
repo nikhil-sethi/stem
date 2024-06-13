@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+    <model name="rope">
+        <static>true</static>
+        <include>
+            <uri>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Artifact Proximity Detector</uri>
+        </include>
+        <link name="link">
+            <collision name="collision">
+                <geometry>
+                    <mesh>
+                        <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/meshes/rope.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                    <mesh>
+                        <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/meshes/rope.dae</uri>
+                    </mesh>
+                </geometry>
+                <material>
+                    <diffuse>1.0 1.0 1.0</diffuse>
+                    <specular>1.0 1.0 1.0</specular>
+                    <pbr>
+                        <metal>
+                            <albedo_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Albedo.jpg</albedo_map>
+                            <normal_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Normal.jpg</normal_map>
+                            <roughness_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Roughness.jpg</roughness_map>
+                        </metal>
+                    </pbr>
+                    <!-- fallback to script if no PBR support-->
+                    <script>
+                        <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/scripts/</uri>
+                        <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/</uri>
+                        <name>Rope_Diffuse</name>
+                    </script>
+                </material>
+            </visual>
+        </link>
+    </model>
+</sdf>

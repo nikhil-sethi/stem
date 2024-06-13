@@ -1,105 +1,8 @@
 <?xml version='1.0'?>
 <sdf version='1.7'>
   <model name='cave'>
-    <link name='backpack_1::link'>
-      <pose>23.7782 -1.00461 0.590058 0.047351 -0.003573 -1.42339</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <visual name='visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
     <link name='Construction Cone'>
       <pose>16.381 2.90417 0.09 0 -0 0</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <static>1</static>
-      <visual name='visual'>
-        <geometry>
-          <mesh>
-            <scale>0.3 0.3 0.3</scale>
-            <uri>model://construction_cone/meshes/construction_cone.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-    </link>
-    <link name='Construction Cone_clone'>
-      <pose>14.0214 1.27195 0.09 0 -0 0</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -140,8 +43,25 @@
         <cast_shadows>1</cast_shadows>
       </visual>
     </link>
-    <link name='Construction Cone_clone_1'>
-      <pose>13.61 1.46162 0.09 0 -0 0</pose>
+    <link name='Radio'>
+      <light name='light_source' type='point'>
+        <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+        <attenuation>
+          <range>2</range>
+          <constant>0.2</constant>
+          <linear>0.1</linear>
+          <quadratic>0.1</quadratic>
+        </attenuation>
+        <diffuse>1 0 0 1</diffuse>
+        <specular>1 0 0 1</specular>
+        <direction>0 0 -1</direction>
+        <spot>
+          <inner_angle>0</inner_angle>
+          <outer_angle>0</outer_angle>
+          <falloff>0</falloff>
+        </spot>
+      </light>
+      <pose>17.4463 -0.75752 0.410228 0 0 -2.03035</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -149,8 +69,7 @@
       <visual name='visual'>
         <geometry>
           <mesh>
-            <scale>0.3 0.3 0.3</scale>
-            <uri>model://construction_cone/meshes/construction_cone.dae</uri>
+            <uri>model://Radio/meshes/Radio.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -166,8 +85,8 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/.gazebo/models/construction_cone/meshes/construction_cone.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/Radio/meshes/Radio.dae</uri>
+            <scale>1 1 1</scale>
           </mesh>
         </geometry>
         <surface>
@@ -217,7 +136,286 @@
         </surface>
       </collision>
     </link>
-    <link name='aruco_visual_marker_2'>
+    <link name='Radio_clone'>
+      <light name='light_source' type='point'>
+        <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+        <attenuation>
+          <range>2</range>
+          <constant>0.2</constant>
+          <linear>0.1</linear>
+          <quadratic>0.1</quadratic>
+        </attenuation>
+        <diffuse>1 0 0 1</diffuse>
+        <specular>1 0 0 1</specular>
+        <direction>0 0 -1</direction>
+        <spot>
+          <inner_angle>0</inner_angle>
+          <outer_angle>0</outer_angle>
+          <falloff>0</falloff>
+        </spot>
+      </light>
+      <pose>17.2681 -1.39705 0.357047 0 0 -2.03035</pose>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <static>1</static>
+      <visual name='visual'>
+        <geometry>
+          <mesh>
+            <uri>model://Radio/meshes/Radio.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/Radio/meshes/Radio.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='Radio_clone_0'>
+      <light name='light_source' type='point'>
+        <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+        <attenuation>
+          <range>2</range>
+          <constant>0.2</constant>
+          <linear>0.1</linear>
+          <quadratic>0.1</quadratic>
+        </attenuation>
+        <diffuse>1 0 0 1</diffuse>
+        <specular>1 0 0 1</specular>
+        <direction>0 0 -1</direction>
+        <spot>
+          <inner_angle>0</inner_angle>
+          <outer_angle>0</outer_angle>
+          <falloff>0</falloff>
+        </spot>
+      </light>
+      <pose>17.3279 -1.01557 0.435477 -1.48485 0.117535 2.77114</pose>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <static>1</static>
+      <visual name='visual'>
+        <geometry>
+          <mesh>
+            <uri>model://Radio/meshes/Radio.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/Radio/meshes/Radio.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='Radio_clone_0_clone'>
+      <light name='light_source' type='point'>
+        <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+        <attenuation>
+          <range>2</range>
+          <constant>0.2</constant>
+          <linear>0.1</linear>
+          <quadratic>0.1</quadratic>
+        </attenuation>
+        <diffuse>1 0 0 1</diffuse>
+        <specular>1 0 0 1</specular>
+        <direction>0 0 -1</direction>
+        <spot>
+          <inner_angle>0</inner_angle>
+          <outer_angle>0</outer_angle>
+          <falloff>0</falloff>
+        </spot>
+      </light>
+      <pose>17.3491 -0.895677 0.424451 -1.42926 0.033796 -2.80774</pose>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <static>1</static>
+      <visual name='visual'>
+        <geometry>
+          <mesh>
+            <uri>model://Radio/meshes/Radio.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/Radio/meshes/Radio.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_19_1'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -316,7 +514,7 @@
         </surface>
       </collision>
     </link>
-    <link name='aruco_visual_marker_3'>
+    <link name='marker_3_1'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -415,305 +613,7 @@
         </surface>
       </collision>
     </link>
-    <link name='aruco_visual_marker_3_clone'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>17.6145 7.42705 0.219976 0 0 -0.292623</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.209769 0.222371 0.222371</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_3/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_3/materials/textures</uri>
-            <name>ArucoVisualMarker3/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.209769 0.222371 0.222371</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='aruco_visual_marker_4'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>13.9364 -4.65927 0.4053 0 -0 0</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.242905 0.219337 0.242906</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_4/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_4/materials/textures</uri>
-            <name>ArucoVisualMarker4/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.242905 0.219337 0.242906</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='aruco_visual_marker_4_0'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>13.6411 -6.24561 0.423567 0 0 -0.230072</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <gravity>1</gravity>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.387956 0.009063 0.387956</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_4/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_4/materials/textures</uri>
-            <name>ArucoVisualMarker5/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.387956 0.009063 0.387956</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='aruco_visual_marker_4_0_clone'>
+    <!-- <link name='aruco_visual_marker_4_0_clone'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -812,12 +712,12 @@
           </contact>
         </surface>
       </collision>
-    </link>
-    <link name='aruco_visual_marker_4_0_clone_0'>
+    </link> -->
+    <link name='marker_1_2'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>15.4084 -6.15081 0.414486 0.313616 0.029052 -0.743314</pose>
+      <pose>14.9629 -6.25741 0.596399 -0.049499 -0.055336 -0.748181</pose>
       <inertial>
         <inertia>
           <ixx>0</ixx>
@@ -836,14 +736,14 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.307179 0.291314 0.307179</size>
+            <size>0.209682 0.213269 0.209682</size>
           </box>
         </geometry>
         <material>
           <script>
-            <uri>model://aruco_visual_marker_4/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_4/materials/textures</uri>
-            <name>ArucoVisualMarker5/Marker</name>
+            <uri>model://aruco_visual_marker_1/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_1/materials/textures</uri>
+            <name>ArucoVisualMarker1/Marker</name>
           </script>
           <ambient>1 1 1 1</ambient>
           <diffuse>1 1 1 1</diffuse>
@@ -863,7 +763,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.307179 0.291314 0.307179</size>
+            <size>0.209682 0.213269 0.209682</size>
           </box>
         </geometry>
         <surface>
@@ -913,156 +813,34 @@
         </surface>
       </collision>
     </link>
-    <link name='aruco_visual_marker_5'>
+    <link name='backpack_1::link'>
+      <pose>23.7782 -1.00461 0.590058 0.047351 -0.003573 -1.42339</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>16.3415 -1.92283 0.383085 0.028464 0.038374 0.63845</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
       <visual name='visual'>
         <geometry>
-          <box>
-            <size>0.184518 0.196634 0.184518</size>
-          </box>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
+            <scale>0.3 0.3 0.3</scale>
+          </mesh>
         </geometry>
         <material>
-          <script>
-            <uri>model://aruco_visual_marker_5/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_5/materials/textures</uri>
-            <name>ArucoVisualMarker4/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
+          <shader type='pixel'/>
         </material>
         <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
-          <box>
-            <size>0.184518 0.196634 0.184518</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='aruco_visual_marker_5_clone'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>16.6342 -0.335715 0.492366 0.035259 -0.032243 2.31124</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.212304 0.231833 0.212304</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_5/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_5/materials/textures</uri>
-            <name>ArucoVisualMarker4/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.212304 0.231833 0.212304</size>
-          </box>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
+            <scale>0.3 0.3 0.3</scale>
+          </mesh>
         </geometry>
         <surface>
           <friction>
@@ -1189,82 +967,6 @@
     </link>
     <link name='backpack_3::link'>
       <pose>35.9067 -17.1566 -2.73049 0.027922 0.01164 1.17592</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <visual name='visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='backpack_4::link'>
-      <pose>15.016 -0.199532 0.070195 -0.046792 0.061363 -1.77601</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -1801,6 +1503,182 @@
         </surface>
       </collision>
     </link>
+    <link name='dog'>
+      <inertial>
+        <pose>0 -0.1 0.95 0 -0 0</pose>
+        <mass>80</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+      <pose>13.665 -4.46221 0.032395 0 -0 0.791065</pose>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <visual name='visual'>
+        <pose>0 0 0.02 0.04 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://dog/meshes/dog.dae</uri>
+            <scale>0.02 0.02 0.02</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='dogi'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0.02 0.04 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/dog/meshes/dog.dae</uri>
+            <scale>0.02 0.02 0.02</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='dog_clone'>
+      <inertial>
+        <pose>0 -0.1 0.95 0 -0 0</pose>
+        <mass>80</mass>
+        <inertia>
+          <ixx>24.88</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>25.73</iyy>
+          <iyz>0</iyz>
+          <izz>2.48</izz>
+        </inertia>
+      </inertial>
+      <pose>16.3268 -3.62547 0.032395 0 -0 0.3113</pose>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <visual name='visual'>
+        <pose>0 0 0.02 0.04 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://dog/meshes/dog.dae</uri>
+            <scale>0.02 0.02 0.02</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='dogi'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0.02 0.04 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/root/thesis_ws/src/thesis/sw/bringup/models/dog/meshes/dog.dae</uri>
+            <scale>0.02 0.02 0.02</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
     <link name='helmet_10'>
       <light name='headlamp' type='spot'>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
@@ -1820,7 +1698,7 @@
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
       </light>
-      <pose>16.5105 -1.88686 0.088769 -0.305759 -0.252417 0.875859</pose>
+      <pose>14.6851 -2.91128 0.803282 -0.305759 -0.252417 0.875859</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -2272,7 +2150,7 @@
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
       </light>
-      <pose>18.0046 9.19611 0.358176 0.189049 -0.347725 -0.537212</pose>
+      <pose>17.4034 8.93512 0.758482 0.189049 -0.347725 -0.537212</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -2385,7 +2263,7 @@
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
       </light>
-      <pose>14.2327 -4.4469 0.011011 0.001422 0.231014 0</pose>
+      <pose>14.4963 -5.19874 1.13181 0.001422 0.231014 0</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -2724,7 +2602,7 @@
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
       </light>
-      <pose>16.2269 -2.00696 0.102567 -0.103533 0.38079 2.84339</pose>
+      <pose>15.0988 -2.6046 0.884119 -0.049935 -0.190809 2.87251</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -2818,168 +2696,8 @@
         </surface>
       </collision>
     </link>
-    <link name='human_1::link'>
-      <pose>18.1586 9.00846 -0.358617 -0.214851 0.237811 1.10601</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <visual name='visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
-          <heat_signature>materials/textures/RescueRandy_Thermal.png</heat_signature>
-          <max_temp>305</max_temp>
-        </plugin>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='human_2'>
-      <pose>14.999 -6.32979 -0.38658 0 0 -1.22943</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <visual name='visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
-          <heat_signature>materials/textures/RescueRandy_Thermal.png</heat_signature>
-          <max_temp>305</max_temp>
-        </plugin>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
     <link name='human_2_clone'>
-      <pose>14.0681 -6.40772 -0.350829 0.212712 0.083647 1.43067</pose>
+      <pose>14.3554 -6.46153 -0.507646 -0.168632 0.083647 1.43067</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -2987,7 +2705,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
@@ -3008,7 +2726,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <surface>
@@ -3067,7 +2785,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
@@ -3088,7 +2806,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <surface>
@@ -3147,7 +2865,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
@@ -3168,7 +2886,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <surface>
@@ -3227,7 +2945,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <plugin name='ignition::gazebo::systems::Thermal' filename='ignition-gazebo-thermal-system'>
@@ -3248,7 +2966,7 @@
         <geometry>
           <mesh>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/rescue randy sitting/8/meshes/rescue_randy.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
+            <scale>0.35 0.35 0.35</scale>
           </mesh>
         </geometry>
         <surface>
@@ -3298,34 +3016,58 @@
         </surface>
       </collision>
     </link>
-    <link name='link_clone'>
-      <pose>14.9647 -0.414287 0.063561 -0.327452 0.248418 -2.52437</pose>
+    <link name='marker_10_1'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
+      <pose>15.2807 -2.96215 0.945051 0.028536 -0.080819 0.635053</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
       <visual name='visual'>
         <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
+          <box>
+            <size>0.184518 0.196634 0.184518</size>
+          </box>
         </geometry>
         <material>
-          <shader type='pixel'/>
+          <script>
+            <uri>model://aruco_visual_marker_10/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_10/materials/textures</uri>
+            <name>ArucoVisualMarker10/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
         </material>
         <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
       </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
+          <box>
+            <size>0.184518 0.196634 0.184518</size>
+          </box>
         </geometry>
         <surface>
           <friction>
@@ -3374,34 +3116,358 @@
         </surface>
       </collision>
     </link>
-    <link name='link_clone_0'>
-      <pose>17.4209 7.61049 0.070195 0.025147 0.072944 -0.791549</pose>
+    <link name='marker_11_1'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
+      <pose>17.0613 -0.80327 0.717104 0.035259 -0.032243 2.31124</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
       <visual name='visual'>
         <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
+          <box>
+            <size>0.212304 0.231833 0.212304</size>
+          </box>
         </geometry>
         <material>
-          <shader type='pixel'/>
+          <script>
+            <uri>model://aruco_visual_marker_11/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_11/materials/textures</uri>
+            <name>ArucoVisualMarker11/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
         </material>
         <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
       </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/jansport backpack red/6/meshes/backpack.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
+          <box>
+            <size>0.212304 0.231833 0.212304</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_12_1'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>16.2635 -3.71921 0.678519 0 -0 0</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.242905 0.219337 0.242906</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_12/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_12/materials/textures</uri>
+            <name>ArucoVisualMarker12/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.242905 0.219337 0.242906</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_12_2'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>13.7712 -4.35853 0.548659 0 -0 0</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.242905 0.219337 0.242906</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_12/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_12/materials/textures</uri>
+            <name>ArucoVisualMarker12/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.242905 0.219337 0.242906</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_1_1'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>13.9571 -6.07659 0.565055 0 -0 0.491184</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.241518 0.225651 0.241518</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_1/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_1/materials/textures</uri>
+            <name>ArucoVisualMarker1/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.241518 0.225651 0.241518</size>
+          </box>
         </geometry>
         <surface>
           <friction>
@@ -5055,38 +5121,6 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <visual name='StriatedRock_visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave elevation type b/7/meshes/caveelevation.dae</uri>
-            <submesh>
-              <name>StriatedRock</name>
-              <center>0</center>
-            </submesh>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>1 1 1 1</specular>
-          <pbr>
-            <metal>
-              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Albedo.jpg</albedo_map>
-              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Normal.jpg</normal_map>
-              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Roughness.jpg</roughness_map>
-            </metal>
-          </pbr>
-          <script>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave elevation type b/7/materials/scripts/</uri>
-            <uri>materials/textures/</uri>
-            <name>CaveTile/StriatedRock_Diffuse</name>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
       <visual name='RockPile_visual'>
         <geometry>
           <mesh>
@@ -5112,6 +5146,38 @@
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave elevation type b/7/materials/scripts/</uri>
             <uri>materials/textures/</uri>
             <name>CaveTile/RockPile_Diffuse</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='StriatedRock_visual'>
+        <geometry>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave elevation type b/7/meshes/caveelevation.dae</uri>
+            <submesh>
+              <name>StriatedRock</name>
+              <center>0</center>
+            </submesh>
+            <scale>0.3 0.3 0.3</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Albedo.jpg</albedo_map>
+              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Normal.jpg</normal_map>
+              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/StriatedRock_Roughness.jpg</roughness_map>
+            </metal>
+          </pbr>
+          <script>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave elevation type b/7/materials/scripts/</uri>
+            <uri>materials/textures/</uri>
+            <name>CaveTile/StriatedRock_Diffuse</name>
           </script>
           <shader type='pixel'/>
         </material>
@@ -5523,63 +5589,6 @@
           </contact>
         </surface>
       </collision>
-    </link>
-    <link name='tile_45_lights'>
-      <light name='spot_light2' type='spot'>
-        <pose>-1.2 -3 2.7 0 -0 0</pose>
-        <diffuse>0.8 0.8 0.8 1</diffuse>
-        <specular>0.1 0.1 0.1 1</specular>
-        <attenuation>
-          <range>10</range>
-          <linear>0.2</linear>
-          <constant>0.3</constant>
-          <quadratic>0.01</quadratic>
-        </attenuation>
-        <spot>
-          <inner_angle>1</inner_angle>
-          <outer_angle>2</outer_angle>
-          <falloff>0.6</falloff>
-        </spot>
-        <cast_shadows>1</cast_shadows>
-        <direction>0 0 -1</direction>
-      </light>
-      <pose>15 -7.5 0 0 -0 0</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <gravity>1</gravity>
-      <inertial>
-        <mass>1</mass>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-      </inertial>
-      <visual name='visual'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>1 1 1</size>
-          </box>
-        </geometry>
-        <material>
-          <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-          <shader type='pixel'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
     </link>
     <link name='tile_4::base_link'>
       <pose>7.5 0 0 0 0 -1.5708</pose>
@@ -6937,6 +6946,128 @@
         </surface>
       </collision>
     </link>
+    <model name='coffee_spill'>
+      <link name='link_0'>
+        <pose>0 0 0 0 -0 0</pose>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.166667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.166667</iyy>
+            <iyz>0</iyz>
+            <izz>0.166667</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://coffee_spill/meshes/spill.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <lighting>1</lighting>
+            <ambient>0.3803 0.196 0.0156 1</ambient>
+            <diffuse>0.3803 0.196 0.0156 1</diffuse>
+            <specular>0.01 0.01 0.01 1</specular>
+            <emissive>0 0 0 1</emissive>
+            <shader type='vertex'>
+              <normal_map>__default__</normal_map>
+            </shader>
+          </material>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+        </visual>
+        <collision name='collision'>
+          <laser_retro>0</laser_retro>
+          <max_contacts>10</max_contacts>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://coffee_spill/meshes/spill.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <pose>15.2084 -0.404478 0.136142 0 -0 0</pose>
+    </model>
+    <model name='rope'>
+      <static>1</static>
+      <frame name='artifact_proximity_detector::__model__' attached_to='artifact_proximity_detector::'>
+        <pose relative_to='__model__'>0 0 0 0 -0 0</pose>
+      </frame>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/meshes/rope.dae</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/meshes/rope.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>1 1 1 1</specular>
+            <pbr>
+              <metal>
+                <albedo_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Albedo.jpg</albedo_map>
+                <normal_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Normal.jpg</normal_map>
+                <roughness_map>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/Rope_Roughness.jpg</roughness_map>
+              </metal>
+            </pbr>
+            <script>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/scripts/</uri>
+              <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/climbing rope/6/files/materials/textures/</uri>
+              <name>Rope_Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose>13.7317 1.43369 0 0 -0 0.819327</pose>
+    </model>
     <static>1</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>
