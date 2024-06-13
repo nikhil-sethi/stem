@@ -1,0 +1,68 @@
+
+# ========= FUEL =========
+define: &max_vel 0.4
+define: &max_acc 0.25
+
+sdf_map:
+  resolution: 0.1
+  map_size_x: 12 # 11
+  map_size_y: 12 # 11
+  map_size_z: 1.5
+  box_min_x: -6 #-5.5
+  box_min_y: -6 #-5.5
+  box_max_x:  6 #5.5
+  box_max_y:  6 #5.5
+  box_min_z:  -0.0
+  box_max_z: 1.5
+
+
+exploration:
+  # Cost to change yaw angle 
+  # this should ideally be matched closely with the controller's maximum yaw rate, but might need to be more conservative because of noise and delays
+  # with the real drone, it seems we need to be much more conservative than the control limit
+  # this is also linked to the free space the trajectory has for moving around (dist0 param in optimization)
+  yd:  0.7     # "$(eval 25 * 3.1415926 / 180.0)"  
+
+frontier:
+  cluster_min: 0 # used to discard frontiers smaller than this value. FUEL was at 100
+  cluster_size_xy: 1.5 # used by PCA to split large frontiers 
+  cluster_size_z: 10
+  
+  # minimum distance a viewpoint needs to be from the centroid of a frontier to be considered
+  # If higher than rmin, it will discard some bad viewpoints
+  min_candidate_dist: 0.5  
+  
+  # how far must a viewpoint candidate be from unknown space to be considered. Like a safety margin.
+  # high values can sometimes mean that there is no vpt available and 'search fails'
+  min_candidate_clearance: 0.21
+
+  # Angle delta for viewpoint sampling
+  # if you have very small narrow spaces, keep this lower, but doesnt affect too much tbh
+  candidate_dphi: 0.261  # "$(eval 15 * 3.1415926 / 180.0)"
+  
+  # how many concentric circles of viewpoints to sample between rmin and rmax 
+  candidate_rnum: 3
+  # lower radius of viewpoint sampling around a frontier
+  candidate_rmin: 0.75 # [m]
+  # max radius for viewpoint sampling around a frontier
+  candidate_rmax: 1.75 # [m]
+  down_sample: 3
+
+  # how many valid frontier voxels does a viewpoint need to see to be considered
+  # lower values mean we have a lot of viewpoints even in small places
+  # higher values means we are conservative about what a viewpoint sees
+  # also depends a lot on your map resolution
+  min_visib_num: 20
+  
+  # % change that must happen for the frontier to call for recompute
+  # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate
+  # high values mean we are more strict. We make a lot of observations before moving. This is sluggish but makes the environment scene more stable
+  # it should be tuned such that your observe smooth motions, without stops or fast acclerations
+  min_view_finish_fraction: 0.1
+
+
+optimization:
+  # The minimum distance the trajectory should maintain from obstacles
+  # in practice this should be higher than what you expect because of noise etc.
+  # But this distance is also valid from the ground (in z axis), so if the drone wants to see something close to the ground, it will find it hard to do and keep oscillating
+  dist0: 0.5 # [m]

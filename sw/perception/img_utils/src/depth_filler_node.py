@@ -287,24 +287,6 @@ def fill_in_multiscale(depth_map, max_depth=100.0,
     return depths_out, process_dict
 
 
-# depth_image_path = "test/ip_basic/ip_basic/depth_1.png"
-# Load depth projections from uint16 image
-# depth_image = cv2.imread(depth_image_path, cv2.IMREAD_ANYDEPTH)
-
-
-# cv2.imshow('test',projected_depth)
-# cv2.waitKey(0) 
-# import time
-# start = time.perf_counter()
-# print(time.perf_counter()-start)
-
-# depth_image = (final_depth * 256).astype(np.uint16)
-# cv2.imshow('test',final_depth)
-# cv2.waitKey(0) 
-  
-# closing all open windows 
-# cv2.destroyAllWindows() 
-
 cv_bridge = CvBridge()
 def depth_fill(msg):
 
@@ -315,7 +297,7 @@ def depth_fill(msg):
         depth_np = np.float32(np.array(depth_cv, dtype=np.uint16)*0.001)
     
     # keep the max depth to larger than you want, this prevents white halos from being formed near object edges
-    depth_filled = fill_in_fast(depth_np, max_depth=15.0, custom_kernel=DIAMOND_KERNEL_7)
+    depth_filled = fill_in_fast(depth_np, max_depth=15.0, custom_kernel=FULL_KERNEL_7)
     
     # use this in case you want lower bandwidths, but FUEL doesnt really care because everything is converted in C++ anyways
     # depth_filled = (depth_filled * 1).astype(np.uint16)

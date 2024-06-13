@@ -1,0 +1,6 @@
+uint16[] cost_mat_flat
+uint16[] priorities
+uint8 dim
+---
+uint8[] tour
+float32 cost

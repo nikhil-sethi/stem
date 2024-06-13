@@ -1,2 +1,5 @@
 *.pyc
 *.bag
+*.nbc
+*.nbi
+__pycache__

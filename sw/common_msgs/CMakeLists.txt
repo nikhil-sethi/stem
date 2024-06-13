@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   message_runtime
   std_msgs
+  visualization_msgs
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,7 +52,10 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   float64List.msg
+  Float64Stamped.msg
+  target.msg
   uint8List.msg
+  Viewpoints.msg
   # Message2.msg
 )
 
@@ -71,7 +76,9 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
+  visualization_msgs
   std_msgs
+  geometry_msgs
 )
 
 ################################################
