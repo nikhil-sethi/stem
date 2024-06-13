@@ -29,7 +29,7 @@
     </include>
 
     <!-- rosbag, gives out sensor_pose, odomtery, depth, rgb -->
-    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="--clock -l $(find bringup)/data/bags/depth_filled_2_smol.bag">
+    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="--clock -l $(find bringup)/data/bags/depth_filled_2.bag">
         <remap from="/camera/depth/image_rect_raw" to="/camera/aligned_depth_to_color/image_raw"/>
     </node>
 

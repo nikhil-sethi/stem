@@ -21,9 +21,10 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   nav_msgs
   target_search
+  active_perception
   )
 find_package(PCL 1.7 REQUIRED)
-
+find_package(Eigen3 REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -113,7 +114,7 @@ find_package(PCL 1.7 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES attention_map
- CATKIN_DEPENDS common common_msgs plan_env roscpp sensor_msgs traj_utils visualization_msgs
+ CATKIN_DEPENDS common common_msgs plan_env traj_utils
 #  DEPENDS system_lib
 )
 
@@ -124,14 +125,15 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${Eigen3_INCLUDE_DIRS} 
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/attention_map.cpp
+#   src/attention_map.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -142,9 +144,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(attention_processor_node src/attention_processor.cpp)
+# add_executable(attention_processor_node src/attention_processor.cpp)
 add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 add_executable(target_att_gt_node src/target_att_gt.cpp)
+add_executable(diff_map_gt_node src/diffusion_map_gt.cpp)
 add_executable(attention_map_2d_node src/attention_map_2d.cpp)
 add_executable(test_node src/test.cpp)
 
@@ -156,18 +159,22 @@ add_executable(test_node src/test.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(attention_processor_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(attention_processor_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(attention_processor_node
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
-)
+# target_link_libraries(attention_processor_node
+#   ${catkin_LIBRARIES}
+#   ${PCL_LIBRARIES}
+# )
 target_link_libraries(pub_att_gt_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
 target_link_libraries(target_att_gt_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+target_link_libraries(diff_map_gt_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
 )
@@ -190,9 +197,10 @@ target_link_libraries(test_node
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/attention_map.py
-  src/att_gmm.py
-  src/att_gmm_dynamic.py
-  src/test.py
+  # src/att_gmm.py
+  # src/att_gmm_dynamic.py
+  # src/test.py
+  # src/gmm_map.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

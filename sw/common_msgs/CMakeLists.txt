@@ -52,6 +52,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   float64List.msg
+  Float64Stamped.msg
   target.msg
   uint8List.msg
   Viewpoints.msg

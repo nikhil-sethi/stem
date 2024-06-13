@@ -76,13 +76,13 @@ class AttGTMaker{
 
         AttGTMaker(ros::NodeHandle&  nh){
             // sdf_map_ = fast_planner::SDFMap();
-            sdf_map_.setParams(nh, "/exploration_node/");
+            sdf_map_.setParams(nh);
             attention_buffer = std::vector<float>(sdf_map_.buffer_size, 0);
             checked = std::vector<bool>(sdf_map_.buffer_size, false);
 
             // let the targets come in
             ros::topic::waitForMessage<common_msgs::target>("/gazebo/targets/gt");
-            target_sub = nh.subscribe<common_msgs::target>("/gazebo/targets/gt", 10, &AttGTMaker::targetCallback, this);
+            target_sub = nh.subscribe<common_msgs::target>("/gazebo/targets/gt", 20, &AttGTMaker::targetCallback, this);
 
             // diffusion timer
             att_update_timer = nh.createTimer(ros::Duration(0.1), &AttGTMaker::attUpdateTimer, this);
@@ -92,7 +92,7 @@ class AttGTMaker{
             att_pub_timer = nh.createTimer(ros::Duration(0.1), &AttGTMaker::attPubTimer, this);
             
             diffusion_factor = 0.9;
-            att_min = 0.5;
+            att_min = 1;
         }
 
         void targetCallback(const common_msgs::target msg){
@@ -215,7 +215,7 @@ class AttGTMaker{
 
 int main(int argc, char **argv){
     ros::init(argc, argv, "target_gt_node");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("/");
     AttGTMaker node(nh);
     ros::spin();
 

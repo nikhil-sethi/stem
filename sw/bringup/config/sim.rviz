@@ -13,6 +13,7 @@ Panels:
         - /Robot1/States1/Ground truth1/Shape1
         - /Environment1
         - /Environment1/Maps1
+        - /Environment1/Maps1/occupied_all11
         - /Environment1/Maps1/Attention map1
         - /Environment1/Maps1/Diffusion map1
         - /Others1/debug1
@@ -21,7 +22,7 @@ Panels:
         - /Objects1/Bboxes1
         - /Objects1/Bboxes1/Namespaces1
       Splitter Ratio: 0.5790554285049438
-    Tree Height: 179
+    Tree Height: 306
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -103,7 +104,8 @@ Visualization Manager:
           Marker Topic: /planning_vis/frontier
           Name: frontiers
           Namespaces:
-            {}
+            dead_frontier: true
+            frontier: true
           Queue Size: 10000
           Value: true
         - Class: rviz/Marker
@@ -111,7 +113,10 @@ Visualization Manager:
           Marker Topic: /planning_vis/viewpoints
           Name: viewpoints
           Namespaces:
-            {}
+            exploration_points: true
+            global_tour: true
+            point-average: true
+            view: true
           Queue Size: 1000
           Value: true
         - Alpha: 1
@@ -240,7 +245,7 @@ Visualization Manager:
               Unreliable: false
               Value: true
             - Class: rviz/Image
-              Enabled: true
+              Enabled: false
               Image Topic: priority_mask
               Max Value: 1
               Median window: 5
@@ -250,7 +255,7 @@ Visualization Manager:
               Queue Size: 2
               Transport Hint: compressed
               Unreliable: false
-              Value: true
+              Value: false
             - Class: rviz/Image
               Enabled: false
               Image Topic: /camera/aligned_depth_to_color/image_raw
@@ -302,7 +307,7 @@ Visualization Manager:
                   Marker Topic: /planning/travel_traj
                   Name: executed_traj1
                   Namespaces:
-                    {}
+                    "": true
                   Queue Size: 100
                   Value: true
                 - Class: rviz/Marker
@@ -310,7 +315,7 @@ Visualization Manager:
                   Marker Topic: /planning/position_cmd_vis
                   Name: position_cmd1
                   Namespaces:
-                    {}
+                    current_pose: true
                   Queue Size: 100
                   Value: true
                 - Class: rviz/Marker
@@ -352,7 +357,7 @@ Visualization Manager:
               Marker Topic: /planning_vis/trajectory
               Name: traj1
               Namespaces:
-                {}
+                B-Spline: true
               Queue Size: 100
               Value: true
             - Class: rviz/Marker
@@ -379,7 +384,7 @@ Visualization Manager:
       Displays:
         - Class: rviz/Group
           Displays:
-            - Alpha: 0.8999999761581421
+            - Alpha: 0.10000000149011612
               Autocompute Intensity Bounds: false
               Autocompute Value Bounds:
                 Max Value: 1.25
@@ -480,7 +485,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: true
               Max Color: 255; 16; 20
-              Max Intensity: 5
+              Max Intensity: 8
               Min Color: 35; 226; 255
               Min Intensity: 0
               Name: Attention map
@@ -510,7 +515,7 @@ Visualization Manager:
               Enabled: true
               Invert Rainbow: true
               Max Color: 255; 255; 255
-              Max Intensity: 5
+              Max Intensity: 8
               Min Color: 0; 0; 0
               Min Intensity: 0
               Name: Diffusion map
@@ -814,18 +819,9 @@ Visualization Manager:
       Visibility:
         Custom Goal: false
         Environment:
-          Maps:
-            Attention map: true
-            Diffusion map: true
+          "":
+            "": true
             Value: true
-            occupied_all1: true
-            occupied_local1: true
-            simulation_map: true
-          Simulation:
-            Value: true
-            robot1: true
-            robot2: true
-            robot3: true
           Value: false
         Exploration:
           Target Viewpoints: true
@@ -834,49 +830,15 @@ Visualization Manager:
           viewpoints: true
         Marker: true
         Objects:
-          Bboxes: true
+          "": true
           Value: true
         Others:
-          AABB: true
-          Pose: true
+          "": true
           Value: false
-          debug: true
-          depth_cloud: true
-          esdf: true
-          exec_traj: true
-          groud_node_frontier: true
-          ground_node_map: true
-          local_esdf: true
-          local_range: true
-          processed_msg: true
-          topo_path: true
-          visib_constraint: true
-          yaw_traj: true
         PointCloud2: true
         Robot:
-          Perception:
-            Attention map  local: true
-            Attention map 2D: true
-            Depth camera: true
-            RGB camera: true
-            Value: true
-          Planning:
-            PlanningCmd:
-              Value: true
-              executed_traj1: true
-              executed_traj2: true
-              executed_traj3: true
-              position_cmd1: true
-              position_cmd2: true
-              position_cmd3: true
-            Value: true
-            traj1: true
-            traj2: true
-            traj3: true
-          States:
-            Camera pose: true
-            Ground truth: true
-            Px4 Estimate: true
+          "":
+            "": true
             Value: true
           Value: false
         RvizConfig:
@@ -897,7 +859,7 @@ Visualization Manager:
             {}
           Queue Size: 100
           Value: true
-      Enabled: true
+      Enabled: false
       Name: Objects
     - Alpha: 1
       Axes Length: 1
@@ -1011,7 +973,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 14.765852928161621
+      Distance: 24.100021362304688
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1019,17 +981,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.2068483829498291
-        Y: -1.3511457443237305
-        Z: -1.3165539712645113e-05
+        X: 5.871316432952881
+        Y: -4.3441667556762695
+        Z: -1.2252979104232509e-05
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4147963523864746
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.277695655822754
+      Yaw: 4.395902156829834
     Saved:
       - Class: rviz/ThirdPersonFollower
         Distance: 17.48538589477539
@@ -1140,10 +1102,10 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 640
+  Height: 685
   Hide Left Dock: false
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd0000000400000000000001c200000251fc0200000015fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df0000018500000177fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000000a00560069006500770073000000022a0000018b000000a000fffffffb0000000c0049006d00610067006500310100000534000000160000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a00640065007000740068000000022c000000520000000000000000fb0000000a0049006d0061006700650000000179000000a20000000000000000fb0000000a0049006d00610067006501000003f4000001190000000000000000fb0000000a0049006d0061006700650100000385000001c90000000000000000fb0000000a0049006d0061006700650000000476000000d80000000000000000fb0000000a00640065007000740068000000003b000002cf0000000000000000fb0000001800440065007000740068002000630061006d006500720061000000014f000001380000001600fffffffb000000100044006900730070006c0061007900730100000014000000ee000000c700fffffffb00000014005200470042002000630061006d0065007200610100000108000000a60000001600fffffffb000000200041007400740065006e00740069006f006e0020006d0061007000200032004401000001b4000000b10000001600fffffffb0000000a0049006d006100670065010000031a000000820000000000000000fb0000000a0049006d0061006700650000000267000000c2000000000000000000000001000001d100000346fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b2000000000000000000000002000005af000001e7fc0100000005fb0000000c00430061006d00650072006100000000000000045c0000006400fffffffb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006370000003bfc0100000002fb0000000800540069006d00650000000000000006370000035c00fffffffb0000000800540069006d00650100000000000004500000000000000000000003e70000025100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001c20000027efc0200000015fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df0000018500000177fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000000a00560069006500770073000000022a0000018b000000a000fffffffb0000000c0049006d00610067006500310100000534000000160000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a00640065007000740068000000022c000000520000000000000000fb0000000a0049006d0061006700650000000179000000a20000000000000000fb0000000a0049006d00610067006501000003f4000001190000000000000000fb0000000a0049006d0061006700650100000385000001c90000000000000000fb0000000a0049006d0061006700650000000476000000d80000000000000000fb0000000a00640065007000740068000000003b000002cf0000000000000000fb0000001800440065007000740068002000630061006d006500720061000000014f000001380000001600fffffffb000000100044006900730070006c00610079007301000000140000016d000000c700fffffffb00000014005200470042002000630061006d00650072006101000001870000010b0000001600fffffffb000000200041007400740065006e00740069006f006e0020006d0061007000200032004400000001d4000000be0000001600fffffffb0000000a0049006d006100670065010000031a000000820000000000000000fb0000000a0049006d0061006700650000000267000000c2000000000000000000000001000001d100000346fc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b2000000000000000000000002000005af000001e7fc0100000005fb0000000c00430061006d00650072006100000000000000045c0000006400fffffffb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000c00430061006d0065007200610100000000000004060000000000000000fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006370000003bfc0100000002fb0000000800540069006d00650000000000000006370000035c00fffffffb0000000800540069006d00650100000000000004500000000000000000000003520000027e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730000000000ffffffff0000000000000000
   RGB camera:
     collapsed: false
   Selection:
@@ -1154,6 +1116,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1455
-  X: 345
+  Width: 1306
+  X: 524
   Y: 27

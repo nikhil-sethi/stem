@@ -1,6 +1,12 @@
-use_active_perception: true 
-use_semantic_search: true # LNS with or without priorities
-use_lkh: false # LKH without priorities
+# sampling around objects for local tours
+use_object_vpts: true 
+
+# diffusing semantic priorities to frontiers
+use_diffusion: true
+
+# planning
+use_motsp: false
+use_greedy_search: false # overrides all planning and becomes greedy for coverage/priorities
 
 # coverage vs. semantic priority
 # 0: pure coverage
@@ -12,8 +18,10 @@ priority_map:
   # lower value means slower update, less confident, more robust to fast movements
   learning_rate: 0.9
 
-  # lower cutoff for attention values. Keep higher if you want more spread
+  # lower cutoff for attention values. 
   pmin: 1 
+  # maximum to scale cosine similarity to
+  pmax: 8
 
 diffusion:
   sigma: 2
@@ -26,7 +34,7 @@ object_finder:
 target_planner:
   rmin: 0.3
   min_vpt_clearance: 0.3
-  min_info_gain: 20
+  min_info_gain: 25
 
 
 

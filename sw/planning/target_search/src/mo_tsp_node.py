@@ -7,7 +7,7 @@ import time
 class MultiObjectiveTSP():
     def __init__(self) -> None:
         rospy.init_node("mo_tsp_node")
-
+        np.random.seed(0)
         self.solve_server = rospy.Service("/planning/motsp_service", TSP, self.handle_solver)
 
         # warm start to load up in cache

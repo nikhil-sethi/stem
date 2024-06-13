@@ -7,14 +7,14 @@ sdf_map:
   resolution: 0.1
   map_size_x: 30 # 11
   map_size_y: 30 # 11
-  map_size_z: 2.5
+  map_size_z: 3
   ground_height: -0.2
   box_min_x: -1 #-5.5
   box_min_y: -15 #-5.5
   box_max_x:  29 #5.5
   box_max_y:  15 #5.5
   box_min_z:  -0.0
-  box_max_z: 2.5
+  box_max_z: 2
 
 fsm:
   # Replan if you have executed at least this amount of trajectory AND the next frontier is covered.

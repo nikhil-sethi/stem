@@ -2,5 +2,4 @@
 *.bag
 *.nbc
 *.nbi
-*.csv
 __pycache__

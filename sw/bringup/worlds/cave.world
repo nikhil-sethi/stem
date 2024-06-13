@@ -186,7 +186,10 @@
         <pose>20.9444 -12.9912 2.58276 -0.411174 0 0</pose>
       </light>
     </state>
-    <model name='cave'>
+    <include>
+      <uri>/root/thesis_ws/src/thesis/sw/bringup/models/cave</uri>
+    </include>
+    <!-- <model name='cave'>
       <link name='backpack_1::link'>
         <pose>23.7782 -1.00461 0.590058 0.047351 -0.003573 -1.42339</pose>
         <self_collide>0</self_collide>
@@ -268,6 +271,7 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+        <static>1</static>
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -282,13 +286,13 @@
           <transparency>0</transparency>
           <cast_shadows>1</cast_shadows>
         </visual>
-        <static>1</static>
       </link>
       <link name='Construction Cone_clone'>
         <pose>14.0214 1.27195 0.09 0 -0 0</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+        <static>1</static>
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -303,13 +307,13 @@
           <transparency>0</transparency>
           <cast_shadows>1</cast_shadows>
         </visual>
-        <static>1</static>
       </link>
       <link name='Construction Cone_clone_0'>
         <pose>16.1357 3.24039 0.09 0 -0 0</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+        <static>1</static>
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -324,13 +328,13 @@
           <transparency>0</transparency>
           <cast_shadows>1</cast_shadows>
         </visual>
-        <static>1</static>
       </link>
       <link name='Construction Cone_clone_1'>
         <pose>13.61 1.46162 0.09 0 -0 0</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+        <static>1</static>
         <visual name='visual'>
           <geometry>
             <mesh>
@@ -401,7 +405,6 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
       </link>
       <link name='aruco_visual_marker_2'>
         <self_collide>0</self_collide>
@@ -420,6 +423,8 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
@@ -499,8 +504,6 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_3'>
         <self_collide>0</self_collide>
@@ -519,6 +522,8 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
@@ -598,8 +603,6 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_3_clone'>
         <self_collide>0</self_collide>
@@ -618,6 +621,8 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
@@ -697,14 +702,12 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_4'>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>13.9364 -4.65927 0.4053 0 -0 0</pose>
+        <pose>13.7712 -4.35853 0.548659 0 -0 0</pose>
         <inertial>
           <inertia>
             <ixx>0</ixx>
@@ -717,6 +720,9 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
+        <gravity>1</gravity>
         <visual name='visual'>
           <geometry>
             <box>
@@ -796,14 +802,12 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_4_0'>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>13.6411 -6.24561 0.423567 0 0 -0.230072</pose>
+        <pose>13.8791 -6.1183 0.340451 0 -0 0.491184</pose>
         <inertial>
           <inertia>
             <ixx>0</ixx>
@@ -817,10 +821,12 @@
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
         <gravity>1</gravity>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.387956 0.009063 0.387956</size>
+              <size>0.241518 0.005642 0.241518</size>
             </box>
           </geometry>
           <material>
@@ -847,7 +853,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.387956 0.009063 0.387956</size>
+              <size>0.241518 0.005642 0.241518</size>
             </box>
           </geometry>
           <surface>
@@ -896,8 +902,6 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_4_0_clone'>
         <self_collide>0</self_collide>
@@ -917,6 +921,8 @@
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
         <gravity>1</gravity>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
@@ -996,14 +1002,12 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_4_0_clone_0'>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>15.4084 -6.15081 0.414486 0.313616 0.029052 -0.743314</pose>
+        <pose>15.1855 -6.01881 0.581497 -0.049499 -0.055336 -0.748181</pose>
         <inertial>
           <inertia>
             <ixx>0</ixx>
@@ -1017,10 +1021,12 @@
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
         <gravity>1</gravity>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.307179 0.291314 0.307179</size>
+              <size>0.209682 0.013491 0.209682</size>
             </box>
           </geometry>
           <material>
@@ -1047,7 +1053,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.307179 0.291314 0.307179</size>
+              <size>0.209682 0.013491 0.209682</size>
             </box>
           </geometry>
           <surface>
@@ -1096,14 +1102,112 @@
             </contact>
           </surface>
         </collision>
+      </link>
+      <link name='aruco_visual_marker_4_clone'>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <pose>15.9543 -4.36459 0.548659 0 -0 0</pose>
+        <inertial>
+          <inertia>
+            <ixx>0</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0</iyy>
+            <iyz>0</iyz>
+            <izz>0</izz>
+          </inertia>
+          <mass>0</mass>
+          <pose>0 0 0 0 -0 0</pose>
+        </inertial>
         <static>1</static>
         <allow_auto_disable>1</allow_auto_disable>
+        <gravity>1</gravity>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.242905 0.219337 0.242906</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://aruco_visual_marker_4/materials/scripts</uri>
+              <uri>model://aruco_visual_marker_4/materials/textures</uri>
+              <name>ArucoVisualMarker4/Marker</name>
+            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0 0 0 1</specular>
+            <emissive>1 1 1 0</emissive>
+            <shader type='vertex'>
+              <normal_map>__default__</normal_map>
+            </shader>
+          </material>
+          <pose>0 0 0 0 -0 0</pose>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+        </visual>
+        <collision name='collision'>
+          <laser_retro>0</laser_retro>
+          <max_contacts>10</max_contacts>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.242905 0.219337 0.242906</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+                <fdir1>0 0 0</fdir1>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
+              </ode>
+              <torsional>
+                <coefficient>1</coefficient>
+                <patch_radius>0</patch_radius>
+                <surface_radius>0</surface_radius>
+                <use_patch_radius>1</use_patch_radius>
+                <ode>
+                  <slip>0</slip>
+                </ode>
+              </torsional>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0</restitution_coefficient>
+              <threshold>1e+06</threshold>
+            </bounce>
+            <contact>
+              <collide_without_contact>0</collide_without_contact>
+              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+              <collide_bitmask>1</collide_bitmask>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>1e+13</kp>
+                <kd>1</kd>
+                <max_vel>0.01</max_vel>
+                <min_depth>0</min_depth>
+              </ode>
+              <bullet>
+                <split_impulse>1</split_impulse>
+                <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>1e+13</kp>
+                <kd>1</kd>
+              </bullet>
+            </contact>
+          </surface>
+        </collision>
       </link>
       <link name='aruco_visual_marker_5'>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>16.3415 -1.92283 0.383085 0.028464 0.038374 0.63845</pose>
+        <pose>14.8356 -2.04148 1.18111 0.029447 0.261807 0.644981</pose>
         <inertial>
           <inertia>
             <ixx>0</ixx>
@@ -1116,6 +1220,9 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
+        <gravity>1</gravity>
         <visual name='visual'>
           <geometry>
             <box>
@@ -1195,14 +1302,12 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='aruco_visual_marker_5_clone'>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
-        <pose>16.6342 -0.335715 0.492366 0.035259 -0.032243 2.31124</pose>
+        <pose>17.0613 -0.80327 0.717104 0.035259 -0.032243 2.31124</pose>
         <inertial>
           <inertia>
             <ixx>0</ixx>
@@ -1215,6 +1320,9 @@
           <mass>0</mass>
           <pose>0 0 0 0 -0 0</pose>
         </inertial>
+        <static>1</static>
+        <allow_auto_disable>1</allow_auto_disable>
+        <gravity>1</gravity>
         <visual name='visual'>
           <geometry>
             <box>
@@ -1294,8 +1402,6 @@
             </contact>
           </surface>
         </collision>
-        <static>1</static>
-        <allow_auto_disable>1</allow_auto_disable>
       </link>
       <link name='backpack_2::link'>
         <pose>31.6152 -18.9843 -0.796293 0 -0.127171 0</pose>
@@ -2006,7 +2112,7 @@
           <direction>0 0 -1</direction>
           <cast_shadows>1</cast_shadows>
         </light>
-        <pose>16.5105 -1.88686 0.088769 -0.305759 -0.252417 0.875859</pose>
+        <pose>14.5427 -2.17909 1.13596 -0.305759 -0.252417 0.875859</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
@@ -2571,7 +2677,7 @@
           <direction>0 0 -1</direction>
           <cast_shadows>1</cast_shadows>
         </light>
-        <pose>14.2327 -4.4469 0.011011 0.001422 0.231014 0</pose>
+        <pose>14.4963 -5.19874 1.13181 0.001422 0.231014 0</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
@@ -2910,7 +3016,7 @@
           <direction>0 0 -1</direction>
           <cast_shadows>1</cast_shadows>
         </light>
-        <pose>16.2269 -2.00696 0.102567 -0.103533 0.38079 2.84339</pose>
+        <pose>15.0107 -1.66635 1.00489 -0.049935 -0.190809 2.87251</pose>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
@@ -5710,63 +5816,6 @@
           </surface>
         </collision>
       </link>
-      <link name='tile_45_lights'>
-        <light name='spot_light2' type='spot'>
-          <pose>-1.2 -3 2.7 0 -0 0</pose>
-          <diffuse>0.8 0.8 0.8 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <attenuation>
-            <range>10</range>
-            <linear>0.2</linear>
-            <constant>0.3</constant>
-            <quadratic>0.01</quadratic>
-          </attenuation>
-          <spot>
-            <inner_angle>1</inner_angle>
-            <outer_angle>2</outer_angle>
-            <falloff>0.6</falloff>
-          </spot>
-          <cast_shadows>1</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <pose>15 -7.5 0 0 -0 0</pose>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-        <inertial>
-          <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <visual name='visual'>
-          <pose>0 0 0 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <lighting>1</lighting>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-            <shader type='pixel'>
-              <normal_map>__default__</normal_map>
-            </shader>
-          </material>
-          <transparency>0</transparency>
-          <cast_shadows>1</cast_shadows>
-        </visual>
-      </link>
       <link name='tile_4::base_link'>
         <pose>7.5 0 0 0 0 -1.5708</pose>
         <self_collide>0</self_collide>
@@ -7123,9 +7172,228 @@
           </surface>
         </collision>
       </link>
+      <model name='Radio'>
+        <static>1</static>
+        <link name='link'>
+          <collision name='collision'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </visual>
+          <light name='light_source' type='point'>
+            <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+            <attenuation>
+              <range>2</range>
+              <constant>0.2</constant>
+              <linear>0.1</linear>
+              <quadratic>0.1</quadratic>
+            </attenuation>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+            <direction>0 0 -1</direction>
+            <spot>
+              <inner_angle>0</inner_angle>
+              <outer_angle>0</outer_angle>
+              <falloff>0</falloff>
+            </spot>
+          </light>
+        </link>
+        <pose>17.4463 -0.75752 0.410228 0 0 -2.03035</pose>
+      </model>
+      <model name='Radio_clone'>
+        <static>1</static>
+        <link name='link'>
+          <collision name='collision'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </visual>
+          <light name='light_source' type='point'>
+            <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+            <attenuation>
+              <range>2</range>
+              <constant>0.2</constant>
+              <linear>0.1</linear>
+              <quadratic>0.1</quadratic>
+            </attenuation>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+            <direction>0 0 -1</direction>
+            <spot>
+              <inner_angle>0</inner_angle>
+              <outer_angle>0</outer_angle>
+              <falloff>0</falloff>
+            </spot>
+          </light>
+        </link>
+        <pose>17.2681 -1.39705 0.357047 0 0 -2.03035</pose>
+      </model>
+      <model name='Radio_clone_0'>
+        <static>1</static>
+        <link name='link'>
+          <collision name='collision'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </visual>
+          <light name='light_source' type='point'>
+            <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+            <attenuation>
+              <range>2</range>
+              <constant>0.2</constant>
+              <linear>0.1</linear>
+              <quadratic>0.1</quadratic>
+            </attenuation>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+            <direction>0 0 -1</direction>
+            <spot>
+              <inner_angle>0</inner_angle>
+              <outer_angle>0</outer_angle>
+              <falloff>0</falloff>
+            </spot>
+          </light>
+        </link>
+        <pose>17.3279 -1.01557 0.435477 -1.48485 0.117535 2.77114</pose>
+      </model>
+      <model name='Radio_clone_0_clone'>
+        <static>1</static>
+        <link name='link'>
+          <collision name='collision'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <geometry>
+              <mesh>
+                <uri>model://Radio/meshes/Radio.dae</uri>
+              </mesh>
+            </geometry>
+          </visual>
+          <light name='light_source' type='point'>
+            <pose>0.0137 -0.02 0.109 0 -0 0</pose>
+            <attenuation>
+              <range>2</range>
+              <constant>0.2</constant>
+              <linear>0.1</linear>
+              <quadratic>0.1</quadratic>
+            </attenuation>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+            <direction>0 0 -1</direction>
+            <spot>
+              <inner_angle>0</inner_angle>
+              <outer_angle>0</outer_angle>
+              <falloff>0</falloff>
+            </spot>
+          </light>
+        </link>
+        <pose>17.3491 -0.895677 0.424451 -1.42926 0.033796 -2.80774</pose>
+      </model>
+      <model name='dog'>
+        <link name='link'>
+          <inertial>
+            <pose>0 -0.1 0.95 0 -0 0</pose>
+            <mass>80</mass>
+            <inertia>
+              <ixx>24.88</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>25.73</iyy>
+              <iyz>0</iyz>
+              <izz>2.48</izz>
+            </inertia>
+          </inertial>
+          <collision name='dogi'>
+            <pose>0 0 0.02 0.04 -0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://dog/meshes/dog.dae</uri>
+                <scale>0.02 0.02 0.02</scale>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <pose>0 0 0.02 0.04 -0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://dog/meshes/dog.dae</uri>
+                <scale>0.02 0.02 0.02</scale>
+              </mesh>
+            </geometry>
+          </visual>
+        </link>
+        <pose>13.665 -4.46221 0.032395 0 -0 0.791065</pose>
+      </model>
+      <model name='dog_clone'>
+        <link name='link'>
+          <inertial>
+            <pose>0 -0.1 0.95 0 -0 0</pose>
+            <mass>80</mass>
+            <inertia>
+              <ixx>24.88</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>25.73</iyy>
+              <iyz>0</iyz>
+              <izz>2.48</izz>
+            </inertia>
+          </inertial>
+          <collision name='dogi'>
+            <pose>0 0 0.02 0.04 -0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://dog/meshes/dog.dae</uri>
+                <scale>0.02 0.02 0.02</scale>
+              </mesh>
+            </geometry>
+          </collision>
+          <visual name='visual'>
+            <pose>0 0 0.02 0.04 -0 0</pose>
+            <geometry>
+              <mesh>
+                <uri>model://dog/meshes/dog.dae</uri>
+                <scale>0.02 0.02 0.02</scale>
+              </mesh>
+            </geometry>
+          </visual>
+        </link>
+        <pose>16.2883 -4.22629 0.032395 0 -0 0.3113</pose>
+      </model>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose>0 -0 0 0 -0 0</pose>
-    </model>
+    </model> -->
+    <!-- <plugin name='ros_interface_plugin' filename='librotors_gazebo_ros_interface_plugin.so'/>
+    <plugin name='gazebo_gt_plugin' filename='libgazebo_gt.so'/> -->
   </world>
 </sdf>
