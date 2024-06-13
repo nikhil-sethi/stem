@@ -57,6 +57,8 @@ void FUELInterface::cmdCallback(const quadrotor_msgs::PositionCommand msg){
     // pose.pose.orientation.z = quat.getZ();
     pos_target_msg_.header = msg.header;
     pos_target_msg_.type_mask = 0;
+    if (msg.trajectory_flag == 0)
+        pos_target_msg_.type_mask = 2552;    
     pos_target_msg_.position = msg.position;
     pos_target_msg_.velocity = msg.velocity;
     pos_target_msg_.acceleration_or_force = msg.acceleration;
@@ -68,6 +70,7 @@ void FUELInterface::cmdCallback(const quadrotor_msgs::PositionCommand msg){
 // looped function
 void FUELInterface::controllerExecution(){
     // keep this hear to use services from base class
+    
     // pose_pub_.publish(pose);
     pos_pub_.publish(pos_target_msg_);
 
