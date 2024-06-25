@@ -5,10 +5,17 @@ import numpy as np
 plt.style.use('ggplot')
 np.set_printoptions(linewidth=200, precision=3)
 
-MAX_ENTROPY = 1208686.75  # earthquake: 115703.375, mine:  1208686.75
-
 # load data for statistics
 world = "cave" 
+
+if world=="earthquake":
+    MAX_ENTROPY = 115703.375  # earthquake: 115703.375, cave:  1208686.75
+    lambda_min = 0.02 # detection threshold
+elif world=="cave":
+    MAX_ENTROPY = 1208686.75
+    lambda_min = 0.015 # detection threshold
+
+
 data_greedy = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/GREEDY")
 data_lkh = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/LKH")
 data_motsp = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS+AP")
@@ -36,22 +43,22 @@ ax1.tick_params(axis='y', labelsize=15)
 fig2, ax2 = plt.subplots()
 ax2.set_title("Class vs. Time in view ",fontsize=17,color="black")
 ax2.set_xlabel("Time in view (s)",fontsize=15,color="black")
-plot_tivs(ax2, data_greedy, 1, color="salmon") 
-plot_tivs(ax2, data_lkh, 2, color="green") 
-plot_tivs(ax2, data_motsp, 3, color="blue") 
+plot_tivs(ax2, data_greedy, 1, color="salmon", world=world) 
+plot_tivs(ax2, data_lkh, 2, color="green", world=world) 
+plot_tivs(ax2, data_motsp, 3, color="blue", world=world) 
 from matplotlib.lines import Line2D
 
 custom_lines = [Line2D([0], [0], color="lightsalmon", lw=4),
                 Line2D([0], [0], color="lightgreen", lw=4),
                 Line2D([0], [0], color="lightblue", lw=4)]
 
-ax2.legend(custom_lines, ['Greedy ($\mu \pm \sigma$)', 'LKH ($\mu \pm \sigma$)', 'MOTSP ($\mu \pm \sigma$)'],prop={'size': 15}, loc="lower right" )
+ax2.legend(custom_lines, ['Greedy ($\mu \pm \sigma$)', 'LKH ($\mu \pm \sigma$)', 'MOTSP ($\mu \pm \sigma$)'],prop={'size': 15}, loc="upper right" )
 
 
 # TARGET INFO
-print("Greedy stats" , *get_target_info_stat(data_greedy, threshold=0.02))
-print("LKH stats" , *get_target_info_stat(data_lkh, threshold=0.02)) 
-print("MOTSP stats" , *get_target_info_stat(data_motsp, threshold=0.02) )
+print("Greedy stats" , *get_target_info_stat(data_greedy, threshold=lambda_min, norm_factor=MAX_ENTROPY))
+print("LKH stats" , *get_target_info_stat(data_lkh, threshold=lambda_min, norm_factor=MAX_ENTROPY)) 
+print("MOTSP stats" , *get_target_info_stat(data_motsp, threshold=lambda_min, norm_factor=MAX_ENTROPY) )
 
 plt.show()
 

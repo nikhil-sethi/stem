@@ -4,14 +4,16 @@ import os
 import numpy as np
 from utils import get_target_info
 
-
-def plot_tivs(ax, data, j, threshold=0.02, color="red"):
+def plot_tivs(ax, data, j, threshold=0.02, color="red", world="earthquake", max_bars=3):
     tivs = np.array([np.sum(d[:, 6:]>threshold, axis=0) for d in data])
-    labels= ["human", "plant", "table", "carpet", "dog", "wall", "blood", "rubble", "flashlight"]
-    labels= ["human","flashlight","blood","rope","dog","radio"]
+    if world =="earthquake":
+        labels= ["human", "plant", "table", "carpet", "dog", "wall", "blood", "rubble", "flashlight"]
+    elif world =="cave":
+        labels= ["human","flashlight","blood","rope","dog","radio"]
+
     for i in range(len(labels)):
-        plot_error_strip(ax, tivs[:,i], j + 4*i+1, color)
-    ax.set_yticks(range(2,4*len(labels), 4))
+        plot_error_strip(ax, tivs[:,i], j + (max_bars+1)*i+1, color)
+    ax.set_yticks(range(2,(max_bars+1)*len(labels), (max_bars+1)))
     ax.set_yticklabels(labels,fontsize=15,color="black")
 
 def plot_semantic_on_wif(df, ax, label="human", color = "red", threshold = 0.02):
@@ -30,7 +32,7 @@ def plot_error_strip(ax, data, y_pos, color):
     box_right = mean + std_dev
     vsize = 0.4
     # Plot the 'box' which is actually a rectangle from mean-std_dev to mean+std_dev
-    ax.fill_betweenx([y_pos - vsize, y_pos + vsize], box_left, box_right, color='light'+color)
+    ax.fill_betweenx([y_pos - vsize, y_pos + vsize], box_left, box_right, color=color)
     
     # Plot the mean as a vertical line
     ax.plot([mean, mean], [y_pos - vsize, y_pos + vsize], color="gray", linestyle='-', linewidth=2)
@@ -49,6 +51,22 @@ def plot_info_gain(df, ax, color, label):
 
 
 def plot_mean_std(mean, std, ax, color, label):
-    ax.plot(range(1, len(mean) + 1), mean, color=color, label=label+' $\mu$')
-    ax.fill_between(range(1, len(mean) + 1), mean - std, mean + std, color='light'+color, alpha=0.5, label= label + ' $\sigma$')
+    ax.plot(range(1, len(mean) + 1), mean, color=color, label=label+' $\mu$', linewidth=2)
+    if color=="goldenrod":
+        std_color = "lemonchiffon"
+    elif color=="yellow":
+        std_color = "lemonchiffon"
+    elif color=="red":
+        std_color = "pink"
+    elif color=="darkorange":
+        std_color = "peachpuff"
+    elif color=="seagreen":
+        std_color = "turquoise"
+    elif color=="darkviolet":
+        std_color = "lavender"
+    elif color=="blue":
+        std_color = "lightskyblue"
+    else:
+        std_color = "light"+color
+    ax.fill_between(range(1, len(mean) + 1), mean - std, mean + std, color=std_color, alpha=0.5, label= label + ' $\sigma$')
 

@@ -2,8 +2,6 @@ import numpy as np
 import os
 import pandas as pd
 
-MAX_ENTROPY = 1208686.75  # earthquake: 115703.375, mine:  1208686.75
-
 def process_directory(directory):
     data = []
     minsize = 10000
@@ -23,26 +21,35 @@ def tolerant_mean(arrs):
     return arr.mean(axis = -1), arr.std(axis=-1)
 
 
-def get_target_info_stat(data, threshold=0.02, idx=6):
+def get_target_info_stat(data, threshold=0.02, idx=6, norm_factor = 115703.375):
     """Gives the mu and std of path_length, time, and energy"""
     info = []
     # info  = np.ma.masked()
     for eps in data:
         arr = []
         try:
-            target_idx = np.argwhere(eps[:,idx]>threshold)[0][0]
+            target_idx = np.argwhere(eps[:,idx]>=threshold)[0][0]
             arr.extend(eps[target_idx, 2:5]) # target: path length, time, energy
         except IndexError:
             arr.extend(np.ones(3)*-1)   
 
         arr.extend(eps[-1, 3:5]) # total: time, energy
-        arr.append(eps[-1, 5]/MAX_ENTROPY) # Relative WIG at episode end
+        arr.append(eps[-1, 5]/norm_factor) # Relative WIG at episode end
 
         info.append(arr)
 
-    info = np.ma.masked_equal(info, -1)
+    info = np.ma.masked_values(info, -1, shrink=False)
     success = np.sum(~info.mask[:,0])/info.shape[0]
-    return np.mean(info, axis=0), np.std(info, axis=0), success
+    mus = np.mean(info, axis=0)
+    stds = np.std(info, axis=0)
+    
+    mus[:-1] = np.round(mus[:-1], 1)
+    stds[:-1] = np.round(stds[:-1], 1)
+
+    mus[-1] = np.round(mus[-1], 3)
+    stds[-1] = np.round(stds[-1], 3)
+
+    return f"{success*100}%", mus, stds
 
 def get_target_info(df, threshold=0.02, label="human"):
     # area_threshold = 0.02   # can also include temporal consistency
