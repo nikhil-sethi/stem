@@ -160,7 +160,9 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/object_detection.py
-  src/aruco_segment.py
+  src/priority_mask.py
+  src/priority_mask_vsep.py
+  src/test_seg_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

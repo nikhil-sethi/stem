@@ -10,14 +10,15 @@ import numpy as np
 class PriorityMask:
     def __init__(self) -> None:
         rospy.init_node('aruco_segmenter', anonymous=True)
+        world = rospy.get_param("/world", "earthquake")
 
         # semantic segmentation pipeline (color -> labels)
         self.segmenter = ArUcoSegmenter()
 
         # priority inference
         # self.priority_map = SemanticPriorityMap()
-        self.priority_map = GTPriorityMap("human", context="mine", p_max=8)
-
+        self.priority_map = GTPriorityMap("human", context=world, p_max=8)
+        print(self.priority_map.priorities)
         # ROS
         self.bridge = CvBridge()
         self.rgb_image_sub = rospy.Subscriber("/camera/color/image_raw/compressed", CompressedImage, self.image_callback)

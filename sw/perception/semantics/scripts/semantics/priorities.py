@@ -81,6 +81,7 @@ class SemanticPriorityMap(BasePriorityMap):
         return np.round(priorities).astype(int)
 
 class GTPriorityMap(BasePriorityMap):
+    """Convenience lass for offline inferred values. Generated using SemanticPriorityMap """
     def __init__(self, target, context, p_max) -> None:
         super().__init__(target, context, p_max)
         # inferred from the semantic priority map for the human target, and stored offline for convenience
@@ -112,7 +113,7 @@ class GTPriorityMap(BasePriorityMap):
             #     "plant" :4
             # }
 
-        elif "mine" in context:
+        elif ("mine" in context) or ("cave" in context):
             self.priorities = [1, 8, 4, 4, 4, 4, 6, 4, 4, 6, 7, 6, 3, 3, 6, 3, 1, 3, 3, 3, 4, 4]                     
             # self.priority_map = {                     
                 #     "human": 8,

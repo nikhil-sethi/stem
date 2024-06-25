@@ -5,7 +5,7 @@ use_object_vpts: true
 use_diffusion: true
 
 # planning
-use_motsp: false
+use_motsp: true
 use_greedy_search: false # overrides all planning and becomes greedy for coverage/priorities
 
 # coverage vs. semantic priority
@@ -34,7 +34,7 @@ object_finder:
 target_planner:
   rmin: 0.3
   min_vpt_clearance: 0.3
-  min_info_gain: 25
+  min_info_gain: 40
 
 
 

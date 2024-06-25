@@ -1,10 +1,5 @@
 <launch>
-    <arg name="init_x"   default="0"/>
-    <arg name="init_y"   default="0"/>
-    <arg name="init_z"   default="0.05"/> 
-    <arg name="init_R"   default="0"/>
-    <arg name="init_P"   default="0"/>
-    <arg name="init_Y"   default="0"/> 
+
     <arg name="map_size_x" default="0"/>
     <arg name="map_size_y" default="5"/>
     <arg name="map_size_z" default="1.7"/>
@@ -15,6 +10,20 @@
     <arg name="sim_name" default="sitl"/>
     <arg name="vehicle" default="mantis_depth_vision"/>
     <arg name="world" default="amrlab"/>
+
+    <arg name="init_z"   default="0.05"/> 
+    <arg name="init_R"   default="0"/>
+    <arg name="init_P"   default="0"/>
+    
+    <!-- Custom starting location for the worlds -->
+    <arg if="$(eval world=='earthquake')" name="init_x"   default="-4.5"/>
+    <arg if="$(eval world=='earthquake')" name="init_y"   default="-4.5"/>
+    <arg if="$(eval world=='earthquake')" name="init_Y"   default="1.57"/> 
+
+    <arg if="$(eval world=='cave')" name="init_x"   default="0"/>
+    <arg if="$(eval world=='cave')" name="init_y"   default="0"/>
+    <arg if="$(eval world=='cave')" name="init_Y"   default="0"/> 
+
     <arg name="odometry_topic" default="/mavros/local_position/odom"/>
     
     <!-- enable for perfect odometry -->
@@ -29,6 +38,7 @@
     
     <!-- So that ros nodes can use it too -->
     <param name="sim" value="$(arg sim)"/>
+    <param name="world" value="$(arg world)"/>
     
     <!-- Default parameter file -->
     <rosparam command='load' file="$(find bringup)/config/default_params.yaml"/>
@@ -73,9 +83,10 @@
     </include>
     
     <!-- <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/> -->
-    <node ns="$(arg vehicle)" name="attention_map_2d" type="aruco_segment.py" pkg="semantics" output="screen" required="true"/>
+    <node name="priority_mask_node" type="priority_mask.py" pkg="semantics" output="screen" required="true"/>
     <!-- <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/> -->
-    <include file="$(find bringup)/rviz.launch"/>
+    <!-- <include file="$(find bringup)/rviz.launch"/> -->
     <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
     <node name="metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/>
+    <node name="color_cloud" type="repub_node" pkg="gazebo_gt" required="false" output="screen"/>
 </launch>

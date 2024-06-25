@@ -88,6 +88,7 @@ void FUELInterface::sensorPoseTimer(const ros::TimerEvent& event){
     geometry_msgs::TransformStamped tfGeom;
     try {
         tfGeom = buffer.lookupTransform("map", "camera_link", ros::Time(0), ros::Duration(4.0));
+        // tfGeom = buffer.lookupTransform("navigation", "firefly/vi_sensor/camera_depth_optical_center_link", ros::Time(0), ros::Duration(4.0));
     } catch (tf2::TransformException &e) {
         ROS_ERROR("Cant find transform");
     }
