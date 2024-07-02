@@ -58,7 +58,7 @@ frontier:
   # lower values mean we have a lot of viewpoints even in small places
   # higher values means we are conservative about what a viewpoint sees
   # also depends a lot on your map resolution
-  min_visib_num: 10
+  min_visib_num: 20
   
   # % change that must happen for the frontier to call for recompute
   # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate

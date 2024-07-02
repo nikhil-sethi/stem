@@ -1,0 +1,39 @@
+<!-- DO NOT EDIT: Generated from depth_camera.sdf.jinja -->
+<sdf version="1.5">
+  <model name="camera_fov">
+    <pose>0 0 0.0 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <pose>0.01 0.025 0.025 0 0 0</pose>
+        <mass>0.00001</mass>
+        <inertia>
+          <ixx>4.15e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.407e-6</iyy>
+          <iyz>0</iyz>
+          <izz>2.407e-6</izz>
+        </inertia>
+      </inertial>
+      <light name='user_spot_light_0' type='spot'>
+        <pose>0.0 0 0.0 0 -1.57 0</pose>
+        <diffuse>0.5 0.5 0.5 1</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+        <direction>0 0 -1</direction>
+        <attenuation>
+          <range>0</range>
+          <constant>0.5</constant>
+          <linear>0.01</linear>
+          <quadratic>0.001</quadratic>
+        </attenuation>
+        <cast_shadows>0</cast_shadows>
+        <spot>
+          <inner_angle>1</inner_angle>
+          <outer_angle>1</outer_angle>
+          <falloff>3</falloff>
+        </spot>
+        <visualize>0</visualize>
+      </light>
+    </link>
+  </model>
+</sdf>

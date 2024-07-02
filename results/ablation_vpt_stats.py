@@ -44,16 +44,16 @@ ax1.tick_params(axis='y', labelsize=15)
 fig2, ax2 = plt.subplots()
 ax2.set_title("Class vs. Time in view ",fontsize=17,color="black")
 ax2.set_xlabel("Time in view (s)",fontsize=15,color="black")
-plot_tivs(ax2, data_frontier, 1, color="salmon", world=world) 
-plot_tivs(ax2, data_ss, 2, color="green", world=world) 
-plot_tivs(ax2, data_ss_ap, 3, color="blue", world=world) 
+plot_tivs(ax2, data_frontier, 1,color="lightsalmon",max_bars=3, world=world) 
+plot_tivs(ax2, data_ss, 2,color="lightcoral",max_bars=3, world=world) 
+plot_tivs(ax2, data_ss_ap, 3,color="lightskyblue",max_bars=3, world=world) 
 from matplotlib.lines import Line2D
 
 custom_lines = [Line2D([0], [0], color="lightsalmon", lw=4),
-                Line2D([0], [0], color="lightgreen", lw=4),
-                Line2D([0], [0], color="lightblue", lw=4)]
+                Line2D([0], [0], color="lightcoral", lw=4),
+                Line2D([0], [0], color="lightskyblue", lw=4)]
 
-ax2.legend(custom_lines, ['COVERAGE ($\mu \pm \sigma$)', 'SS ($\mu \pm \sigma$)', 'SS+AP ($\mu \pm \sigma$)'],prop={'size': 15}, loc="lower right" )
+ax2.legend(custom_lines, ['COVERAGE ($\mu \pm \sigma$)', 'SS ($\mu \pm \sigma$)', 'SS+AP ($\mu \pm \sigma$)'],prop={'size': 15}, loc="center right" )
 
 # NUMBER stats
 

@@ -142,7 +142,7 @@ class GTPriorityMap(BasePriorityMap):
                 # }
 
         self.priorities.insert(0, 0) #  0 means empty space. just to sit right with label numbering.
-        self.priorities.insert(1, p_max) # manually add max priority for the target. human in this hardcode. not included in inference because it skews distribution
+        self.priorities.insert(1, p_max) # manually add max priority for the target. human in this hardcode. not included in inference because it skews distribution. Does not affect anything, just convenience to get a better spread.
 
         self.priorities = np.array(self.priorities)
 

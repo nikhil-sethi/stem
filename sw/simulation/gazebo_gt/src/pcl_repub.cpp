@@ -36,13 +36,13 @@ void repubPclTimer(const ros::TimerEvent& e){
     // filter to save memory
     pcl::VoxelGrid<pcl::PointXYZRGB> sor;
     sor.setInputCloud (pcl_cloud);
-    sor.setLeafSize (0.05f, 0.05f, 0.05f);
+    sor.setLeafSize (0.02f, 0.02f, 0.02f);
     sor.filter (*pcl_cloud);
     
     pcl::PassThrough<pcl::PointXYZRGB> pass;
     pass.setInputCloud (pcl_cloud);
     pass.setFilterFieldName ("y");
-    pass.setFilterLimits (-5.0, 1);
+    pass.setFilterLimits (-0.0, 1);
     //pass.setNegative (true);
     pass.filter (*pcl_cloud);
 
@@ -54,6 +54,7 @@ void repubPclTimer(const ros::TimerEvent& e){
         if (norm(point)>3)
             continue;
         point.rgb = bgr_to_rgb(point.rgb);
+        if (point.rgb==0.0f) continue;
         pcl_cloud_filtered->push_back(point);
     }
 
