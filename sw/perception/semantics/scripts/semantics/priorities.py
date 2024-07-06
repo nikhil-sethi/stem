@@ -140,6 +140,33 @@ class GTPriorityMap(BasePriorityMap):
                 #     "carpet":4,
                 #     "plant" :4,
                 # }
+        elif "amrlab" in context:
+            self.priorities = [1, 8, 4, 7, 4, 4, 6, 4, 4, 6, 7, 6, 3, 3, 6, 3, 1, 3, 3, 3, 4, 4]                     
+            # self.priority_map = {                     
+                #     "human": 8,
+                #     "helmet":1,
+                #     "blood":8,
+                #     "chair":4,
+                #     "table":7,
+                #     "gun":4,
+                #     "drill":4,
+                #     "phone":6,
+                #     "rubble":4,
+                #     "flashlight":4,
+                #     "radio":6,
+                #     "dog":7,
+                #     "worker":6,
+                #     "knife":3,
+                #     "wall":3,
+                #     "ground":6,
+                #     "toy":3,
+                #     "ball":1,
+                #     "rope":3,
+                #     "headphones":3,
+                #     "sofa":3,
+                #     "carpet":4,
+                #     "plant" :4,
+                # }
 
         self.priorities.insert(0, 0) #  0 means empty space. just to sit right with label numbering.
         self.priorities.insert(1, p_max) # manually add max priority for the target. human in this hardcode. not included in inference because it skews distribution. Does not affect anything, just convenience to get a better spread.

@@ -3,8 +3,8 @@ define: &max_acc 0.5
 
 sdf_map:
   resolution: 0.1
-  map_size_x: 5
-  map_size_y: 5
+  map_size_x: 7
+  map_size_y: 7
   map_size_z: 1.7
   ground_height: -0.2
   p_hit: 0.68
@@ -12,11 +12,11 @@ sdf_map:
   p_min: 0.12
   p_max: 0.99
   p_occ: 0.7
-  box_min_x: -2.5
-  box_min_y: -2.5
+  box_min_x: -3.5
+  box_min_y: -3.5
   box_min_z:  -0.1
-  box_max_x: 2.5
-  box_max_y: 2.5
+  box_max_x: 3.5
+  box_max_y: 3.5
   box_max_z: 1.6
 
 
@@ -61,7 +61,7 @@ frontier:
   # lower values mean we have a lot of viewpoints even in small places
   # higher values means we are conservative about what a viewpoint sees
   # also depends a lot on your map resolution
-  min_visib_num: 20
+  min_visib_num: 10
   
   # % change that must happen for the frontier to call for recompute
   # Low values mean that we moved along very fast across the space, considering even a small changed to be enough to reevaluate

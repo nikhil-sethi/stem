@@ -5,7 +5,7 @@ loop_frequency: 50
 lab_bounds: [100, 100, 3]
 
 # Distance threshold for reaching a desired position
-dist_thres: 0.1
+dist_thres: 0.2
 
 # Desired positions in 3D space
 pos:
