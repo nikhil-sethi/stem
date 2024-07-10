@@ -168,7 +168,6 @@ target_link_libraries(wig_vsep_node
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/metrics_node.py
-  src/metrics_vsep_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

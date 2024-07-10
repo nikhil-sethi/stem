@@ -8,14 +8,14 @@ plt.style.use('ggplot')
 np.set_printoptions(linewidth=200, precision=3)
 
 # load data for statistics
-world = "cave" 
+world = "earthquake" 
 
 if world=="earthquake":
     MAX_ENTROPY = 115703.375  # earthquake: 115703.375, cave:  1208686.75
-    lambda_min = 0.02 # detection threshold
+    lambda_min = 0.01 # detection threshold
 elif world=="cave":
     MAX_ENTROPY = 1208686.75
-    lambda_min = 0.015 # detection threshold
+    lambda_min = 0.01 # detection threshold
 
 data_fuel = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL")
 data_fuel_f0_i10 = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL_MOD")

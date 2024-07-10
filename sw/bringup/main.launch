@@ -19,6 +19,10 @@
     <arg name="init_P"   default="0"/>
     
     <!-- Custom starting location for the worlds -->
+    <arg if="$(eval world=='amrlab')" name="init_x"   default="0"/>
+    <arg if="$(eval world=='amrlab')" name="init_y"   default="0"/>
+    <arg if="$(eval world=='amrlab')" name="init_Y"   default="0"/> 
+
     <arg if="$(eval world=='earthquake')" name="init_x"   default="-4.5"/>
     <arg if="$(eval world=='earthquake')" name="init_y"   default="-4.5"/>
     <arg if="$(eval world=='earthquake')" name="init_Y"   default="1.57"/> 
@@ -35,7 +39,7 @@
     <arg name="sensor_pose_topic" default="/camera/pose"/>
     <!-- <arg if="$(eval sim_name=='perfect')" name="odometry_topic" value="/state_ukf/odom_1"/> -->
 
-    <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/> 
+    <arg name="depth_topic" value="/camera/depth/image_rect_raw/compressed"/> 
     <!-- <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>  -->
     <!-- <arg name="depth_topic" value="/camera/aligned_depth_to_color/filled"/>  -->
     

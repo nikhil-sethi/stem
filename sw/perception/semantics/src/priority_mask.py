@@ -6,6 +6,8 @@ from cv_bridge import CvBridge, CvBridgeError
 from semantics.segmentation_pipelines import ArUcoSegmenter
 from semantics.priorities import GTPriorityMap
 import numpy as np
+import cv2
+import time
 
 class PriorityMask:
     def __init__(self) -> None:
@@ -22,7 +24,7 @@ class PriorityMask:
         # ROS
         self.bridge = CvBridge()
         self.rgb_image_sub = rospy.Subscriber("/camera/color/image_raw/compressed", CompressedImage, self.image_callback)
-        self.priority_mask_pub = rospy.Publisher("/priority_mask/compressed", CompressedImage, queue_size=10)
+        self.priority_mask_pub = rospy.Publisher("/priority_mask/compressed", CompressedImage, queue_size=1)
 
     def image_callback(self, msg):
         try:
@@ -34,11 +36,21 @@ class PriorityMask:
             return
 
         seg_img = self.segmenter.segment(cv_image_bgr)
-        # print(seg_img.max())
         priority_mask_img = self.priority_map.priorities[seg_img] # pixelwise integer labels -> integer priorities
-        # print(np.unique(priority_mask_img))
-        self.publish_img(priority_mask_img*255/self.priority_map.p_max, header)
+        # start = time.perf_counter()
+        # priority_mask_img = np.zeros(cv_image_bgr.shape[:-1])
 
+        # cv_image_bgr = cv2.cvtColor(cv_image_bgr, cv2.COLOR_RGB2HSV_FULL)
+        # cv_image_bgr[cv_image_bgr[:,:,2]<40]=0
+        # cv_image_bgr[cv_image_bgr[:,:,1]>250]=0
+
+        # hue_channel = cv_image_bgr[:,:,0]
+        # priority_mask_img[hue_channel>160] = 8
+        # priority_mask_img[(hue_channel>150) * (hue_channel<160)] = 7
+        # priority_mask_img[(hue_channel>60) * (hue_channel<100)] = 5
+        # priority_mask_img[(hue_channel>30) * (hue_channel<60)] = 3
+        # print(time.perf_counter()-start)
+        self.publish_img(priority_mask_img*255/self.priority_map.p_max, header)
 
     def publish_img(self, img, header):
          # Publish the segmented image
