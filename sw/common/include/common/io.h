@@ -7,7 +7,7 @@
 
 #include <vector>
 
-Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+inline Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 template<typename T>
 inline void print(const std::vector<T>& vec){
     if (!vec.empty()){

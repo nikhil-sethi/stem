@@ -1,34 +1,32 @@
 <launch>
     <arg name="sim" default="true"/>
     <!-- size of map, change the size in x, y, z according to your application -->
-    <arg name="map_size_x" default="50.0"/>
-    <arg name="map_size_y" default="50.0"/>
-    <arg name="map_size_z" default=" 10.0"/>
-  
-    <arg name="init_x" default="0"/>
-    <arg name="init_y" default="0"/>
+    <arg name="map_size_x" default="5.0"/>
+    <arg name="map_size_y" default="5.0"/>
+    <arg name="map_size_z" default=" 1.7"/>
+
+    <arg name="init_x" default="-2"/>
+    <arg name="init_y" default="-1"/>
     <arg name="init_z" default="1.0"/> 
-  
+
     <!-- topic of your odometry such as VIO or LIO -->
-    <arg name="odometry_topic" default="/state_ukf/odom" />
-    <arg name="sensor_pose_topic" default="/state_ukf/odom" />
-    <arg name="depth_topic" default="/state_ukf/odom" />
+    <arg name="odometry_topic" default="/mavros/local_position/odom" />
+    <arg name="sensor_pose_topic" default="/camera/pose" />
+    <arg name="depth_topic" default="/camera/depth/image_rect_raw" />
   
     <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
     <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
 
     <!-- main algorithm params -->
-    
-    <node pkg="exploration_manager" name="exploration_node" type="exploration_node" output="log">
-      <rosparam command="load" file="$(find bringup)/config/fuel_algo.yaml"/>
-      
+    <!-- <rosparam command='load' file="$(find bringup)/config/fuel_default.yaml"/> -->
+    <node pkg="exploration_manager" name="exploration_node" type="exploration_node" output="screen">      
       <!-- Some important remaps -->
       <remap from ="/odom_world" to="$(arg odometry_topic)"/>
       <remap from ="/map_ros/pose"   to = "$(arg sensor_pose_topic)"/> 
       <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
       
       <!-- Need a redefine to give custom path -->
-      <param name ="~exploration/tsp_dir" value="$(find lkh_tsp_solver)/resource"/>
+      <param name ="~exploration/tsp_dir" value="/root/thesis_ws/src/thesis/sw/bringup/resource"/>
 
     </node>
 

@@ -1,0 +1,18 @@
+sdf_map:
+  resolution: 0.1
+  map_size_x: 10 # 11
+  map_size_y: 15 # 11
+  map_size_z: 2
+  ground_height: 0
+  default_dist: 0.0
+  p_hit: 0.68
+  p_miss: 0.47  # 0.47 works best in sim. Higher values we are more liberal, so there are more false positives as well
+  p_min: 0.12
+  p_max: 0.99
+  p_occ: 0.7 # keep this lower if there is a lot of noise. But higher values also might lead to more false positives
+  box_min_x: -0.5 #-5.5
+  box_min_y: -7.5 #-5.5
+  box_max_x:  9.5 #5.5
+  box_max_y:  7.5 #5.5
+  box_min_z:  -0.0
+  box_max_z: 2

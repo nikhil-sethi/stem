@@ -91,7 +91,7 @@ class RacerInterface(BaseInterface):
         self.planner = RacerPlanner(start_pose = self.start_pose)
         # self.planner = KeyboardPlanner(start_pose = self.start_pose)  # enable this if you want all planning to happen but use control yourself
         self.sensor_pose_publisher = rospy.Publisher(f"camera/pose", PoseStamped, queue_size=1)
-        self.sensor_pose_timer = rospy.Timer(rospy.Duration(0.01), self.sensor_pose_cb)
+        self.sensor_pose_timer = rospy.Timer(rospy.Duration(0.05), self.sensor_pose_cb)
 
         self.trigger = rospy.Publisher(f"/move_base_simple/goal", PoseStamped, queue_size=1)
 

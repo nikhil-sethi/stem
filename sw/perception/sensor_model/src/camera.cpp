@@ -3,11 +3,11 @@
 #include <common/io.h>
 Camera::Camera(const ros::NodeHandle& nh){
     // get these from the parameter server later on
-    fx_ = 454;
-    fy_ = 454;
+    fx_ = 427.75729;
+    fy_ = 427.75729;
     height_ = 480;
     width_ = 848;
-    tol = 0.9;
+    tol = 1;
     AR_ = width_/height_;
 
     tf2_ros::Buffer tfBuffer;
@@ -63,7 +63,7 @@ bool Camera::arePtsInView(const std::vector<Eigen::Vector3d>& points_cam){
 }
 
 
-/* in place transform from frame_from to frame_to */
+/* transform using T as rotation matrix */
 void Camera::transform(const std::vector<Eigen::Vector3d>& points,std::vector<Eigen::Vector3d>& points_transformed, const Eigen::Isometry3d& t){
     for (uint i=0; i<points.size(); ++i){
         points_transformed[i] = t*points[i];
