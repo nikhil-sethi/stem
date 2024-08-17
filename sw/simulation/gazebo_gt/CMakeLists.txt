@@ -187,6 +187,7 @@ target_link_libraries(repub_node
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/gazebo_repub.py
+  src/marker_to_pcl.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

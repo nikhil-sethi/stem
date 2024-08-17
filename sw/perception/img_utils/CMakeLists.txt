@@ -14,6 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   roscpp
   sensor_msgs
+  image_transport
+  compressed_depth_image_transport
   cv_bridge
 )
 
@@ -139,6 +141,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(depth_compress_node src/depth_compress.cpp)
+add_executable(test2_node src/test2.cpp)
+add_executable(test_node src/test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -154,6 +158,15 @@ add_executable(depth_compress_node src/depth_compress.cpp)
 target_link_libraries(depth_compress_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
+)
+target_link_libraries(test2_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+target_link_libraries(test_node
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  avcodec avformat avutil swscale
 )
 
 #############
