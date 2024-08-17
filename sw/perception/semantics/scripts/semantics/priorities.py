@@ -12,7 +12,7 @@ class BasePriorityMap():
     def __init__(self, target, context, p_max) -> None:
         self.target = target
         self.situation = context
-        self.label_map = create_label_map("/root/thesis_ws/src/thesis/sw/perception/semantics/src/labels.txt")
+        self.label_map = create_label_map("/root/thesis_ws/src/thesis/sw/perception/semantics/src/labels.txt") # make this relative later on
         self.objects = list(self.label_map.keys())
         self.p_max = p_max
         self.p_min = 1 # exploration baseline
@@ -81,7 +81,7 @@ class SemanticPriorityMap(BasePriorityMap):
         return np.round(priorities).astype(int)
 
 class GTPriorityMap(BasePriorityMap):
-    """Convenience lass for offline inferred values. Generated using SemanticPriorityMap """
+    """Convenience class for offline inferred values. Generated using SemanticPriorityMap """
     def __init__(self, target, context, p_max) -> None:
         super().__init__(target, context, p_max)
         # inferred from the semantic priority map for the human target, and stored offline for convenience
@@ -141,7 +141,7 @@ class GTPriorityMap(BasePriorityMap):
                 #     "plant" :4,
                 # }
         elif "amrlab" in context:
-            self.priorities = [1, 8, 4, 7, 4, 4, 6, 4, 4, 6, 7, 6, 3, 3, 6, 3, 1, 3, 3, 3, 4, 4]                     
+            self.priorities = [1, 8, 5, 8, 4, 4, 6, 4, 4, 6, 7, 6, 3, 3, 6, 3, 1, 3, 3, 3, 4, 4]                     
             # self.priority_map = {                     
                 #     "human": 8,
                 #     "helmet":1,

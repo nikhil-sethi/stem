@@ -1986,7 +1986,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>11.3026 11.0116 0.051385</size>
+            <size>13 13 0.051385</size>
           </box>
         </geometry>
         <material>

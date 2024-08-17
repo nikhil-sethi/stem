@@ -269,7 +269,7 @@
             <ambient>0 0 0 1</ambient>
             <diffuse>0 0 0 1</diffuse>
             <specular>0 0 0 1</specular>
-            <emissive>0.08 0.93 0.98 1</emissive> 21 238 251
+            <emissive>0.08 0.93 0.98 1</emissive>
             <shader type='vertex'>
               <normal_map>__default__</normal_map>
             </shader>
@@ -282,61 +282,65 @@
       <pose>-0.724136 0.539068 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
+      <sim_time>388 502000000</sim_time>
+      <real_time>137 167907446</real_time>
+      <wall_time>1722762082 350556223</wall_time>
+      <iterations>136668</iterations>
       <model name='coffee_spill'>
-        <pose>-1.37956 1.77734 0.4 0 -0 0</pose>
+        <pose>-1.7385 2.88382 0.1 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link_0'>
-          <pose>-1.37956 1.77734 0.1 0 -0 0</pose>
+          <pose>-1.7385 2.88382 0.1 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='coffee_spill_clone'>
-        <pose>-1.14303 1.48878 0.4 0 -0 0</pose>
+        <pose>-1.41452 2.60939 0.1 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link_0'>
-          <pose>-1.14303 1.48878 0.1 0 -0 0</pose>
+          <pose>-1.41452 2.60939 0.1 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='dog'>
-        <pose>-0.817538 2.64966 0.008139 -0.005324 0.012329 0.484917</pose>
+        <pose>-0.142714 3.49199 0.003838 -0.009734 0.009252 0.081817</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose>-0.817538 2.64966 0.008139 -0.005324 0.012329 0.484917</pose>
+          <pose>-0.142714 3.49199 0.003838 -0.009734 0.009252 0.081817</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='nist_elevated_floor_120'>
-        <pose>0.558186 2.79551 0.05 0 0 -0.895087</pose>
+        <pose>1.34116 3.30757 0 0 0 -0.895087</pose>
         <scale>1 1 1</scale>
         <link name='nist_elevated_floor_120'>
-          <pose>0.558186 2.79551 0 0 0 -0.895087</pose>
+          <pose>1.34116 3.30757 0 0 0 -0.895087</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='person_standing'>
-        <pose>-2.12049 0.284879 0.05 -1.56603 0.081304 -0.432906</pose>
+        <pose>-2.68438 1.60888 0.168293 -1.56603 0.081304 -0.432906</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose>-2.12049 0.284879 0.040268 -1.56603 0.081304 -0.432906</pose>
+          <pose>-2.68438 1.60888 0.168293 -1.56603 0.081304 -0.432906</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='unit_box'>
-        <pose>-3.49873 6.31303 -0.031138 0.004609 -1e-06 -0.140785</pose>
+        <pose>-0.121998 0.242056 -0.031138 0.004609 -1e-06 -0.140785</pose>
         <scale>3.86814 3.86814 3.86814</scale>
         <link name='link'>
-          <pose>-3.49873 6.31303 -0.031138 0.004609 -1e-06 -0.140785</pose>
+          <pose>-0.121998 0.242056 -0.031138 0.004609 -1e-06 -0.140785</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -345,7 +349,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>2.54444 -2.9269 6.13972 0 0.562455 1.94734</pose>
+        <pose>3.48534 -1.32613 14.1831 0 1.1978 2.27533</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

@@ -6,22 +6,26 @@ from utils import get_target_info
 
 def plot_tivs(ax, data, j, threshold=0.02, color="red", world="earthquake", max_bars=3):
     tivs = np.array([np.sum(d[:, 6:]>threshold, axis=0) for d in data])
+    # print(data[0])
     if world =="earthquake":
-        labels= ["human", "plant", "table", "carpet", "dog", "wall", "blood", "rubble", "flashlight"]
+        # labels= ["human", "plant", "table", "carpet", "dog", "wall", "blood", "rubble", "flashlight"]
+        labels= ["plant", "carpet", "table", "rubble", "dog", "blood", "human"]
+        label_idx = [1, 3, 2, 7, 4, 6, 0]
     elif world =="cave":
-        labels= ["human","flashlight","blood","rope","dog","radio"]
+        labels= ["rope","flashlight","radio","dog","blood","human"]
 
     for i in range(len(labels)):
-        plot_error_strip(ax, tivs[:,i], j + (max_bars+1)*i+1, color)
+        plot_error_strip(ax, tivs[:,label_idx[i]], j + (max_bars+1)*i+1, color)
     ax.set_yticks(range(2,(max_bars+1)*len(labels), (max_bars+1)))
     ax.set_yticklabels(labels,fontsize=15,color="black")
 
 def plot_semantic_on_wif(df, ax, label="human", color = "red", threshold = 0.02):
     target_info = get_target_info(df)
-    idx, time, _, _ = target_info
     if target_info:
-        ax.plot(time.values, df["wif"][idx.index].values, color=color, marker="o", markersize=6, label="Target detections")
-        ax.vlines(time.values, 0, df["wif"][idx.index].values, color="darkgray")
+        idx, time, _, _ = target_info
+        # print(df["wif"][idx.index].values)
+        ax.plot(df["time"][idx.index].values, df["wif"][idx.index].values, color=color, marker="o", markersize=6, label="Target detections")
+        ax.vlines(df["time"][idx.index].values, 0, df["wif"][idx.index].values, color="darkgray")
      
 def plot_error_strip(ax, data, y_pos, color):
     mean = np.mean(data)
@@ -51,7 +55,8 @@ def plot_info_gain(df, ax, color, label):
 
 
 def plot_mean_std(mean, std, ax, color, label):
-    ax.plot(range(1, len(mean) + 1), mean, color=color, label=label+' $\mu$', linewidth=2)
+    ax.plot(range(1, len(mean) + 1), mean, color=color,  linewidth=2)
+    ax.plot(len(mean), mean[-1], color=color, markersize=5, marker="o", label=label+" $I^w_{t_f}$",linestyle='None')
     if color=="goldenrod":
         std_color = "lemonchiffon"
     elif color=="yellow":
@@ -68,5 +73,5 @@ def plot_mean_std(mean, std, ax, color, label):
         std_color = "lightskyblue"
     else:
         std_color = "light"+color
-    ax.fill_between(range(1, len(mean) + 1), mean - std, mean + std, color=std_color, alpha=0.5, label= label + ' $\sigma$')
+    ax.fill_between(range(1, len(mean) + 1), mean - std, mean + std, color=std_color, alpha=0.5, label= label + ' ($\mu \pm \sigma$)')
 

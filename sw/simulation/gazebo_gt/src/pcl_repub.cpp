@@ -30,6 +30,9 @@ float bgr_to_rgb(float bgr){
 }
 
 void repubPclTimer(const ros::TimerEvent& e){
+    /*
+    Filters point cloud, recolorizes it, removes invalid points and republishes at a slower rate. Need this for cumulative map display in rviz
+    */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
     pcl::fromROSMsg(cloud_msg, *pcl_cloud);
     
@@ -51,10 +54,10 @@ void repubPclTimer(const ros::TimerEvent& e){
 
     // reorder global cloud's rgb channels
     for (auto& point: pcl_cloud->points){
-        if (norm(point)>3)
+        if (norm(point)>3) // dont need points outside sensor range
             continue;
         point.rgb = bgr_to_rgb(point.rgb);
-        if (point.rgb==0.0f) continue;
+        if (point.rgb==0.0f) continue; // remove black (only when simulating segmentation)
         pcl_cloud_filtered->push_back(point);
     }
 
@@ -62,7 +65,7 @@ void repubPclTimer(const ros::TimerEvent& e){
     sensor_msgs::PointCloud2 repub_msg;
     pcl::toROSMsg(*pcl_cloud_filtered, repub_msg);
     repub_msg.header = cloud_msg.header;
-    // repub_msg.header.frame_id = "firefly/vi_sensor/camera_depth_optical_center_link"; // uncommend this for vsep
+    // repub_msg.header.frame_id = "firefly/vi_sensor/camera_depth_optical_center_link"; // uncomment this for vsep
     repub_msg.height = pcl_cloud_filtered->height;
     repub_msg.width = pcl_cloud_filtered->width;
     // repub_msg.is_dense = cloud_msg.is_dense;

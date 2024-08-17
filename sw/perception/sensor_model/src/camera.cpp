@@ -63,7 +63,7 @@ bool Camera::arePtsInView(const std::vector<Eigen::Vector3d>& points_cam){
 }
 
 
-/* in place transform from frame_from to frame_to */
+/* transform using T as rotation matrix */
 void Camera::transform(const std::vector<Eigen::Vector3d>& points,std::vector<Eigen::Vector3d>& points_transformed, const Eigen::Isometry3d& t){
     for (uint i=0; i<points.size(); ++i){
         points_transformed[i] = t*points[i];

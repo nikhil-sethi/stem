@@ -39,13 +39,15 @@
     <arg name="sensor_pose_topic" default="/camera/pose"/>
     <!-- <arg if="$(eval sim_name=='perfect')" name="odometry_topic" value="/state_ukf/odom_1"/> -->
 
-    <arg name="depth_topic" value="/camera/depth/image_rect_raw/compressed"/> 
-    <!-- <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>  -->
+    <arg unless="$(arg sim)" name="depth_topic" value="/camera/depth/image_rect_raw/compressed"/> 
+    <arg if="$(arg sim)" name="depth_topic" value="/camera/depth/image_raw/compressed"/> 
     <!-- <arg name="depth_topic" value="/camera/aligned_depth_to_color/filled"/>  -->
     
     <!-- So that ros nodes can use it too -->
     <param name="sim" value="$(arg sim)"/>
     <param name="world" value="$(arg world)"/>
+    <param name="/camera/depth/image_raw/compressed/format" value="png"/>
+    <param name="/camera/depth/image_raw/compressed/png_level" value="5"/>
     
     <!-- Default parameter file -->
     <rosparam command='load' file="$(find bringup)/config/default_params.yaml"/>
@@ -91,8 +93,8 @@
     
     <!-- <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/> -->
     <node name="priority_mask_node" type="priority_mask.py" pkg="semantics" output="screen" required="true"/>
-    <!-- <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/> -->
-    <include file="$(find bringup)/rviz.launch"/>
+    <node if="$(arg sim)" name="depth_compress" type="depth_compress_node" pkg="img_utils" output="screen" required="true"/>
+    <!-- <include file="$(find bringup)/rviz.launch"/> -->
     <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
     <!-- <node name="metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/> -->
     <node if="$(arg sim)" name="color_cloud" type="repub_node" pkg="gazebo_gt" required="false" output="screen"/>

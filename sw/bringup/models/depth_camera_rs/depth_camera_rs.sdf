@@ -45,7 +45,7 @@
           <pointCloudCutoffMax>20</pointCloudCutoffMax>
           <imageTopicName>color/image_raw</imageTopicName>
           <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
-          <depthImageTopicName>aligned_depth_to_color/image_raw</depthImageTopicName>
+          <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
           <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
           <pointCloudTopicName>depth/points</pointCloudTopicName>
           <frameName>camera_link</frameName>
@@ -54,7 +54,8 @@
           <distortion_k3>0.0</distortion_k3>
           <distortion_t1>0.0</distortion_t1>
           <distortion_t2>0.0</distortion_t2>
-        </plugin></sensor>
+        </plugin>
+      </sensor>
     </link>
   </model>
 </sdf>

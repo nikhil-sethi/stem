@@ -12,10 +12,10 @@ world = "earthquake"
 
 if world=="earthquake":
     MAX_ENTROPY = 115703.375  # earthquake: 115703.375, cave:  1208686.75
-    lambda_min = 0.01 # detection threshold
+    lambda_min = 0.02 # detection threshold
 elif world=="cave":
     MAX_ENTROPY = 1208686.75
-    lambda_min = 0.01 # detection threshold
+    lambda_min = 0.02 # detection threshold
 
 data_fuel = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL")
 data_fuel_f0_i10 = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL_MOD")
@@ -31,7 +31,7 @@ mu_wif_ss_ap, std_wif_ss_ap =  get_mean_std(data_ss_ap, idx=5)
 # INFORMATION GAIN
 fig, ax1 = plt.subplots()
 plot_mean_std(mu_wif_fuel/MAX_ENTROPY, std_wif_fuel/MAX_ENTROPY, ax1, color="green", label="FUEL")
-plot_mean_std(mu_wif_fuel_f0_i10/MAX_ENTROPY, std_wif_fuel_f0_i10/MAX_ENTROPY, ax1, color="darkorange", label="FUEL-mod")
+plot_mean_std(mu_wif_fuel_f0_i10/MAX_ENTROPY, std_wif_fuel_f0_i10/MAX_ENTROPY, ax1, color="darkorange", label="FUEL-complete")
 plot_mean_std(mu_wif_vsep/MAX_ENTROPY, std_wif_vsep/MAX_ENTROPY, ax1, color="red", label="VSEP")
 plot_mean_std(mu_wif_ss_ap/MAX_ENTROPY, std_wif_ss_ap/MAX_ENTROPY, ax1, color="blue", label="Ours")
 ax1.set_title("Weighted information gain vs. Time(s)", fontsize=17)
@@ -58,7 +58,7 @@ custom_lines = [Line2D([0], [0], color="lightgreen", lw=6),
                 Line2D([0], [0], color="lightcoral", lw=6),
                 Line2D([0], [0], color="lightskyblue", lw=6)]
 
-ax2.legend(custom_lines, ['FUEL ($\mu \pm \sigma$)','FUEL-mod ($\mu \pm \sigma$)', 'VSEP ($\mu \pm \sigma$)', 'Ours ($\mu \pm \sigma$)'],prop={'size': 15}, loc="center right" )
+ax2.legend(custom_lines, ['FUEL ($\mu \pm \sigma$)','FUEL-complete ($\mu \pm \sigma$)', 'VSEP ($\mu \pm \sigma$)', 'Ours ($\mu \pm \sigma$)'],prop={'size': 15}, loc="lower right" )
 
 # NUMBER stats
 

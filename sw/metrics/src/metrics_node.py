@@ -33,7 +33,7 @@ class Metrics:
         else:
             self.relevant_classes = ["human", "flashlight", "blood", "rope", "dog", "radio"] # only do segmentation area calc for these classes. just for compute saving
         
-        self.label_map = create_label_map("/root/thesis_ws/src/thesis/sw/perception/semantics/src/labels.txt") # classes -> ids
+        self.label_map = create_label_map("/root/thesis_ws/src/thesis/sw/perception/semantics/src/labels.txt") # classes -> ids  TODO make path relative
         print(self.label_map)
 
         self.is_vsep_comparison = False # make true when comparing to VSEP
@@ -103,7 +103,7 @@ class Metrics:
             cls_area = (seg_img == label).sum()/self.num_pixels 
             if cls=="human" and cls_area>0.02:
                 print(f"Target found! time: {traj_info_msg.data[1]}, path_length:{traj_info_msg.data[0]}")
-                # rospy.signal_shutdown("Target found")
+                rospy.signal_shutdown("Target found")
             self.data[cls].append(cls_area)
 
         # weighted information gain
@@ -140,7 +140,7 @@ class Metrics:
         # save data
         self.data["wif"] = self.data["wif"][1:]
         df = pd.DataFrame(data=self.data)
-        df.to_csv(f"/root/thesis_ws/src/thesis/sw/metrics/src/{time.ctime()}.csv", float_format="%.5f")
+        df.to_csv(f"/root/thesis_ws/src/thesis/sw/metrics/src/{time.ctime()}.csv", float_format="%.5f") # TODO make relative
         
         rospy.signal_shutdown("Finish metrics service called. Closing everything")
 

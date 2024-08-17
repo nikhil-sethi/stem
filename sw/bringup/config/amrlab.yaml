@@ -3,21 +3,21 @@ define: &max_acc 0.5
 
 sdf_map:
   resolution: 0.1
-  map_size_x: 7
-  map_size_y: 7
-  map_size_z: 1.7
+  map_size_x: 6
+  map_size_y: 6
+  map_size_z: 2
   ground_height: -0.2
   p_hit: 0.68
   p_miss: 0.48
   p_min: 0.12
   p_max: 0.99
   p_occ: 0.7
-  box_min_x: -3.5
-  box_min_y: -3.5
+  box_min_x: -3
+  box_min_y: -3
   box_min_z:  -0.1
-  box_max_x: 3.5
-  box_max_y: 3.5
-  box_max_z: 1.6
+  box_max_x: 3
+  box_max_y: 3
+  box_max_z: 1.9
 
 
 fsm:

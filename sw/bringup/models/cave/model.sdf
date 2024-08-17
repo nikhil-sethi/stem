@@ -45,7 +45,6 @@
     </link>
     <link name='Radio'>
       <light name='light_source' type='point'>
-        <visualise>false</visualise>
         <pose>0.0137 -0.02 0.109 0 -0 0</pose>
         <attenuation>
           <range>2</range>
@@ -61,6 +60,7 @@
           <outer_angle>0</outer_angle>
           <falloff>0</falloff>
         </spot>
+        <visualise>0</visualise>
       </light>
       <pose>17.4463 -0.75752 0.410228 0 0 -2.03035</pose>
       <self_collide>0</self_collide>
@@ -140,7 +140,6 @@
     </link>
     <link name='Radio_clone'>
       <light name='light_source' type='point'>
-        <visualise>false</visualise>
         <pose>0.0137 -0.02 0.109 0 -0 0</pose>
         <attenuation>
           <range>2</range>
@@ -156,6 +155,7 @@
           <outer_angle>0</outer_angle>
           <falloff>0</falloff>
         </spot>
+        <visualise>0</visualise>
       </light>
       <pose>17.2681 -1.39705 0.357047 0 0 -2.03035</pose>
       <self_collide>0</self_collide>
@@ -234,7 +234,6 @@
     </link>
     <link name='Radio_clone_0'>
       <light name='light_source' type='point'>
-        <visualise>false</visualise>
         <pose>0.0137 -0.02 0.109 0 -0 0</pose>
         <attenuation>
           <range>2</range>
@@ -250,6 +249,7 @@
           <outer_angle>0</outer_angle>
           <falloff>0</falloff>
         </spot>
+        <visualise>0</visualise>
       </light>
       <pose>17.3279 -1.01557 0.435477 -1.48485 0.117535 2.77114</pose>
       <self_collide>0</self_collide>
@@ -328,7 +328,6 @@
     </link>
     <link name='Radio_clone_0_clone'>
       <light name='light_source' type='point'>
-        <visualise>false</visualise>
         <pose>0.0137 -0.02 0.109 0 -0 0</pose>
         <attenuation>
           <range>2</range>
@@ -344,6 +343,7 @@
           <outer_angle>0</outer_angle>
           <falloff>0</falloff>
         </spot>
+        <visualise>0</visualise>
       </light>
       <pose>17.3491 -0.895677 0.424451 -1.42926 0.033796 -2.80774</pose>
       <self_collide>0</self_collide>
@@ -372,404 +372,6 @@
             <uri>/root/thesis_ws/src/thesis/sw/bringup/models/Radio/meshes/Radio.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='marker_19_1'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>13.7364 1.38247 0.452205 -0.018045 -0.077671 0.936207</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.202556 0.194889 0.194887</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_2/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_2/materials/textures</uri>
-            <name>ArucoVisualMarker2/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.202556 0.194889 0.194887</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <link name='marker_3_1'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>14.9984 -0.370885 0.452923 0 0 -0.292623</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.209769 0.222371 0.222371</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_3/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_3/materials/textures</uri>
-            <name>ArucoVisualMarker3/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.209769 0.222371 0.222371</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <!-- <link name='aruco_visual_marker_4_0_clone'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>18.5838 8.90971 0.381643 0 -0 0.213213</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>-nan</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <gravity>1</gravity>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0 0 0</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_4/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_4/materials/textures</uri>
-            <name>ArucoVisualMarker5/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0 0 0</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
-    </link> -->
-    <link name='marker_1_2'>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>14.9629 -6.25741 0.596399 -0.049499 -0.055336 -0.748181</pose>
-      <inertial>
-        <inertia>
-          <ixx>0</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0</iyy>
-          <iyz>0</iyz>
-          <izz>0</izz>
-        </inertia>
-        <mass>0</mass>
-        <pose>0 0 0 0 -0 0</pose>
-      </inertial>
-      <gravity>1</gravity>
-      <static>1</static>
-      <allow_auto_disable>1</allow_auto_disable>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.209682 0.213269 0.209682</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <uri>model://aruco_visual_marker_1/materials/scripts</uri>
-            <uri>model://aruco_visual_marker_1/materials/textures</uri>
-            <name>ArucoVisualMarker1/Marker</name>
-          </script>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <emissive>1 1 1 0</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <cast_shadows>1</cast_shadows>
-        <transparency>0</transparency>
-      </visual>
-      <collision name='collision'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.209682 0.213269 0.209682</size>
-          </box>
         </geometry>
         <surface>
           <friction>
@@ -1051,38 +653,6 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <visual name='CaveWall_visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight 02 type b/6/meshes/cavestraight02.dae</uri>
-            <scale>0.3 0.3 0.3</scale>
-            <submesh>
-              <name>CaveWall</name>
-              <center>0</center>
-            </submesh>
-          </mesh>
-        </geometry>
-        <material>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>1 1 1 1</specular>
-          <pbr>
-            <metal>
-              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
-              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
-              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
-            </metal>
-          </pbr>
-          <script>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight 02 type b/6/materials/scripts/</uri>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
-            <name>CaveTile/CaveWall_Diffuse</name>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
       <visual name='RockPile_visual'>
         <geometry>
           <mesh>
@@ -1108,6 +678,38 @@
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight 02 type b/6/materials/scripts/</uri>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
             <name>CaveTile/RockPile_Diffuse</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='CaveWall_visual'>
+        <geometry>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight 02 type b/6/meshes/cavestraight02.dae</uri>
+            <scale>0.3 0.3 0.3</scale>
+            <submesh>
+              <name>CaveWall</name>
+              <center>0</center>
+            </submesh>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
+              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
+              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
+            </metal>
+          </pbr>
+          <script>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight 02 type b/6/materials/scripts/</uri>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
+            <name>CaveTile/CaveWall_Diffuse</name>
           </script>
           <shader type='pixel'/>
         </material>
@@ -1686,7 +1288,6 @@
     </link>
     <link name='helmet_10'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -1703,6 +1304,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>14.6851 -2.91128 0.803282 -0.305759 -0.252417 0.875859</pose>
       <self_collide>0</self_collide>
@@ -1800,7 +1402,6 @@
     </link>
     <link name='helmet_11::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -1817,6 +1418,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>13.777 -5.95062 0.08937 0.001387 0.059145 -0.000244</pose>
       <self_collide>0</self_collide>
@@ -1914,7 +1516,6 @@
     </link>
     <link name='helmet_1::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -1931,6 +1532,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>34.0092 44.8818 0.164956 0.130334 -0 -1.9437</pose>
       <self_collide>0</self_collide>
@@ -2028,7 +1630,6 @@
     </link>
     <link name='helmet_2::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2045,6 +1646,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>59.2491 -13.1966 -5.961 -0.056288 0.155458 1.48209</pose>
       <self_collide>0</self_collide>
@@ -2142,7 +1744,6 @@
     </link>
     <link name='helmet_3::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2159,6 +1760,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>17.4034 8.93512 0.758482 0.189049 -0.347725 -0.537212</pose>
       <self_collide>0</self_collide>
@@ -2256,7 +1858,6 @@
     </link>
     <link name='helmet_4::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2273,6 +1874,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>14.4963 -5.19874 1.13181 0.001422 0.231014 0</pose>
       <self_collide>0</self_collide>
@@ -2370,7 +1972,6 @@
     </link>
     <link name='helmet_6::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2387,6 +1988,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>14.4919 -4.4616 0.011011 0.052796 -0.024875 1.98668</pose>
       <self_collide>0</self_collide>
@@ -2484,7 +2086,6 @@
     </link>
     <link name='helmet_7::link'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2501,6 +2102,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>91.4337 -119.474 -0.059959 -0.006749 0.196361 0.945367</pose>
       <self_collide>0</self_collide>
@@ -2598,7 +2200,6 @@
     </link>
     <link name='helmet_9'>
       <light name='headlamp' type='spot'>
-        <visualise>false</visualise>
         <pose>0.0414 0 0.0339 3.14159 1.56859 0</pose>
         <attenuation>
           <range>10</range>
@@ -2615,6 +2216,7 @@
         </spot>
         <direction>0 0 -1</direction>
         <cast_shadows>1</cast_shadows>
+        <visualise>0</visualise>
       </light>
       <pose>15.0988 -2.6046 0.884119 -0.049935 -0.190809 2.87251</pose>
       <self_collide>0</self_collide>
@@ -2711,7 +2313,7 @@
       </collision>
     </link>
     <link name='human_2_clone'>
-      <pose>14.3554 -6.46153 -0.507646 -0.168632 0.083647 1.43067</pose>
+      <pose>14.533 -6.40259 -0.492123 -0.168632 0.083647 1.43067</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
@@ -3053,7 +2655,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.184518 0.196634 0.184518</size>
+            <size>0.2 0.2 0.2</size>
           </box>
         </geometry>
         <material>
@@ -3134,7 +2736,7 @@
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>17.0613 -0.80327 0.717104 0.035259 -0.032243 2.31124</pose>
+      <pose>17.1064 -0.856661 0.637251 0.035259 -0.032243 2.31124</pose>
       <inertial>
         <inertia>
           <ixx>0</ixx>
@@ -3253,7 +2855,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.242905 0.219337 0.242906</size>
+            <size>0.2 0.2 0.2</size>
           </box>
         </geometry>
         <material>
@@ -3353,7 +2955,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.242905 0.219337 0.242906</size>
+            <size>0.2 0.2 0.2</size>
           </box>
         </geometry>
         <material>
@@ -3430,11 +3032,110 @@
         </surface>
       </collision>
     </link>
+    <link name='marker_19_1'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>14.0767 2.27224 0.452205 -0.018045 -0.077671 0.936207</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.202556 0.194889 0.194887</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_2/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_2/materials/textures</uri>
+            <name>ArucoVisualMarker2/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.202556 0.194889 0.194887</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
     <link name='marker_1_1'>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>13.9571 -6.07659 0.565055 0 -0 0.491184</pose>
+      <pose>13.8201 -5.96869 0.643969 0 -0 0.874457</pose>
       <inertial>
         <inertia>
           <ixx>0</ixx>
@@ -3453,7 +3154,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.241518 0.225651 0.241518</size>
+            <size>0.2 0.2 0.2</size>
           </box>
         </geometry>
         <material>
@@ -3480,7 +3181,207 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.241518 0.225651 0.241518</size>
+            <size>0.223499 0.208815 0.223499</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_1_2'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>15.0762 -6.21911 0.596399 -0.070188 -0.024172 -0.23895</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.2 0.2 0.2</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_1/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_1/materials/textures</uri>
+            <name>ArucoVisualMarker1/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.209682 0.213269 0.209682</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='marker_3_1'>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose>14.4108 -0.243838 0.452923 0 0 -0.292623</pose>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>0</mass>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <static>1</static>
+      <allow_auto_disable>1</allow_auto_disable>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.209769 0.2 0.2</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_visual_marker_3/materials/scripts</uri>
+            <uri>model://aruco_visual_marker_3/materials/textures</uri>
+            <name>ArucoVisualMarker3/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.209769 0.222371 0.222371</size>
           </box>
         </geometry>
         <surface>
@@ -4213,38 +4114,6 @@
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='CaveWall_visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave starting area type b/9/meshes/cavestartingarea.dae</uri>
-            <submesh>
-              <name>CaveWall</name>
-              <center>0</center>
-            </submesh>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>1 1 1 1</specular>
-          <pbr>
-            <metal>
-              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
-              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
-              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
-            </metal>
-          </pbr>
-          <script>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave starting area type b/9/materials/scripts/</uri>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
-            <name>CaveTile/CaveWall_Diffuse</name>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
       <visual name='RockPile_visual'>
         <geometry>
           <mesh>
@@ -4270,6 +4139,38 @@
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave starting area type b/9/materials/scripts/</uri>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
             <name>CaveTile/RockPile_Diffuse</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='CaveWall_visual'>
+        <geometry>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave starting area type b/9/meshes/cavestartingarea.dae</uri>
+            <submesh>
+              <name>CaveWall</name>
+              <center>0</center>
+            </submesh>
+            <scale>0.3 0.3 0.3</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
+              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
+              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
+            </metal>
+          </pbr>
+          <script>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave starting area type b/9/materials/scripts/</uri>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
+            <name>CaveTile/CaveWall_Diffuse</name>
           </script>
           <shader type='pixel'/>
         </material>
@@ -5920,43 +5821,6 @@
         </surface>
       </collision>
     </link>
-    <!-- <link name='tile_61_lights'>
-      <light name='spot_light2' type='spot'>
-        <pose>-1.8 0 2.7 0 -0 0</pose>
-        <diffuse>0.8 0.8 0.8 1</diffuse>
-        <specular>0.1 0.1 0.1 1</specular>
-        <attenuation>
-          <range>10</range>
-          <linear>0.2</linear>
-          <constant>0.5</constant>
-          <quadratic>0.02</quadratic>
-        </attenuation>
-        <spot>
-          <inner_angle>1</inner_angle>
-          <outer_angle>2</outer_angle>
-          <falloff>1.2</falloff>
-        </spot>
-        <cast_shadows>1</cast_shadows>
-        <direction>0 0 -1</direction>
-      </light>
-      <pose>24.2516 3.27219 0 0 0 -1.5708</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <gravity>1</gravity>
-      <inertial>
-        <mass>1</mass>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-      </inertial>
-    </link> -->
     <link name='tile_62::base_link'>
       <pose>22.5 -15 0 0 -0 0</pose>
       <self_collide>0</self_collide>
@@ -6273,98 +6137,11 @@
         </surface>
       </collision>
     </link>
-    <!-- <link name='tile_63_lights'>
-      <light name='spot_light1' type='spot'>
-        <pose>-0.45 2.25 1.5 0 -0 1.57</pose>
-        <diffuse>0.8 0.8 0.8 1</diffuse>
-        <specular>0.1 0.1 0.1 1</specular>
-        <attenuation>
-          <range>10</range>
-          <linear>0.2</linear>
-          <constant>0.3</constant>
-          <quadratic>0.01</quadratic>
-        </attenuation>
-        <spot>
-          <inner_angle>1</inner_angle>
-          <outer_angle>2</outer_angle>
-          <falloff>0.5</falloff>
-        </spot>
-        <cast_shadows>1</cast_shadows>
-        <direction>0 0 -1</direction>
-      </light>
-      <light name='spot_light2' type='spot'>
-        <pose>-1.05 -0.825 1.2 0 -0 0</pose>
-        <diffuse>0.8 0.8 0.8 1</diffuse>
-        <specular>0.1 0.1 0.1 1</specular>
-        <attenuation>
-          <range>10</range>
-          <linear>0.2</linear>
-          <constant>0.3</constant>
-          <quadratic>0.01</quadratic>
-        </attenuation>
-        <spot>
-          <inner_angle>1</inner_angle>
-          <outer_angle>2</outer_angle>
-          <falloff>0.5</falloff>
-        </spot>
-        <cast_shadows>1</cast_shadows>
-        <direction>0 0 -1</direction>
-      </light>
-      <pose>31.6173 -20.3141 0 0 -0 1.5708</pose>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <gravity>1</gravity>
-      <inertial>
-        <mass>1</mass>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-      </inertial>
-    </link> -->
     <link name='tile_64::base_link'>
       <pose>37.5 -7.5 3 0 -0 0</pose>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <visual name='CaveWall_visual'>
-        <geometry>
-          <mesh>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave corner 02 type b/7/meshes/cavecorner02.dae</uri>
-            <submesh>
-              <name>CaveWall</name>
-              <center>0</center>
-            </submesh>
-            <scale>0.3 0.3 0.3</scale>
-          </mesh>
-        </geometry>
-        <material>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>1 1 1 1</specular>
-          <pbr>
-            <metal>
-              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
-              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
-              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
-            </metal>
-          </pbr>
-          <script>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave corner 02 type b/7/materials/scripts/</uri>
-            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
-            <name>CaveTile/CaveWall_Diffuse</name>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <pose>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
       <visual name='StriatedRock_visual'>
         <geometry>
           <mesh>
@@ -6390,6 +6167,38 @@
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave corner 02 type b/7/materials/scripts/</uri>
             <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
             <name>CaveTile/StriatedRock_Diffuse</name>
+          </script>
+          <shader type='pixel'/>
+        </material>
+        <pose>0 0 0 0 -0 0</pose>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='CaveWall_visual'>
+        <geometry>
+          <mesh>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave corner 02 type b/7/meshes/cavecorner02.dae</uri>
+            <submesh>
+              <name>CaveWall</name>
+              <center>0</center>
+            </submesh>
+            <scale>0.3 0.3 0.3</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Albedo.jpg</albedo_map>
+              <normal_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Normal.jpg</normal_map>
+              <roughness_map>https://fuel.ignitionrobotics.org/1.0/OpenRobotics/models/Cave Straight Type A/tip/files/materials/textures/CaveWall_Roughness.jpg</roughness_map>
+            </metal>
+          </pbr>
+          <script>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave corner 02 type b/7/materials/scripts/</uri>
+            <uri>/root/.ignition/fuel/fuel.ignitionrobotics.org/openrobotics/models/cave straight type a/10/materials/textures</uri>
+            <name>CaveTile/CaveWall_Diffuse</name>
           </script>
           <shader type='pixel'/>
         </material>
@@ -7024,7 +6833,7 @@
       </link>
       <static>1</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose>15.2084 -0.404478 0.136142 0 -0 0</pose>
+      <pose>14.2212 -0.15563 0.136142 0 -0 0</pose>
     </model>
     <model name='rope'>
       <static>1</static>
@@ -7077,7 +6886,7 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <pose>13.7317 1.43369 0 0 -0 0.819327</pose>
+      <pose>14.0376 2.32577 0 0 -0 0.819327</pose>
     </model>
     <static>1</static>
     <allow_auto_disable>1</allow_auto_disable>
