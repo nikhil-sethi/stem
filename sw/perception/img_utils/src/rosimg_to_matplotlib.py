@@ -14,7 +14,7 @@ class ImageSubscriber:
         self.image = None
 
         # Create a subscriber for the image topic
-        topic = rospy.get_param("~img_topic", "/camera/depth/image_rect_raw/compressed")
+        topic = rospy.get_param("~img_topic", "/camera/depth/image_raw/compressedDepth")
         rospy.Subscriber(topic, CompressedImage, self.image_callback)
 
         # Initialize Matplotlib figure and axis
@@ -30,7 +30,8 @@ class ImageSubscriber:
     def image_callback(self, msg):
         # Convert ROS Image message to OpenCV format
         self.image = self.bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='passthrough')
-
+        print(self.image.shape)
+        
     def init_plot(self):
         self.img_plot.set_array(self.image)
         return self.img_plot,
