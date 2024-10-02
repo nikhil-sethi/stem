@@ -3,3 +3,4 @@
 *.nbc
 *.nbi
 __pycache__
+sw/bringup/resource
