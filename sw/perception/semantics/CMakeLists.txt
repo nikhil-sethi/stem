@@ -162,7 +162,6 @@ catkin_install_python(PROGRAMS
   src/object_detection.py
   src/priority_mask.py
   src/priority_mask_vsep.py
-  src/test_seg_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

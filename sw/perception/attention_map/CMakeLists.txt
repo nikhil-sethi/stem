@@ -149,7 +149,6 @@ add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 add_executable(target_att_gt_node src/target_att_gt.cpp)
 add_executable(diff_map_gt_node src/diffusion_map_gt.cpp)
 add_executable(attention_map_2d_node src/attention_map_2d.cpp)
-add_executable(test_node src/test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -181,9 +180,6 @@ target_link_libraries(diff_map_gt_node
 target_link_libraries(attention_map_2d_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
-)
-target_link_libraries(test_node
-  ${catkin_LIBRARIES}
 )
 
 #############
