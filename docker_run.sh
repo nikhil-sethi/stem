@@ -8,19 +8,19 @@
 xhost local:root
 
 #    --volume /home/nikhil/Nikhil/Masters/Thesis/software/gpdhydra_ws:/root/gpdhydra_ws \
-XAUTH=/tmp/.docker.xauth
+# XAUTH=/tmp/.docker.xauth
 
-if [ ! -f $XAUTH ]
-then
-    xauth_list=$(xauth nlist :0 | sed -e 's/^..../ffff/')
-    if [ ! -z "$xauth_list" ]
-    then
-        echo $xauth_list | xauth -f $XAUTH nmerge -
-    else
-        touch $XAUTH
-    fi
-    chmod a+r $XAUTH
-fi
+# if [ ! -f $XAUTH ]
+# then
+#     xauth_list=$(xauth nlist :0 | sed -e 's/^..../ffff/')
+#     if [ ! -z "$xauth_list" ]
+#     then
+#         echo $xauth_list | xauth -f $XAUTH nmerge -
+#     else
+#         touch $XAUTH
+#     fi
+#     chmod a+r $XAUTH
+# fi
 
 docker run -it \
     --privileged \
@@ -32,7 +32,5 @@ docker run -it \
     --gpus all \
     --runtime=nvidia \
     --env=NVIDIA_DRIVER_CAPABILITIES=all  \
-    --env="XAUTHORITY=$XAUTH" \
-    --net=host \
-    nikhil:thesis \
+    uav-target-search \
     bash
