@@ -51,7 +51,7 @@ RUN mkdir -p -m 0600 ~/.ssh \
     && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 # Install python packages
-RUN pip3 install scikit-learn networkx tqdm numba opencv-python
+RUN pip3 install numba scikit-learn networkx tqdm opencv-python
 
 ## ========== THESIS =============
 
@@ -63,7 +63,7 @@ RUN mkdir -p ~/thesis_ws/src \
 
 # clone and update main repo
 RUN --mount=type=ssh cd ~/thesis_ws/src \
-    && git clone git@github.com:mlodel/uav-target-search.git thesis \
+    && git clone git@github.com:mlodel/uav-target-search.git -b docker thesis \
     && cd ~/thesis_ws/src/thesis \ 
     && git submodule update --init --recursive  # might take some time
 
@@ -129,7 +129,8 @@ RUN cd ~/thesis_ws \
 
 # Source ROS and workspace
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc \
-    && echo "source ~/thesis_ws/devel/setup.bash" >> ~/.bashrc
+    && echo "source ~/thesis_ws/devel/setup.bash" >> ~/.bashrc \
+    && echo "source ~/thesis_ws/src/thesis/setup_paths.bash" >> ~/.bashrc
 
 
 # Output bash terminal
