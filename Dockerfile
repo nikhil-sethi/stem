@@ -50,6 +50,9 @@ RUN rosdep init \
 RUN mkdir -p -m 0600 ~/.ssh \
     && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
+# Install python packages
+RUN pip3 install numba scikit-learn networkx tqdm opencv-python
+
 ## ========== THESIS =============
 
 # Create the workspace
@@ -60,7 +63,7 @@ RUN mkdir -p ~/thesis_ws/src \
 
 # clone and update main repo
 RUN --mount=type=ssh cd ~/thesis_ws/src \
-    && git clone git@github.com:nikhil-sethi/thesis.git -b docker_move \
+    && git clone git@github.com:mlodel/uav-target-search.git -b docker thesis \
     && cd ~/thesis_ws/src/thesis \ 
     && git submodule update --init --recursive  # might take some time
 
@@ -68,23 +71,23 @@ RUN --mount=type=ssh cd ~/thesis_ws/src \
 # PX4 prerequisites
 RUN apt-get update \
     && apt-get install -y --no-install-recommends  \
-    	protobuf-compiler \ 
-    	libeigen3-dev \
-    	libopencv-dev \
-    	ros-${ROS_DISTRO}-mavros \
-    	ros-${ROS_DISTRO}-mavros-extras \
-    	ros-${ROS_DISTRO}-mavros-msgs \
-    	geographiclib-tools \
-    	libgeographic-dev \
-    	libgeographic19 \
-	ros-noetic-geographic-msgs \
-	ros-noetic-libmavconn \
-	ros-noetic-mavlink \
-	ros-noetic-uuid-msgs \
+    protobuf-compiler \ 
+    libeigen3-dev \
+    libopencv-dev \
+    ros-${ROS_DISTRO}-mavros \
+    ros-${ROS_DISTRO}-mavros-extras \
+    ros-${ROS_DISTRO}-mavros-msgs \
+    geographiclib-tools \
+    libgeographic-dev \
+    libgeographic19 \
+    ros-noetic-geographic-msgs \
+    ros-noetic-libmavconn \
+    ros-noetic-mavlink \
+    ros-noetic-uuid-msgs \
     && wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh \
     && bash ./install_geographiclib_datasets.sh \
     && rm -rf /var/lib/apt/lists/*
-    
+
 RUN cd ~/thesis_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
     && bash ./Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx 
 
@@ -118,15 +121,16 @@ RUN apt-get update \
 # build everything
 RUN cd ~/thesis_ws \ 
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server odom_visualization\
+    && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server odom_visualization attention_map\
     && catkin build
-    
+
 # fake stop
 # RUN fake_stop
 
 # Source ROS and workspace
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc \
-    && echo "source ~/thesis_ws/devel/setup.bash" >> ~/.bashrc
+    && echo "source ~/thesis_ws/devel/setup.bash" >> ~/.bashrc \
+    && echo "source ~/thesis_ws/src/thesis/setup_paths.bash" >> ~/.bashrc
 
 
 # Output bash terminal
