@@ -9,21 +9,27 @@ docker build --ssh default -t nikhil:thesis .
 It should take about 20-30 minutes to build. time to doodle something on your notebook.
 
 ## Run
-Download and execute the 'docker_run.sh' script located in the root of this repository.
-
+Download and execute the 'docker_run.sh' script located in the root of this repository. 
+```
+example ./docker_run.sh 
+```
 Inside the container:
 
 Simulation:
 ```bash
-terminal 1: roslaunch bringup rviz.launch # preferable to host the master on rviz
+source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
 
-terminal 2: source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
-            roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
-
-terminal 3 (for now): rosrun attention_map attention_processor_node
+roslaunch bringup main.launch sim:=true world:=earthquake
 ```
+
 If everything went well you should see an axis marker for the drone and camera in Rviz along with occupancy map. If not, go to the debugging section.
 
+cmdline options
+`sim`: true if you want simulation only
+'gui': true if you want Gazebo graphics. Note, this might slow cause processing problems on less powerful PCs
+world: 'earthquake' or 'cave'. Empty is also possible; it simulates a small lab environment.
+
+> the first time you run the simulation after building the docker image, it might take some time for gazebo to download assets. As Tame Impala says: Let it happen.
 
 Hardware testing
 
