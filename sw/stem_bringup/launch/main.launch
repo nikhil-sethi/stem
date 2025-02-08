@@ -96,6 +96,6 @@
     <node if="$(arg sim)" name="depth_compress" type="depth_compress_node" pkg="img_utils" output="screen" required="true"/>
     <include file="$(find stem_bringup)/launch/rviz.launch"/>
     <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
-    <!-- <node name="metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/> -->
+    <!-- <node name="stem_metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/> -->
     <node if="$(arg sim)" name="color_cloud" type="repub_node" pkg="gazebo_gt" required="false" output="screen"/>
 </launch>

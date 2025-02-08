@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>stem_metrics</name>
+  <version>0.0.0</version>
+  <description>The stem_metrics package</description>
+
+  <maintainer email="niksethi@tudelft.nl">Nikhil Sethi</maintainer>
+
+  <license>TODO</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <depend>plan_env</depend>
+
+
+</package>
