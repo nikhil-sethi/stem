@@ -7,7 +7,7 @@ from quadrotor_msgs.msg import PositionCommand
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Header
 from tf.transformations import quaternion_multiply, quaternion_from_euler
-from control_interface.base_interface import BaseInterface, BasePlanner
+from stem_control.base_interface import BaseInterface, BasePlanner
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np

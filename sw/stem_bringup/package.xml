@@ -27,7 +27,7 @@
 
   <!-- Control -->
   <exec_depend>px4</exec_depend>
-  <exec_depend>control_interface</exec_depend>
+  <exec_depend>stem_control</exec_depend>
   <exec_depend>px4_tools</exec_depend>
   
   <!-- Misc -->

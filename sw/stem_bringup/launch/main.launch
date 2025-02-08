@@ -70,7 +70,7 @@
     </include>
 
     <!-- drone toolbox template -->
-    <node name="control_if" type="control_interface_node" pkg="control_interface" output="screen" required="true">
+    <node name="control_if" type="control_interface_node" pkg="stem_control" output="screen" required="true">
         <param name="is_sim" value="$(arg sim)"/>
         <rosparam command="load" file="$(find drone_toolbox_ext_control_template)/config/controller.yaml"/>
     </node>

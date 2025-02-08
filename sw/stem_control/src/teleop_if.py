@@ -7,7 +7,7 @@ from nav_msgs.msg import Odometry
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 import sys
 from std_srvs.srv import Trigger, TriggerResponse, Empty
-from control_interface.base_interface import BaseInterface, BasePlanner
+from stem_control.base_interface import BaseInterface, BasePlanner
 import sys, select, termios, tty
 
 
