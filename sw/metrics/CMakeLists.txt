@@ -11,7 +11,7 @@ find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   rospy
-  common_msgs
+  stem_msgs
   plan_env
 )
 find_package(Eigen3 REQUIRED)

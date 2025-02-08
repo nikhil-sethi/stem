@@ -21,7 +21,7 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   gazebo_ros
-  common_msgs
+  stem_msgs
   gazebo_plugins
 )
 

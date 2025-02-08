@@ -4,7 +4,7 @@
 #include <eigen3/Eigen/Dense>
 #include <sensor_msgs/PointCloud2.h>
 #include <vector>
-#include <common_msgs/target.h>
+#include <stem_msgs/target.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/common/common.h>
@@ -18,7 +18,7 @@ class DiffusionMapGT{
     std::shared_ptr<fast_planner::SDFMap> sdf_map_;
 
     friend Diffuser;
-    void createGTPriorityMap(const common_msgs::target msg);
+    void createGTPriorityMap(const stem_msgs::target msg);
     void doDiffusion();
     void pubTimer(const ros::TimerEvent& e);
     ros::Publisher att_gt_pub;
@@ -39,9 +39,9 @@ class DiffusionMapGT{
         
         diffuser->setSDFMap(sdf_map_);
 
-        auto targets_msg = ros::topic::waitForMessage<common_msgs::target>("/gazebo/targets/gt");
+        auto targets_msg = ros::topic::waitForMessage<stem_msgs::target>("/gazebo/targets/gt");
         // createGTPriorityMap(*targets_msg);
-        target_sub = nh.subscribe<common_msgs::target>("/gazebo/targets/gt", 20, &DiffusionMapGT::createGTPriorityMap, this);
+        target_sub = nh.subscribe<stem_msgs::target>("/gazebo/targets/gt", 20, &DiffusionMapGT::createGTPriorityMap, this);
 
         // doDiffusion();
         std::cout<<"ffg"<<std::endl;
@@ -50,7 +50,7 @@ class DiffusionMapGT{
     }
 };
 
-    void DiffusionMapGT::createGTPriorityMap(const common_msgs::target msg){
+    void DiffusionMapGT::createGTPriorityMap(const stem_msgs::target msg){
         Eigen::Vector3i bbox_min, bbox_max;
         Eigen::Vector3d bbox_mind(msg.bbox_min[0], msg.bbox_min[1],msg.bbox_min[2]); 
         Eigen::Vector3d bbox_maxd(msg.bbox_max[0], msg.bbox_max[1],msg.bbox_max[2]); 

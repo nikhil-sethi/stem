@@ -14,7 +14,7 @@ find_package(catkin REQUIRED
     roscpp
     active_perception
     message_generation
-    common_msgs
+    stem_msgs
 )
 
 

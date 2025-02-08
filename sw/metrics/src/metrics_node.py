@@ -5,8 +5,8 @@ import pandas as pd
 import rospy
 import time
 import message_filters
-from common_msgs.msg import float64List
-from common_msgs.msg import Float64Stamped
+from stem_msgs.msg import float64List
+from stem_msgs.msg import Float64Stamped
 from semantics.segmentation_pipelines import ArUcoSegmenter
 from semantics.priorities import create_label_map
 from std_srvs.srv import Trigger

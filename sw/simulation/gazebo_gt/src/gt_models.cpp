@@ -1,7 +1,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <ros/ros.h>
-#include <common_msgs/target.h>
+#include <stem_msgs/target.h>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -78,7 +78,7 @@ namespace gazebo
         // PubQueue<nav_msgs::Odometry>::Ptr pub_Queue;
 
         std::unique_ptr<ros::NodeHandle> nh;
-        std::vector<common_msgs::target> targets;
+        std::vector<stem_msgs::target> targets;
         visualization_msgs::MarkerArray marker_array_msg;
   };
   GZ_REGISTER_WORLD_PLUGIN(TargetGTPlugin)
@@ -112,7 +112,7 @@ void TargetGTPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
     // Create our ROS node. This acts in a similar manner to
     // the Gazebo node
     nh.reset(new ros::NodeHandle("gazebo_client"));
-    this->targets_gt_pub = this->nh->advertise<common_msgs::target>("/gazebo/targets/gt", 20);
+    this->targets_gt_pub = this->nh->advertise<stem_msgs::target>("/gazebo/targets/gt", 20);
     this->markers_pub = this->nh->advertise<visualization_msgs::MarkerArray>("/gazebo/gt/target_markers", 10);
     // create publish timer
     this->timer = this->nh->createTimer(ros::Duration(0.1), &TargetGTPlugin::targetPubTimer,this);        
@@ -143,7 +143,7 @@ void TargetGTPlugin::updateTargets(physics::Model_V models){
             if (priorities.find(label) != priorities.end() && priorities[label] >0){
                 
                 // creat a target message
-                common_msgs::target target_msg;
+                stem_msgs::target target_msg;
                 target_msg.label = linkName;
                 ignition::math::AxisAlignedBox bbox = link->BoundingBox(); 
                 ignition::math::Vector3d bbox_min = bbox.Min();
@@ -212,7 +212,7 @@ void TargetGTPlugin::updateTargets(physics::Model_V models){
 }
 
 void TargetGTPlugin::targetPubTimer(const ros::TimerEvent& e){
-    // common_msgs::target target_msg;
+    // stem_msgs::target target_msg;
     for (auto target_msg: targets){
         this->targets_gt_pub.publish(target_msg);
     }

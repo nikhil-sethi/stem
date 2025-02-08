@@ -19,7 +19,7 @@
 #include <vector>
 #include <Eigen/Eigen>
 #include <traj_utils/planning_visualization.h>
-#include <common_msgs/uint8List.h>
+#include <stem_msgs/uint8List.h>
 #include <plan_env/sdf_map.h>
 #include <memory>
 #include <sensor_model/camera.h>
@@ -42,7 +42,7 @@
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 #include <std_srvs/Trigger.h>
 #include <target_search/target_viewpoint.h>
-#include <common_msgs/Viewpoints.h>
+#include <stem_msgs/Viewpoints.h>
 
 
 Eigen::Vector3d origin(-5.5, -5.5, 0);
@@ -158,8 +158,8 @@ class AttentionMap{
     public:
         AttentionMap(ros::NodeHandle& nh);
         void attCloudCallback(const sensor_msgs::PointCloud2& msg);
-        void occCallback(const common_msgs::uint8List& msg);
-        void occInflateCallback(const common_msgs::uint8List& msg);
+        void occCallback(const stem_msgs::uint8List& msg);
+        void occInflateCallback(const stem_msgs::uint8List& msg);
         void sampleViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts);
         void findTopViewpoints(Object& object, std::vector<TargetViewpoint>& sampled_vpts);
         void loopTimer(const ros::TimerEvent& event);
@@ -235,7 +235,7 @@ AttentionMap::AttentionMap(ros::NodeHandle& nh):camera(nh), corners_cam(8), perc
 
     bbox_pub = nh.advertise<visualization_msgs::Marker>("objects/bboxes", 1);
     // vpt_pub_viz = nh.advertise<geometry_msgs::PoseArray>("/objects/target_poses_viz", 1);
-    vpt_pub = nh.advertise<common_msgs::Viewpoints>("/objects/target_vpts", 1);
+    vpt_pub = nh.advertise<stem_msgs::Viewpoints>("/objects/target_vpts", 1);
     att_3d_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/global", 1);
     // att_diff_pub = nh.advertise<sensor_msgs::PointCloud2>("/attention_map/blur", 10);
 
@@ -486,7 +486,7 @@ void AttentionMap::objectUpdateTimer(const ros::TimerEvent& e){
 void AttentionMap::loopTimer(const ros::TimerEvent& event){
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
-    common_msgs::Viewpoints vpts_msg;
+    stem_msgs::Viewpoints vpts_msg;
     vpts_msg.viewpoints.header.stamp = ros::Time::now();
     vpts_msg.viewpoints.header.frame_id = "map";
 
@@ -699,7 +699,7 @@ bool AttentionMap::isObjectInView(const Object& object, const Eigen::Vector3d& p
     return camera.arePtsInView(corners_cam);
 }
 
-void AttentionMap::occCallback(const common_msgs::uint8List& msg){
+void AttentionMap::occCallback(const stem_msgs::uint8List& msg){
     // sdfmap buffer isnt used here because of different compatible uint8 datatype
     occupancy_buffer_ = msg.data;
     // pcl::PointCloud<pcl::PointXYZ> cloud;
@@ -726,7 +726,7 @@ void AttentionMap::occCallback(const common_msgs::uint8List& msg){
     // unknown_pub_.publish(cloud_msg);
 }
 
-void AttentionMap::occInflateCallback(const common_msgs::uint8List& msg){
+void AttentionMap::occInflateCallback(const stem_msgs::uint8List& msg){
     sdf_map_->md_->occupancy_buffer_inflate_ = msg.data;
 }
 

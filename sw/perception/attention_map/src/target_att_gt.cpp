@@ -2,7 +2,7 @@
 #include <eigen3/Eigen/Dense>
 #include <sensor_msgs/PointCloud2.h>
 #include <vector>
-#include <common_msgs/target.h>
+#include <stem_msgs/target.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/common/common.h>
@@ -66,7 +66,7 @@ inline vector<Eigen::Vector3i> allNeighbors(const Eigen::Vector3i& voxel, int de
 class AttGTMaker{
     public:
         fast_planner::SDFMap sdf_map_;
-        std::vector<common_msgs::target> targets;
+        std::vector<stem_msgs::target> targets;
         std::vector<float> attention_buffer;
         std::vector<bool> checked;
         ros::Publisher att_gt_pub;
@@ -81,8 +81,8 @@ class AttGTMaker{
             checked = std::vector<bool>(sdf_map_.buffer_size, false);
 
             // let the targets come in
-            ros::topic::waitForMessage<common_msgs::target>("/gazebo/targets/gt");
-            target_sub = nh.subscribe<common_msgs::target>("/gazebo/targets/gt", 20, &AttGTMaker::targetCallback, this);
+            ros::topic::waitForMessage<stem_msgs::target>("/gazebo/targets/gt");
+            target_sub = nh.subscribe<stem_msgs::target>("/gazebo/targets/gt", 20, &AttGTMaker::targetCallback, this);
 
             // diffusion timer
             att_update_timer = nh.createTimer(ros::Duration(0.1), &AttGTMaker::attUpdateTimer, this);
@@ -95,7 +95,7 @@ class AttGTMaker{
             att_min = 1;
         }
 
-        void targetCallback(const common_msgs::target msg){
+        void targetCallback(const stem_msgs::target msg){
             Eigen::Vector3i bbox_min, bbox_max;
             Eigen::Vector3d bbox_mind(msg.bbox_min[0], msg.bbox_min[1],msg.bbox_min[2]); 
             Eigen::Vector3d bbox_maxd(msg.bbox_max[0], msg.bbox_max[1],msg.bbox_max[2]); 
