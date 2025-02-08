@@ -18,7 +18,7 @@
     <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/>
 
     <!-- main algorithm params -->
-    <!-- <rosparam command='load' file="$(find bringup)/config/fuel_default.yaml"/> -->
+    <!-- <rosparam command='load' file="$(find stem_bringup)/config/fuel_default.yaml"/> -->
     <node pkg="exploration_manager" name="exploration_node" type="exploration_node" output="screen">      
       <!-- Some important remaps -->
       <remap from ="/odom_world" to="$(arg odometry_topic)"/>
@@ -26,7 +26,7 @@
       <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
       
       <!-- Need a redefine to give custom path -->
-      <param name ="~exploration/tsp_dir" value="/root/thesis_ws/src/thesis/sw/bringup/resource"/>
+      <param name ="~exploration/tsp_dir" value="/root/thesis_ws/src/thesis/sw/stem_bringup/resource"/>
 
     </node>
 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import savgol_filter
 
-bag_file_name = "/root/thesis_ws/src/thesis/sw/bringup/data/bags/2024-03-27-21-02-50.bag"
+bag_file_name = "/root/thesis_ws/src/thesis/sw/stem_bringup/data/bags/2024-03-27-21-02-50.bag"
 bag = bagreader(bag_file_name)
 odom_data = bag.message_by_topic("/mavros/local_position/odom")
 cmd_data = bag.message_by_topic("/mavros/setpoint_position/local")

@@ -19,7 +19,7 @@ Simulation:
 ```bash
 source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
 
-roslaunch bringup main.launch sim:=true world:=earthquake
+roslaunch stem_bringup main.launch sim:=true world:=earthquake
 ```
 
 If everything went well you should see an axis marker for the drone and camera in Rviz along with occupancy map. If not, go to the debugging section.
@@ -36,8 +36,8 @@ Hardware testing
 Make sure the ROS_MASTER_URI and ROS_IP are set correctly on both the OBC and your laptop.
 - Your PC
 ```bash
-terminal 1: roslaunch bringup main.launch sim:=false
-terminal 2: roslaunch bringup rviz.launch
+terminal 1: roslaunch stem_bringup main.launch sim:=false
+terminal 2: roslaunch stem_bringup rviz.launch
 ```
 
 - OBC (Nvidia Jetson Xavier)

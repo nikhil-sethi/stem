@@ -14,7 +14,7 @@
     <!-- Because bags are always non simulation -->
     <param name="sim" value="False"/> 
 
-    <include file="$(find bringup)/fuel.launch">
+    <include file="$(find stem_bringup)/fuel.launch">
         <arg name="init_x"   value="-2"/>
         <arg name="init_y"   value="-1"/>
         <arg name="init_z"   value="1"/>
@@ -29,7 +29,7 @@
     </include>
 
     <!-- rosbag, gives out sensor_pose, odomtery, depth, rgb -->
-    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="--clock -l $(find bringup)/data/bags/depth_filled_2.bag">
+    <node name="fake_fuel_bag" pkg="rosbag" type="play" args="--clock -l $(find stem_bringup)/data/bags/depth_filled_2.bag">
         <remap from="/camera/depth/image_rect_raw" to="/camera/aligned_depth_to_color/image_raw"/>
     </node>
 
@@ -38,14 +38,14 @@
     </node>
 
     <!-- parameters -->
-    <rosparam file="$(find bringup)/config/fuel_algo.yaml" ns="exploration_node"/>
+    <rosparam file="$(find stem_bringup)/config/fuel_algo.yaml" ns="exploration_node"/>
     
     <node name="attention_map_2d" type="attention_map.py" pkg="attention_map" output="screen" required="false">
         <param name="rgb_topic" value="/camera/color/image_raw"/>
     </node>
     <node name="depth_filler" type="depth_filler_node.py" pkg="img_utils" output="screen" required="true"/>
 
-    <include file="$(find bringup)/rviz.launch">
+    <include file="$(find stem_bringup)/rviz.launch">
         <arg name="odometry_topic" value="$(arg odometry_topic)"/>
     </include>
 

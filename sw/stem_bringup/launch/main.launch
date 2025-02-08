@@ -50,14 +50,14 @@
     <param name="/camera/depth/image_raw/compressed/png_level" value="5"/>
     
     <!-- Default parameter file -->
-    <rosparam command='load' file="$(find bringup)/config/default_params.yaml"/>
+    <rosparam command='load' file="$(find stem_bringup)/config/default_params.yaml"/>
     
     <!-- World specific overrides -->
-    <rosparam command='load' file="$(find bringup)/config/$(arg world).yaml"/>
+    <rosparam command='load' file="$(find stem_bringup)/config/$(arg world).yaml"/>
 
 
     <!-- simulator -->
-    <include if="$(arg sim)" file="$(find bringup)/sim.launch">
+    <include if="$(arg sim)" file="$(find stem_bringup)/launch/sim.launch">
         <arg name="init_x" value="$(arg init_x)"/>
         <arg name="init_y" value="$(arg init_y)"/>
         <arg name="init_z" value="$(arg init_z)"/>
@@ -77,7 +77,7 @@
             
 
     <!-- Planner -->
-    <include file="$(find bringup)/fuel.launch">
+    <include file="$(find stem_bringup)/launch/fuel.launch">
         <arg name="sim" value="$(arg sim)"/>
         <arg name="init_x"   value="$(arg init_x)"/>
         <arg name="init_y"   value="$(arg init_y)"/>
@@ -94,7 +94,7 @@
     <!-- <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/> -->
     <node name="priority_mask_node" type="priority_mask.py" pkg="semantics" output="screen" required="true"/>
     <node if="$(arg sim)" name="depth_compress" type="depth_compress_node" pkg="img_utils" output="screen" required="true"/>
-    <include file="$(find bringup)/rviz.launch"/>
+    <include file="$(find stem_bringup)/launch/rviz.launch"/>
     <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
     <!-- <node name="metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/> -->
     <node if="$(arg sim)" name="color_cloud" type="repub_node" pkg="gazebo_gt" required="false" output="screen"/>

@@ -19,9 +19,9 @@
             <arg name="P" value="$(arg init_P)"/>
             <arg name="Y" value="$(arg init_Y)"/>
             <arg name="vehicle" value="iris_vision"/>
-            <arg name="world" value="$(find bringup)/worlds/$(arg world).world"/>
+            <arg name="world" value="$(find stem_bringup)/worlds/$(arg world).world"/>
             <arg name="gui" value="$(arg gui)" />
-            <arg name="sdf" value="$(find bringup)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+            <arg name="sdf" value="$(find stem_bringup)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
             <arg name="interactive" value="false"/>
             <!-- mavros args -->
             <!-- <arg name="fcu_url" value="udp://@10.43.0.225:14540"/> -->
@@ -39,7 +39,7 @@
         <!-- drone toolbox interface -->
         <!-- This already runs onboard so only need it in sim -->
         <node pkg="px4_tools" type="px4_control_interface_node" name="px4_control_interface" required="true" output="screen">
-            <rosparam command="load" file="$(find bringup)/config/px4_interface.yaml"/>
+            <rosparam command="load" file="$(find stem_bringup)/config/px4_interface.yaml"/>
             <param name="is_sim" value="true"/>
             <param name="odometry_topic" value="$(arg odometry_topic)"/>
         </node>

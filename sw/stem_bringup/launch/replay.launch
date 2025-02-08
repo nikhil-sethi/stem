@@ -10,8 +10,8 @@
     <node name="repub" pkg="gazebo_gt" type="gazebo_repub.py"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="gui" value="true"/>
-        <arg name="world_name" value="$(find bringup)/worlds/cave_repub.world"/>
+        <arg name="world_name" value="$(find stem_bringup)/worlds/cave_repub.world"/>
     </include>
-    <node name="sd" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find bringup)/models/mantis_depth_vision/mantis_depth_vision.sdf -model iris_vision -x 0 -y 0 -z 0.05 -R 0 -P 0 -Y 0"/>
+    <node name="sd" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find stem_bringup)/models/mantis_depth_vision/mantis_depth_vision.sdf -model iris_vision -x 0 -y 0 -z 0.05 -R 0 -P 0 -Y 0"/>
 
 </launch>

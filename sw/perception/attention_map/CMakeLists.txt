@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  common_msgs
+  stem_msgs
   plan_env
   roscpp
   rospy
@@ -79,7 +79,7 @@ find_package(Eigen3 REQUIRED)
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   common_msgs#   sensor_msgs#   visualization_msgs
+#   stem_msgs#   sensor_msgs#   visualization_msgs
 # )
 
 ################################################
@@ -114,7 +114,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES attention_map
- CATKIN_DEPENDS common common_msgs plan_env traj_utils
+ CATKIN_DEPENDS common stem_msgs plan_env traj_utils
 #  DEPENDS system_lib
 )
 
@@ -144,8 +144,6 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(attention_processor_node src/attention_processor.cpp)
-add_executable(pub_att_gt_node src/pub_att_gt.cpp)
 add_executable(target_att_gt_node src/target_att_gt.cpp)
 add_executable(diff_map_gt_node src/diffusion_map_gt.cpp)
 add_executable(attention_map_2d_node src/attention_map_2d.cpp)
@@ -165,10 +163,7 @@ add_executable(attention_map_2d_node src/attention_map_2d.cpp)
 #   ${catkin_LIBRARIES}
 #   ${PCL_LIBRARIES}
 # )
-target_link_libraries(pub_att_gt_node
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
-)
+
 target_link_libraries(target_att_gt_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}

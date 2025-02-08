@@ -9,7 +9,7 @@ class MeshPublisherNode:
     def __init__(self):
         rospy.init_node('mesh_publisher_node', anonymous=True)
         
-        self.mesh_file_path = "/root/thesis_ws/src/thesis/sw/bringup/models/person_standing/meshes/standing.dae"
+        self.mesh_file_path = "/root/thesis_ws/src/thesis/sw/stem_bringup/models/person_standing/meshes/standing.dae"
         if not self.mesh_file_path:
             rospy.logerr("No mesh file path provided!")
             return
