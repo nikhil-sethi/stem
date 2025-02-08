@@ -1,6 +1,6 @@
 import rospy
-from target_search.tsp_solver_lns_cleanup import TSPSolver
-from target_search.srv import TSP, TSPResponse
+from stem_planner.tsp_solver_lns_cleanup import TSPSolver
+from stem_msgs.srv import TSP, TSPResponse
 import numpy as np
 import time
 
@@ -18,7 +18,6 @@ class MultiObjectiveTSP():
         priorities = list(req.priorities) # deserialised as tuple
         priorities.insert(0,0) # add any priority for self node
         priorities = 10*np.round(np.array(priorities)/10)
-        print(priorities)
         cost_mat = self.mat_from_list(req.cost_mat_flat, req.dim)
         tour, cost = self.solve_prio_atsp(cost_mat, priorities, req.dim)
         return TSPResponse(tour, cost)
@@ -33,7 +32,7 @@ class MultiObjectiveTSP():
 
     @staticmethod
     def solve_prio_atsp(cost_mat, priorities, dim):
-        start = time.perf_counter()
+        # start = time.perf_counter()
         starts = [0]
 
         heuristic = "2opt_lns"
@@ -63,8 +62,8 @@ class MultiObjectiveTSP():
         
         tours, cost = tsp.solve_mtsp(starts)
         tour = [tours[0][i]-1 for i in range(1,len(tours[0]))] # remove first position and readjust. FUEL expects this
-        print("tour: ", tour)
-        print("Time: ", time.perf_counter()-start)
+        # print("tour: ", tour)
+        # print("Time: ", time.perf_counter()-start)
         return tour, cost
 
 
