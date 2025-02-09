@@ -55,14 +55,11 @@ RUN pip3 install numba scikit-learn networkx tqdm opencv-python
 
 ## ========== THESIS =============
 
-# clone and update main repo
-RUN --mount=type=ssh cd ~/stem_ws/src \
-    && git clone git@github.com:nikhil-sethi/thesis.git -b refactor thesis \
-    && cd ~/stem_ws/src \ 
-    # && git submodule update --init --recursive  # might take some time
+# Get dependencies
+RUN cd ~/stem_ws/src \ 
     vcs import thesis/dependencies < thesis.repos
 
-# Build third party sw
+# Build dependencies
 # PX4 prerequisites
 RUN apt-get update \
     && apt-get install -y --no-install-recommends  \
@@ -83,21 +80,21 @@ RUN apt-get update \
     && bash ./install_geographiclib_datasets.sh \
     && rm -rf /var/lib/apt/lists/*
 
-RUN cd ~/stem_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
+RUN cd ~/stem_ws/src/thesis/sw/dependencies/PX4-Autopilot/ \
     && bash ./Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx 
 
 # add this to prereqs above
 RUN apt-get install -y --no-install-recommends libgstreamer-plugins-base1.0-dev
 
 # PX4 build
-RUN cd ~/stem_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
+RUN cd ~/stem_ws/src/thesis/sw/dependencies/PX4-Autopilot/ \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && DONT_RUN=1 make -j10 px4_sitl_default gazebo_iris_vision
 
 
 # FUEL prereqs
 # NLOPT
-RUN cd ~/stem_ws/src/thesis/sw/third_party/nlopt \
+RUN cd ~/stem_ws/src/thesis/sw/dependencies/nlopt \
     && mkdir build \
     && cd build \
     && cmake .. \
