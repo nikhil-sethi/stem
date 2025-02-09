@@ -25,8 +25,8 @@
 #include <sensor_model/camera.h>
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <common/io.h>
-#include <common/utils.h>
+#include <stem_utils/io.h>
+#include <stem_utils/utils.h>
 #include <plan_env/raycast.h>
 #include <active_perception/frontier_finder.h>
 #include <active_perception/perception_utils.h>
