@@ -92,10 +92,10 @@
     </include>
     
     <!-- <node ns="$(arg vehicle)" name="attention_map_2d" type="attention_map_2d_node" pkg="attention_map" output="screen" required="true"/> -->
-    <node name="priority_mask_node" type="priority_mask.py" pkg="semantics" output="screen" required="true"/>
-    <node if="$(arg sim)" name="depth_compress" type="depth_compress_node" pkg="img_utils" output="screen" required="true"/>
+    <node name="priority_mask_node" type="priority_mask.py" pkg="stem_semantics" output="screen" required="true"/>
+    <node if="$(arg sim)" name="depth_compress" type="depth_compress_node" pkg="stem_utils" output="screen" required="true"/>
     <include file="$(find stem_bringup)/launch/rviz.launch"/>
-    <node name="motsp_node" type="mo_tsp_node.py" pkg="target_search" output="log" required="true"/>
+    <node name="motsp_node" type="mo_tsp_node.py" pkg="stem_planner" output="log" required="true"/>
     <!-- <node name="stem_metrics" type="metrics_node.py" pkg="metrics" required="true" output="screen"/> -->
-    <node if="$(arg sim)" name="color_cloud" type="repub_node" pkg="gazebo_gt" required="false" output="screen"/>
+    <node if="$(arg sim)" name="color_cloud" type="repub_node" pkg="stem_utils" required="false" output="screen"/>
 </launch>
