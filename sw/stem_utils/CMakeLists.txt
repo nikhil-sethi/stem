@@ -3,6 +3,8 @@ project(stem_utils)
 
 ## System dependencies are found with CMake's conventions
 find_package(Eigen3 REQUIRED)
+find_package(gazebo REQUIRED)
+find_package(PCL REQUIRED)
 find_package(catkin REQUIRED
   geometry_msgs
   roscpp
@@ -14,14 +16,20 @@ find_package(catkin REQUIRED
   tf2_ros
   tf2_eigen
   tf2_geometry_msgs
+  geographic_msgs
+  nav_msgs
+  gazebo_ros
+  gazebo_plugins
 )
 
 catkin_package()
 
 catkin_install_python(PROGRAMS
-  src/img_utils/depth_filler_node.py
-  src/img_utils/rosimg_to_matplotlib.py
-  src/img_utils/depth_compress.py
+  src/perception/depth_filler_node.py
+  src/perception/rosimg_to_matplotlib.py
+  src/perception/depth_compress.py
+  src/simulation/gazebo_repub.py
+  src/simulation/marker_to_pcl.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 include_directories(
@@ -29,9 +37,13 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIRS} 
     ${OpenCV_INCLUDE_DIRS}
-
+    ${Boost_INCLUDE_DIR}
+    ${GAZEBO_INCLUDE_DIRS}
 )
-add_executable(depth_compress_node src/img_utils/depth_compress.cpp)
+
+
+## perception utils
+add_executable(depth_compress_node src/perception/depth_compress.cpp)
 target_link_libraries(depth_compress_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
@@ -43,11 +55,38 @@ target_link_libraries(test_utils
   ${catkin_LIBRARIES}
 )
 
-add_library(${PROJECT_NAME}
-  src/camera.cpp
+add_library(sensor_model
+  src/perception/camera.cpp
 )
 target_link_libraries(sensor_model
   ${catkin_LIBRARIES}
+)
+
+
+## simulation utils
+
+add_executable(fake_localization_node src/simulation/fake_localization_node.cpp)
+target_link_libraries(fake_localization_node
+  ${catkin_LIBRARIES}
+)
+
+add_executable(fake_bag_odom_node src/simulation/fake_bag_odom.cpp)
+target_link_libraries(fake_bag_odom_node
+  ${catkin_LIBRARIES}
+)
+
+add_library(gazebo_gt
+  src/simulation/gt_models.cpp
+)
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+)
+
+add_executable(repub_node src/simulation/pcl_repub.cpp)
+target_link_libraries(repub_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
