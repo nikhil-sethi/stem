@@ -7,6 +7,12 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   stem_msgs
   plan_env
+  pcl_conversions
+)
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 catkin_package()

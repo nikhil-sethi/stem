@@ -22,7 +22,7 @@
 
   <!-- Stem Planning -->
   <exec_depend>plan_manage</exec_depend>
-  <exec_depend>target_search</exec_depend>
+  <exec_depend>stem_planner</exec_depend>
   <exec_depend>waypoint_generator</exec_depend>
 
   <!-- Control -->

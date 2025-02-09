@@ -20,9 +20,15 @@ find_package(catkin REQUIRED
   nav_msgs
   gazebo_ros
   gazebo_plugins
-)
+  pcl_ros
+  pcl_conversions
+  stem_msgs
+  )
 
-catkin_package()
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES sensor_model
+)
 
 catkin_install_python(PROGRAMS
   src/perception/depth_filler_node.py
@@ -39,6 +45,7 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIR}
     ${GAZEBO_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 
 
@@ -78,7 +85,7 @@ target_link_libraries(fake_bag_odom_node
 add_library(gazebo_gt
   src/simulation/gt_models.cpp
 )
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(gazebo_gt
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES}
 )

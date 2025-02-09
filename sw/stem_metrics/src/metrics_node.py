@@ -7,8 +7,8 @@ import time
 import message_filters
 from stem_msgs.msg import float64List
 from stem_msgs.msg import Float64Stamped
-from semantics.segmentation_pipelines import ArUcoSegmenter
-from semantics.priorities import create_label_map
+from stem_semantics.segmentation_pipelines import ArUcoSegmenter
+from stem_semantics.priorities import create_label_map
 from std_srvs.srv import Trigger
 from nav_msgs.msg import Odometry
 import math

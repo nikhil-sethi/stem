@@ -3,22 +3,15 @@ project(stem_planner)
 
 find_package(Eigen3 REQUIRED)
 find_package(catkin REQUIRED
-    common
+    roscpp    
     geometry_msgs
-    roscpp
+    
     active_perception
-    message_generation
     stem_msgs
+    stem_utils
 )
 
 catkin_python_setup()
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
-
 
 catkin_package()
 

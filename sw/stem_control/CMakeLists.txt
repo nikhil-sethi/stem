@@ -17,7 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
   quadrotor_msgs
   tf2_ros
 )
+catkin_python_setup()
 
+catkin_package()
 
 include_directories(
   include
@@ -31,7 +33,6 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 catkin_install_python(PROGRAMS
-  scripts/stem_control/base_interface.py
   src/teleop_if.py
   src/racer_if.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
