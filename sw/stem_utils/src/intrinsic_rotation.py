@@ -22,9 +22,7 @@ def rotate_pose_by_xyz(pose_stamped, angles):
 
     # Create a new PoseStamped with the rotated orientation
     rotated_pose_stamped = PoseStamped()
-    rotated_pose_stamp
-    
-    ed.header = Header()
+    rotated_pose_stamped.header = Header()
     rotated_pose_stamped.header.frame_id = pose_stamped.header.frame_id
     rotated_pose_stamped.header.stamp = rospy.Time.now()
 
