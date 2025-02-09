@@ -55,16 +55,10 @@ RUN pip3 install numba scikit-learn networkx tqdm opencv-python
 
 ## ========== THESIS =============
 
-# Create the workspace
-RUN mkdir -p ~/thesis_ws/src \
-    && cd ~/thesis_ws \
-    && catkin init \
-    && catkin config --extend ${ROS_ROOT} 
-
 # clone and update main repo
-RUN --mount=type=ssh cd ~/thesis_ws/src \
-    && git clone git@github.com:nikhil-sethi/thesis.git thesis \
-    && cd ~/thesis_ws/src \ 
+RUN --mount=type=ssh cd ~/stem_ws/src \
+    && git clone git@github.com:nikhil-sethi/thesis.git -b refactor thesis \
+    && cd ~/stem_ws/src \ 
     # && git submodule update --init --recursive  # might take some time
     vcs import thesis/dependencies < thesis.repos
 
@@ -89,21 +83,21 @@ RUN apt-get update \
     && bash ./install_geographiclib_datasets.sh \
     && rm -rf /var/lib/apt/lists/*
 
-RUN cd ~/thesis_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
+RUN cd ~/stem_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
     && bash ./Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx 
 
 # add this to prereqs above
 RUN apt-get install -y --no-install-recommends libgstreamer-plugins-base1.0-dev
 
 # PX4 build
-RUN cd ~/thesis_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
+RUN cd ~/stem_ws/src/thesis/sw/simulation/PX4-Autopilot/ \
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && DONT_RUN=1 make -j10 px4_sitl_default gazebo_iris_vision
 
 
 # FUEL prereqs
 # NLOPT
-RUN cd ~/thesis_ws/src/thesis/sw/third_party/nlopt \
+RUN cd ~/stem_ws/src/thesis/sw/third_party/nlopt \
     && mkdir build \
     && cd build \
     && cmake .. \
@@ -120,7 +114,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # build everything
-RUN cd ~/thesis_ws \ 
+RUN cd ~/stem_ws \ 
     && source /opt/ros/${ROS_DISTRO}/setup.bash \
     && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server odom_visualization attention_map\
     && catkin build
@@ -130,8 +124,8 @@ RUN cd ~/thesis_ws \
 
 # Source ROS and workspace
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc \
-    && echo "source ~/thesis_ws/devel/setup.bash" >> ~/.bashrc \
-    && echo "source ~/thesis_ws/src/thesis/setup_paths.bash" >> ~/.bashrc
+    && echo "source ~/stem_ws/devel/setup.bash" >> ~/.bashrc \
+    && echo "source ~/stem_ws/src/thesis/setup_paths.bash" >> ~/.bashrc
 
 
 # Output bash terminal

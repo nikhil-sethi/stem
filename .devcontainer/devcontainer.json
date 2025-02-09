@@ -1,0 +1,31 @@
+{
+    "name": "stem-v0.0.1",
+    "build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			"WORKSPACE": "${containerWorkspaceFolder}"
+		},
+        "options": [
+            "--ssh=default"        
+        ]
+    },
+    "remoteUser": "ros",
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt=seccomp=unconfined",
+        "--ipc=host",
+        "--network=host", # use the host network interfaces in the container
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix", # for graphics forwarding
+        "--volume=/dev:/dev", # for accessing devices
+        "--gpus all",
+        "--privileged",
+    ],
+    "containerEnv": {
+        "DEV_WORKSPACE": "${containerWorkspaceFolder}",
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "QT_X11_NO_MITSHM": "1",
+        "NVIDIA_DRIVER_CAPABILITIES": "all",
+        }
+            
+
+}
