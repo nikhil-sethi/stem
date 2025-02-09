@@ -1,6 +1,6 @@
-#include <sensor_model/camera.h>
+#include <stem_utils/camera.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <common/io.h>
+#include <stem_utils/io.h>
 Camera::Camera(const ros::NodeHandle& nh){
     // get these from the parameter server later on
     fx_ = 427.75729;
