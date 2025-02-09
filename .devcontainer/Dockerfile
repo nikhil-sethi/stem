@@ -45,19 +45,12 @@ RUN apt-get update \
 RUN rosdep init \
     && rosdep update
 
-
 # Make GitHub connection to clone private repositories
 RUN mkdir -p -m 0600 ~/.ssh \
     && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
 # Install python packages
 RUN pip3 install numba scikit-learn networkx tqdm opencv-python
-
-## ========== THESIS =============
-
-# Get dependencies
-RUN cd ~/stem_ws/src \ 
-    vcs import thesis/dependencies < thesis.repos
 
 # Build dependencies
 # PX4 prerequisites
@@ -66,6 +59,11 @@ RUN apt-get update \
     protobuf-compiler \ 
     libeigen3-dev \
     libopencv-dev \
+    libdw-dev \
+    xterm \
+    python3-tk \
+    python3-scipy \
+    libgstreamer-plugins-base1.0-dev \
     ros-${ROS_DISTRO}-mavros \
     ros-${ROS_DISTRO}-mavros-extras \
     ros-${ROS_DISTRO}-mavros-msgs \
@@ -79,51 +77,6 @@ RUN apt-get update \
     && wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh \
     && bash ./install_geographiclib_datasets.sh \
     && rm -rf /var/lib/apt/lists/*
-
-RUN cd ~/stem_ws/src/thesis/sw/dependencies/PX4-Autopilot/ \
-    && bash ./Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx 
-
-# add this to prereqs above
-RUN apt-get install -y --no-install-recommends libgstreamer-plugins-base1.0-dev
-
-# PX4 build
-RUN cd ~/stem_ws/src/thesis/sw/dependencies/PX4-Autopilot/ \
-    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && DONT_RUN=1 make -j10 px4_sitl_default gazebo_iris_vision
-
-
-# FUEL prereqs
-# NLOPT
-RUN cd ~/stem_ws/src/thesis/sw/dependencies/nlopt \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
-    && make \
-    && make install # will install the main library in /usr/local/lib
-
-# extra libs 
-RUN apt-get update \ 
-    && apt-get install -y --no-install-recommends \
-    libdw-dev \ 
-    xterm \
-    python3-tk \
-    python3-scipy \
-    && rm -rf /var/lib/apt/lists/*
-
-# build everything
-RUN cd ~/stem_ws \ 
-    && source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && catkin config --skiplist hovergames_control hovergames_mpc_identification hovergames_sim_identification hovergames_flight_identification testbench_identification hovergames_mpc_model_mismatch minimal px4 rviz_plugins multi_map_server odom_visualization attention_map\
-    && catkin build
-
-# fake stop
-# RUN fake_stop
-
-# Source ROS and workspace
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc \
-    && echo "source ~/stem_ws/devel/setup.bash" >> ~/.bashrc \
-    && echo "source ~/stem_ws/src/thesis/setup_paths.bash" >> ~/.bashrc
-
 
 # Output bash terminal
 CMD ["bash"]

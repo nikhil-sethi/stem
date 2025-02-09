@@ -12,11 +12,11 @@ repositories:
   FUEL: 
     type: git
     url: https://github.com/nikhil-sethi/FUEL
-    branch: devel
+    version: devel
   PX4-Autopilot: 
     type: git
     url: https://github.com/nikhil-sethi/PX4-Autopilot
-    branch: devel
+    version: devel
   nlopt: 
     type: git
     url:  https://github.com/stevengj/nlopt.git

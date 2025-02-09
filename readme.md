@@ -1,12 +1,30 @@
 
 
-## Build docker image
+## Build (for users)
 
 Download the 'Dockerfile' from the root of this repository and launch the following command where the file is located.
 ```
 docker build --ssh default -t nikhil:thesis .
 ```
 It should take about 20-30 minutes to build. time to doodle something on your notebook.
+
+## Build (for developers)
+The devcontainer environment in vscode provides a neat way of developing with containers. First install this extension in vscode.
+
+Create a ros workspace and clone the repo
+```bash
+mkdir -p stem_ws/src
+cd src
+git clone git@github.com:nikhil-sethi/thesis.git
+```
+
+Link the .devcontainer folder at the root to let vscode know
+```
+ln -s stem_ws/src/thesis/.devcontainer stem_ws/.devcontainer
+```
+Open vscode in the `stem_ws` directory and choose the 'Reopen in container' option.
+
+
 
 ## Run
 Download and execute the 'docker_run.sh' script located in the root of this repository. 
