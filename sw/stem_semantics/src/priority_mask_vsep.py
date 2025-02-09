@@ -3,8 +3,8 @@
 import rospy
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-from semantics.segmentation_pipelines import ArUcoSegmenter
-from semantics.priorities import GTPriorityMap
+from stem_semantics.segmentation_pipelines import ArUcoSegmenter
+from stem_semantics.priorities import GTPriorityMap
 import numpy as np
 
 class PriorityMask:
