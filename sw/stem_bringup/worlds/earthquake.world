@@ -42,7 +42,7 @@
 
     <include>
       <pose>0 0 0.2 0 0 0</pose>
-      <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/earthquake</uri>
+      <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/earthquake</uri>
     </include> 
 
     <gui fullscreen='0'>

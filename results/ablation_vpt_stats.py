@@ -18,9 +18,9 @@ elif world=="cave":
     lambda_min = 0.015 # detection threshold
 
 
-data_frontier = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/COVERAGE")
-data_ss = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS")
-data_ss_ap = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS+AP")
+data_frontier = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/COVERAGE")
+data_ss = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/SS")
+data_ss_ap = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/SS+AP")
 
 mu_wif_frontier, std_wif_frontier =  get_mean_std(data_frontier, idx=5) 
 mu_wif_ss_ap, std_wif_ss_ap =  get_mean_std(data_ss_ap, idx=5) 

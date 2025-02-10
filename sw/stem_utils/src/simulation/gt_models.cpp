@@ -179,7 +179,7 @@ void TargetGTPlugin::updateTargets(physics::Model_V models){
                     marker.action = visualization_msgs::Marker::ADD;
                     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
                     int idx = mesh_uri.find("://");
-                    marker.mesh_resource = "file:///root/thesis_ws/src/thesis/sw/stem_bringup/models/"+ mesh_uri.substr(idx+3, 100);
+                    marker.mesh_resource = "file:///workspaces/stem_ws/src/thesis/sw/stem_bringup/models/"+ mesh_uri.substr(idx+3, 100);
                     marker.mesh_use_embedded_materials = true;
                     marker_array_msg.markers.push_back(marker);
                 }

@@ -41,7 +41,7 @@
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 #include <std_srvs/Trigger.h>
-#include <target_search/target_viewpoint.h>
+#include <stem_msgs/target_viewpoint.h>
 #include <stem_msgs/Viewpoints.h>
 
 

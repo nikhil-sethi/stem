@@ -26,7 +26,7 @@
       <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
       
       <!-- Need a redefine to give custom path -->
-      <param name ="~exploration/tsp_dir" value="/root/thesis_ws/src/thesis/sw/stem_bringup/resource"/>
+      <param name ="~exploration/tsp_dir" value="/workspaces/stem_ws/src/thesis/sw/stem_bringup/resource"/>
 
     </node>
 

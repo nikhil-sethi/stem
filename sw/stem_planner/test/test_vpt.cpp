@@ -3,7 +3,7 @@
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include <chrono>
-#include <target_search/target_viewpoint.h>
+#include <stem_msgs/target_viewpoint.h>
 
 using namespace Eigen;
 class Object{

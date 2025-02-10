@@ -8,33 +8,39 @@ docker build --ssh default -t nikhil:thesis .
 ```
 It should take about 20-30 minutes to build. time to doodle something on your notebook.
 
+Download and execute the 'docker_run.sh' script located in the root of this repository. 
+```
+./docker_run.sh 
+```
+
 ## Build (for developers)
 The devcontainer environment in vscode provides a neat way of developing with containers. First install this extension in vscode.
 
 Create a ros workspace and clone the repo
 ```bash
 mkdir -p stem_ws/src
-cd src
+cd stem_ws/src
 git clone git@github.com:nikhil-sethi/thesis.git
+cd ../..
 ```
 
 Link the .devcontainer folder at the root to let vscode know
-```
+```bash
 ln -s stem_ws/src/thesis/.devcontainer stem_ws/.devcontainer
+xhost +local:root # to enable display in the docker container
+code .
 ```
 Open vscode in the `stem_ws` directory and choose the 'Reopen in container' option.
 
+> Note: To display on Rviz, it is highly recommended that you have a dedicated GPU and uncomment the `--gpus=all` and `"NVIDIA_DRIVER_CAPABILITIES": "all"` line in the `.devcontainer/devcontainer.json` file. Displaying everything on a CPU can lead to significant lag.
 
 
-## Run
-Download and execute the 'docker_run.sh' script located in the root of this repository. 
-```
-example ./docker_run.sh 
-```
+
 Inside the container:
 
 Simulation:
 ```bash
+source devel/setup.bash
 source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
 
 roslaunch stem_bringup main.launch sim:=true world:=earthquake

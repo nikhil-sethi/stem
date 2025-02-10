@@ -87,7 +87,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -181,7 +181,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -275,7 +275,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -369,7 +369,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/Radio/meshes/Radio.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -1147,7 +1147,7 @@
         <pose>0 0 0.02 0.04 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/dog/meshes/dog.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/dog/meshes/dog.dae</uri>
             <scale>0.02 0.02 0.02</scale>
           </mesh>
         </geometry>
@@ -1235,7 +1235,7 @@
         <pose>0 0 0.02 0.04 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/root/thesis_ws/src/thesis/sw/stem_bringup/models/dog/meshes/dog.dae</uri>
+            <uri>/workspaces/stem_ws/src/thesis/sw/stem_bringup/models/dog/meshes/dog.dae</uri>
             <scale>0.02 0.02 0.02</scale>
           </mesh>
         </geometry>

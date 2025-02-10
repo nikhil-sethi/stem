@@ -35,7 +35,6 @@ catkin build
 # Source ROS and workspace
 echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc 
 echo "source $ws_path/devel/setup.bash" >> ~/.bashrc 
-echo "source /workspaces/src/thesis/setup_paths.bash" >> ~/.bashrc
 echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$repo_path/sw/stem_bringup/models" >> ~/.bashrc
 echo "export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:$repo_path/sw/dependencies/PX4-Autopilot/:$repo_path/sw/dependencies/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/" >> ~/.bashrc
-echo " source $repo_path/sw/dependencies/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash $repo_path/sw/dependencies/PX4-Autopilot $repo_path/sw/dependencies/PX4-Autopilot/build/px4_sitl_default
+echo "source $repo_path/sw/dependencies/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash $repo_path/sw/dependencies/PX4-Autopilot $repo_path/sw/dependencies/PX4-Autopilot/build/px4_sitl_default" >> ~/.bashrc

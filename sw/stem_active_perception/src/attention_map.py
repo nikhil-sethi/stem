@@ -156,7 +156,7 @@ def get_attention_map(rgb_image):
 # class FakeAttention
 
 if __name__=="__main__":
-    # arr = plt.imread("/root/thesis_ws/src/thesis/planner/view2.png")
+    # arr = plt.imread("/workspaces/stem_ws/src/thesis/planner/view2.png")
     # arr_att = get_attention_map(arr)
     # plt.imshow(arr_att, cmap='jet')
 

@@ -16,14 +16,14 @@
         "--network=host", # use the host network interfaces in the container
         "--volume=/tmp/.X11-unix:/tmp/.X11-unix", # for graphics forwarding
         "--volume=/dev:/dev", # for accessing devices
-        "--gpus=all",
+        // "--gpus=all",
         "--privileged",
     ],
     "containerEnv": {
         "DEV_WORKSPACE": "${containerWorkspaceFolder}",
         "DISPLAY": "${localEnv:DISPLAY}",
         "QT_X11_NO_MITSHM": "1",
-        "NVIDIA_DRIVER_CAPABILITIES": "all",
+        // "NVIDIA_DRIVER_CAPABILITIES": "all",
         },
     "postCreateCommand": "chmod +x ${containerWorkspaceFolder}/src/thesis/setup.sh && bash ${containerWorkspaceFolder}/src/thesis/setup.sh"            
 

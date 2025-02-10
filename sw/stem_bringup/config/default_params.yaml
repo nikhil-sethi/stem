@@ -129,7 +129,7 @@ exploration:
   # higher values resist changes and act more sluggish but result in better, stable movements
   # lower values decrease flight times but with poor mapping
   w_dir: 1.5
-  tsp_dir: "/root/thesis_ws/src/thesis/sw/planning/FUEL/fuel_planner/utils/lkh_tsp_solver/resource/" # YAML limitation: needs to be remapped from outside if you want relative paths. 
+  tsp_dir: "/workspaces/stem_ws/src/thesis/sw/planning/FUEL/fuel_planner/utils/lkh_tsp_solver/resource/" # YAML limitation: needs to be remapped from outside if you want relative paths. 
   relax_time: 1.0
 
 frontier:

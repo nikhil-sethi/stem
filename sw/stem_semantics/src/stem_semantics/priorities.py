@@ -12,7 +12,7 @@ class BasePriorityMap():
     def __init__(self, target, context, p_max) -> None:
         self.target = target
         self.situation = context
-        self.label_map = create_label_map("/root/thesis_ws/src/thesis/sw/stem_semantics/config/labels.txt") #TODO make this relative later on
+        self.label_map = create_label_map("/workspaces/stem_ws/src/thesis/sw/stem_semantics/config/labels.txt") #TODO make this relative later on
         self.objects = list(self.label_map.keys())
         self.p_max = p_max
         self.p_min = 1 # exploration baseline

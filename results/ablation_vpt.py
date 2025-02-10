@@ -5,7 +5,7 @@ plt.style.use('ggplot')
 from plotting import plot_info_gain, plot_semantic_on_wif
 
 def plot_wif_and_target(ax, color, world, label):
-    df = pd.read_csv(f"/root/thesis_ws/src/thesis/results/data/{world}/{label}/{label}.csv")
+    df = pd.read_csv(f"/workspaces/stem_ws/src/thesis/results/data/{world}/{label}/{label}.csv")
     if label=='FUEL':
         label='COVERAGE'
     elif label=='SS':
