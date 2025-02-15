@@ -1,6 +1,6 @@
 
 
-## Build docker image
+## Build (for users)
 
 Download the 'Dockerfile' from the root of this repository and launch the following command where the file is located.
 ```
@@ -8,30 +8,60 @@ docker build --ssh default -t nikhil:thesis .
 ```
 It should take about 20-30 minutes to build. time to doodle something on your notebook.
 
-## Run
-Download and execute the 'docker_run.sh' script located in the root of this repository.
+Download and execute the 'docker_run.sh' script located in the root of this repository. 
+```
+./docker_run.sh 
+```
+
+## Build (for developers)
+The devcontainer environment in vscode provides a neat way of developing with containers. First install this extension in vscode.
+
+Create a ros workspace and clone the repo
+```bash
+mkdir -p stem_ws/src
+cd stem_ws/src
+git clone git@github.com:nikhil-sethi/thesis.git
+cd ../..
+```
+
+Link the .devcontainer folder at the root to let vscode know
+```bash
+ln -s stem_ws/src/thesis/.devcontainer stem_ws/.devcontainer
+xhost +local:root # to enable display in the docker container
+code .
+```
+Open vscode in the `stem_ws` directory and choose the 'Reopen in container' option.
+
+> Note: To display on Rviz, it is highly recommended that you have a dedicated GPU and uncomment the `--gpus=all` and `"NVIDIA_DRIVER_CAPABILITIES": "all"` line in the `.devcontainer/devcontainer.json` file. Displaying everything on a CPU can lead to significant lag.
+
+
 
 Inside the container:
 
 Simulation:
 ```bash
-terminal 1: roslaunch bringup rviz.launch # preferable to host the master on rviz
+source devel/setup.bash
+source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
 
-terminal 2: source src/thesis/setup_paths.bash  && # need this for px4 sitl and gazebo
-            roslaunch bringup main.launch vehicle:=iris_depth_camera sim:=true
-
-terminal 3 (for now): rosrun attention_map attention_processor_node
+roslaunch stem_bringup main.launch sim:=true world:=earthquake
 ```
+
 If everything went well you should see an axis marker for the drone and camera in Rviz along with occupancy map. If not, go to the debugging section.
 
+cmdline options
+`sim`: true if you want simulation only
+'gui': true if you want Gazebo graphics. Note, this might slow cause processing problems on less powerful PCs
+world: 'earthquake' or 'cave'. Empty is also possible; it simulates a small lab environment.
+
+> the first time you run the simulation after building the docker image, it might take some time for gazebo to download assets. As Tame Impala says: Let it happen.
 
 Hardware testing
 
 Make sure the ROS_MASTER_URI and ROS_IP are set correctly on both the OBC and your laptop.
 - Your PC
 ```bash
-terminal 1: roslaunch bringup main.launch sim:=false
-terminal 2: roslaunch bringup rviz.launch
+terminal 1: roslaunch stem_bringup main.launch sim:=false
+terminal 2: roslaunch stem_bringup rviz.launch
 ```
 
 - OBC (Nvidia Jetson Xavier)

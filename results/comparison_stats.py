@@ -17,10 +17,10 @@ elif world=="cave":
     MAX_ENTROPY = 1208686.75
     lambda_min = 0.02 # detection threshold
 
-data_fuel = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL")
-data_fuel_f0_i10 = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/FUEL_MOD")
-data_vsep = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/VSEP")
-data_ss_ap = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS+AP")
+data_fuel = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/FUEL")
+data_fuel_f0_i10 = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/FUEL_MOD")
+data_vsep = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/VSEP")
+data_ss_ap = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/SS+AP")
 
 mu_wif_fuel, std_wif_fuel =  get_mean_std(data_fuel, idx=5) 
 mu_wif_fuel_f0_i10, std_wif_fuel_f0_i10, =  get_mean_std(data_fuel_f0_i10, idx=5) 

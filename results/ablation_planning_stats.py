@@ -16,10 +16,10 @@ elif world=="cave":
     lambda_min = 0.015 # detection threshold
 
 
-data_greedy = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/GREEDY")
-data_lkh = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/LKH")
-data_motsp = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS+AP")
-# data_ss = process_directory(f"/root/thesis_ws/src/thesis/results/data/{world}/SS")
+data_greedy = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/GREEDY")
+data_lkh = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/LKH")
+data_motsp = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/SS+AP")
+# data_ss = process_directory(f"/workspaces/stem_ws/src/thesis/results/data/{world}/SS")
 
 mu_wig_greedy, std_wig_greedy =  get_mean_std(data_greedy, idx=5) 
 mu_wig_lkh, std_wig_lkh =  get_mean_std(data_lkh, idx=5)

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>stem_utils</name>
+  <version>0.0.0</version>
+  <description>The stem_utils package</description>
+
+  <maintainer email="niksethi@tudelft.nl">Nikhil Sethi</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>compressed_depth_image_transport</depend>
+  <depend>image_transport</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_eigen</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>geographic_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>gazebo_ros</depend>
+  <depend>gazebo_plugins</depend>
+
+</package>

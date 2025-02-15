@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>stem_planner</name>
+  <version>0.0.0</version>
+  <description>The stem_planner package</description>
+  <maintainer email="niksethi@tudelft.nl">Nikhil Sethi</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>active_perception</depend>
+  <depend>stem_msgs</depend>
+  <depend>stem_utils</depend>
+</package>

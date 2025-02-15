@@ -3,3 +3,4 @@
 *.nbc
 *.nbi
 __pycache__
+sw/stem_bringup/resource

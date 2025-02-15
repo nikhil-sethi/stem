@@ -1,0 +1,17 @@
+<launch>
+
+    <!-- <node name="tf_world_map" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 map world 10)"/>
+    <node name="tf_base_cam" pkg="tf" type="static_transform_publisher" args="0.065 0 0.065 -0.5 0.5 -0.5 0.5 odom camera_link 10"/> -->
+
+    <node name="bag" pkg="rosbag" type="play" args="--clock /root/2024-06-25-19-44-51.bag">
+        <remap from="/gazebo/model_states" to="gazebo/model_states_repub"/>
+        <remap from="/camera/color/image_raw/compressed" to="/camera/color/image_raw/repub/compressed/"/>
+    </node>
+    <node name="repub" pkg="gazebo_gt" type="gazebo_repub.py"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="gui" value="true"/>
+        <arg name="world_name" value="$(find stem_bringup)/worlds/cave_repub.world"/>
+    </include>
+    <node name="sd" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(find stem_bringup)/models/mantis_depth_vision/mantis_depth_vision.sdf -model iris_vision -x 0 -y 0 -z 0.05 -R 0 -P 0 -Y 0"/>
+
+</launch>
