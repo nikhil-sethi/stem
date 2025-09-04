@@ -32,5 +32,5 @@ docker run -it \
     --gpus all \
     --runtime=nvidia \
     --env=NVIDIA_DRIVER_CAPABILITIES=all  \
-    uav-target-search \
+    stem \
     bash
